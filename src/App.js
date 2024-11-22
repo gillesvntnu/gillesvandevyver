@@ -27,11 +27,11 @@ function App() {
           <ScrollToTop />
           <Navbar />
           <Switch>
-            <Route path='/gillesvandevyver' exact component={Home} />
-            <Route path='/gillesvandevyver/projects/data-analytics' component={DataAnalytics} />
-            <Route path='/gillesvandevyver/projects/finding-hearts' component={FindingHearts} />
-            <Route path='/gillesvandevyver/projects/pattern-recognition' component={PatternRecognition} />
-            <Route path='/gillesvandevyver/projects/natural-language-processing' component={NaturalLanguageProcessing} />
+            <Route path='/' exact component={Home} />
+            <Route path='/projects/data-analytics' component={DataAnalytics} />
+            <Route path='/projects/finding-hearts' component={FindingHearts} />
+            <Route path='/projects/pattern-recognition' component={PatternRecognition} />
+            <Route path='/projects/natural-language-processing' component={NaturalLanguageProcessing} />
           </Switch>
         </HashRouter>
       </>
