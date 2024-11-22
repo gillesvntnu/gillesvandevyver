@@ -321,14 +321,21 @@ h1, h2, h3 {
     font-size: 2rem; /* Decrease font size */
   }
 
-
-
   .slider {
     --slide-width: 80vw;
     --slide-margin: 5vh;
     width: var(--slide-width);
   }
 
+  // on mobile, make space for browser's controls at the bottom
 
+  .slide__image-wrapper {
+    height: calc(75vh - var(--navbar-height));
+    top: 5%;
+  }
+
+  .slider__controls {
+    top: calc(79vh - var(--navbar-height));
+    }
 }
 
