@@ -1,0 +1,194 @@
+/* CommonStyles.css */
+.project-page-container {
+    padding: 2rem;
+    font-family: sans-serif;
+    color: #333;
+    font-weight: normal;
+    margin: 0 15%; /* Apply margin only to the left and right */
+    line-height: 1.4; /* Adjust this value to increase or decrease the spacing */
+}
+
+.project-page-container * {
+    font-weight: normal;
+}
+
+.project-page-container h1 {
+    font-size: 2.5em;
+    margin-bottom: 1.25rem;
+    font-weight: normal;
+}
+
+.project-page-container p {
+    font-size: 1.2em;
+    line-height: 1.6;
+    margin-bottom: 1.25rem;
+    font-weight: normal;
+}
+
+
+.tldr {
+    background-color: #e0e0e0;
+    padding-left: 1vh;
+    padding-right: 1vh;
+    padding-top: 1vh;
+    border-left: 0.3rem solid #252947;
+    font-weight: normal;
+}
+
+.project-page-container strong {
+    font-weight: bold;
+}
+
+.horizontal-card,
+.vertical-card {
+    display: flex;
+    margin-top: 3vh;
+    border: 1px solid #ddd; /* Lighter border color */
+    padding: 1rem; /* Add padding */
+    border-radius: 2vh; /* Rounded corners */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle box shadow */
+}
+
+.vertical-card {
+    flex-direction: column;
+    align-items: center;
+}
+
+.horizontal-card p,
+.vertical-card p {
+    flex: 1;
+}
+
+.horizontal-card h2,
+.vertical-card h2 {
+    margin-bottom: 1vh;
+}
+
+.image-container {
+    max-width: 38.2%;
+    min-width: 38.2%;
+    text-align: center;
+    font-size: 0.621rem;
+    color: gray; /* Set the caption color to gray */
+    padding: 1rem; /* Add padding */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+}
+
+
+.project-page-image-right,
+.project-page-image-left {
+    height: auto;
+    align-self: center; /* Center the image vertically */
+    max-width: 100%; /* Ensure image takes full width */
+}
+
+.project-page-image-right {
+    margin-left: 2vh;
+}
+
+.project-page-image-left {
+    margin-right: 2vh;
+}
+
+.vertical-card .image-container {
+    max-width: 62.1%; /* Increase the max-width for part 2 */
+    min-width: 62.1%; /* Increase the min-width for part 2 */
+
+}
+
+
+@media (max-width: 1536px) {
+    .project-page-container {
+        margin: 0 10%; /* Reduce margin for screens smaller than 1024px */
+    }
+
+    .image-container {
+        max-width: 50%;
+        min-width: 50%;
+    }
+}
+
+
+
+/* Media query for smaller screens */
+@media (max-width: 1280px) {
+
+
+    .horizontal-card,
+    .vertical-card {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .horizontal-card-left {
+        flex-direction: column-reverse;
+    }
+
+    .image-container {
+        max-width: 62.1%; /* Increase the max-width for part 2 */
+        min-width: 62.1%; /* Increase the min-width for part 2 */
+    }
+}
+
+/* Media query for smaller screens */
+@media (max-width: 1024px) {
+    .project-page-container {
+        margin: 0 7%; /* Reduce margin for screens smaller than 1024px */
+    }
+
+    .image-container {
+        max-width: 75%; /* Increase the max-width for part 2 */
+        min-width: 75%; /* Increase the min-width for part 2 */
+    }
+}
+
+/* Media query for smaller screens */
+@media (max-width: 768px) {
+    .project-page-container {
+        margin: 0 5%; /* Reduce margin for screens smaller than 1024px */
+    }
+
+    .image-container {
+        max-width: 100%;
+        min-width: 100%;
+    }
+
+    .project-page-image-right,
+    .project-page-image-left {
+        margin: 2vh 0 0 0; /* Adjust margin for images */
+        max-width: 100%; /* Ensure images take full width */
+    }
+}
+
+@media (max-width: 480px) {
+    .project-page-container {
+        margin: 0 2%; /* Further reduce margin for very small screens */
+    }
+}
+
+
+.inline-image-container {
+    display: block; /* Ensure the container is a block element */
+    text-align: center; /* Center the content */
+    margin: 0 auto; /* Center the container itself */
+    vertical-align: middle; /* Align the container with the text */
+}
+
+.inline-image-container img {
+    display: block; /* Ensure the image is a block element */
+    max-width: 62.1%;
+    height: auto;
+    margin: 0 auto 0.5rem auto; /* Center the image and add some space between the image and the caption */
+}
+
+.inline-image-container p {
+    font-size: 0.8em;
+    color: gray; /* Set the caption color to gray */
+    margin: 0;
+}
+
+
+

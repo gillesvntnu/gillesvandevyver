@@ -1,0 +1,142 @@
+.contact-section-container {
+  background-color: #101522;
+  padding: 2rem 1rem; /* Reduce padding */
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  color: #fff;
+  min-height: 20vh; /* Reduce minimum height */
+  font-family: 'Roboto', sans-serif; /* Use a modern font */
+}
+
+.contact-section-container h2 {
+  margin-bottom: 2rem; /* Reduce margin */
+  font-size: 3rem; /* Reduce font size */
+  font-weight: 700;
+  color: #f0f0f0;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.contact-section {
+  text-align: center;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.left-column {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.contact-column {
+  flex: 1;
+  min-width: 30rem;
+  margin: 1rem;
+}
+
+.contact-section p {
+  margin: 0.5rem 0;
+  font-size: 1.2rem; /* Reduce font size */
+}
+
+.contact-item {
+  position: relative;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem; /* Reduce margin between contact items */
+  transition: transform 0.2s ease-in-out;
+}
+
+.contact-item i {
+  margin-right: 10px;
+}
+
+.copy-icon {
+  position: relative;
+  right: 0;
+  margin-left: 10px;
+  font-size: 0.8em;
+  color: #888;
+  opacity: 0;
+  transition: opacity 0.2s ease-in-out;
+}
+
+.copy-icon.visible {
+  opacity: 1;
+}
+
+.contact-section h6 {
+  margin: 0.5rem 0;
+  font-size: 1.5rem; /* Reduce font size */
+}
+
+.copied-message {
+  margin-top: 10px;
+  font-size: 1.2rem;
+  color: white;
+  opacity: 0;
+  transition: opacity 0.2s ease-in-out;
+  text-align: left;
+}
+
+.copied-message.visible {
+  opacity: 1;
+}
+
+.bottom-whitespace {
+  height: 2rem; /* Reduce whitespace height */
+}
+
+.copyright {
+  margin-top: 1rem; /* Reduce margin */
+  font-size: 0.8rem; /* Reduce font size */
+  color: #888;
+  text-align: center;
+}
+
+@media (max-width: 768px) {
+  .contact-section-container h2 {
+    font-size: 3rem;
+    margin-bottom: 2rem;
+  }
+
+  .contact-column {
+    min-width: 100%;
+    margin: 0.5rem 0;
+  }
+
+  .contact-section p {
+    font-size: 1.2rem;
+  }
+
+  .contact-section h6 {
+    font-size: 1.5rem;
+  }
+
+  .copied-message {
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .contact-section-container h2 {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .contact-section p {
+    font-size: 1rem;
+  }
+
+  .contact-section h6 {
+    font-size: 1.2rem;
+  }
+
+  .copied-message {
+    font-size: 0.8rem;
+  }
+}

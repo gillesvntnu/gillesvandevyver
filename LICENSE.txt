@@ -1,0 +1,3 @@
+Copyright (c) Gilles Van De Vyver
+
+All rights reserved.

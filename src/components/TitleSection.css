@@ -1,0 +1,142 @@
+/* Keyframes for animations */
+@keyframes fadeInUp {
+  from {
+    opacity: 1;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* General styles */
+.title-image, .title-section h1, .title-section p {
+  opacity: 1;
+}
+
+.centered-button {
+  opacity: 1;
+}
+
+.title-image-container {
+  width: 441px;
+}
+
+.title-image {
+  max-width: 100%;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.centered-button {
+  margin-top: 5vh;
+  padding: 1.5vh 3vw;
+  font-size: 1.2vw;
+  cursor: pointer;
+  color: #fff;
+  background: linear-gradient(90deg, #1c1b1b 0%, #2d3772 100%);
+  border: none;
+  border-radius: 1vw;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: background-color 0.3s ease, transform 0.3s ease;
+  font-family: 'Poppins', sans-serif;
+  letter-spacing: 0.1vw;
+}
+
+.centered-button:hover {
+  background: linear-gradient(90deg, #363535 0%, #007bff 100%);
+  transform: translateY(-0.2vw);
+}
+
+:root {
+  --navbar-height: 5rem; /* assuming 1rem = 16px */
+}
+
+/* Title section styles */
+.title-section {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  min-height: calc(100vh - var(--navbar-height));
+  width: 100%;
+  padding: 20px;
+  box-sizing: border-box;
+  background-color: #f5f5f5;
+  text-align: center;
+  padding-right: 20px;
+  padding-left: 20px;
+}
+
+.title-section-text {
+  width: 75%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.title-section h1 {
+  color: #333;
+  font-size: 3vw;
+  font-weight: 700;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+  font-family: 'Roboto', sans-serif;
+}
+
+.title-section p {
+  color: #555;
+  font-size: 1.5vw;
+  font-family: 'Roboto', Arial, sans-serif;
+  margin: 10px;
+  max-width: 800px;
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+@media (max-width: 768px) {
+  .title-section {
+    flex-direction: column;
+    justify-content: flex-start;
+  }
+
+  .title-section-text h1 {
+    font-size: 5vw;
+  }
+
+  .title-section-text p {
+    font-size: 4vw;
+  }
+
+  .centered-button {
+    font-size: 4vw;
+    padding: 1vh 5vw;
+    border-radius: 6vw;
+  }
+
+  .title-image-container {
+    height: 282px;
+    margin-bottom: 10px;
+    margin-top: 30px;
+  }
+
+  .title-image {
+    width: 50%;
+    height: 100%;
+  }
+}
+
+@media (min-width: 1200px) {
+  .title-section {
+    padding-right: 120px;
+    padding-left: 80px;
+  }
+}

@@ -1,0 +1,17 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+.home,
+
+
+/* Center the button */
+.centered-button {
+  display: block;
+  margin: 20px auto; /* Adjust the margin as needed */
+  padding: 10px 20px; /* Adjust the padding as needed */
+  font-size: 1rem; /* Adjust the font size as needed */
+  cursor: pointer;
+}
