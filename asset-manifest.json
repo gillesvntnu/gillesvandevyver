@@ -1,6 +1,6 @@
 {
   "files": {
-    "main.css": "/gillesvandevyver/static/css/main.0b988cb6.css",
+    "main.css": "/gillesvandevyver/static/css/main.0a4a226b.css",
     "main.js": "/gillesvandevyver/static/js/main.ec8c2b7d.js",
     "static/media/vit1.png": "/gillesvandevyver/static/media/vit1.cfccadac46f695909a6a.png",
     "static/media/vit2.png": "/gillesvandevyver/static/media/vit2.1d1ea18c6a47c73cbb58.png",
@@ -32,11 +32,11 @@
     "static/media/fa-v4compatibility.ttf": "/gillesvandevyver/static/media/fa-v4compatibility.0f6cb412603527bda691.ttf",
     "static/media/fa-v4compatibility.woff2": "/gillesvandevyver/static/media/fa-v4compatibility.6cfec8414be20e2c3426.woff2",
     "index.html": "/gillesvandevyver/index.html",
-    "main.0b988cb6.css.map": "/gillesvandevyver/static/css/main.0b988cb6.css.map",
+    "main.0a4a226b.css.map": "/gillesvandevyver/static/css/main.0a4a226b.css.map",
     "main.ec8c2b7d.js.map": "/gillesvandevyver/static/js/main.ec8c2b7d.js.map"
   },
   "entrypoints": [
-    "static/css/main.0b988cb6.css",
+    "static/css/main.0a4a226b.css",
     "static/js/main.ec8c2b7d.js"
   ]
 }
