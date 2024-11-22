@@ -11,7 +11,7 @@ const slideData = [
     headline: 'Data Analytics',
     button: 'Find out more',
     src: data_analytics_pic,
-    link: '/gillesvandevyver/projects/data-analytics'
+    link: '/projects/data-analytics'
   },
   //{
   //  index: 1,
@@ -25,21 +25,21 @@ const slideData = [
     headline: 'Finding hearts',
     button: 'Find out more',
     src: computer_vision_pic,
-    link: '/gillesvandevyver/projects/finding-hearts'
+    link: '/projects/finding-hearts'
   },
   {
     index: 2,
     headline: 'Natural language processing',
     button: 'Find out more',
     src: chatbot_pic,
-    link: '/gillesvandevyver/projects/natural-language-processing'
+    link: '/projects/natural-language-processing'
   },
   {
     index: 3,
     headline: 'Pattern recognition',
     button: 'Find out more',
     src: spectrogram_pic,
-    link: '/gillesvandevyver/projects/pattern-recognition'
+    link: '/projects/pattern-recognition'
   }
 ];
   
