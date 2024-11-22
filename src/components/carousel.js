@@ -8,7 +8,7 @@ import chatbot_pic from '../images/chatbot.jpeg'
 const slideData = [
   {
     index: 0,
-    headline: 'Data Analytics 5',
+    headline: 'Data Analytics',
     button: 'Find out more',
     src: data_analytics_pic,
     link: '#/projects/data-analytics'

@@ -41,16 +41,16 @@
 .centered-button {
   margin-top: 5vh;
   padding: 1.5vh 3vw;
-  font-size: 1.2vw;
+  font-size: max(1.5vw,1.5vh);
   cursor: pointer;
   color: #fff;
   background: linear-gradient(90deg, #1c1b1b 0%, #2d3772 100%);
   border: none;
-  border-radius: 1vw;
+  border-radius: max(1.5vw,1.5vh);
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   transition: background-color 0.3s ease, transform 0.3s ease;
   font-family: 'Poppins', sans-serif;
-  letter-spacing: 0.1vw;
+  letter-spacing: max(0.1vw,0.1vh);
 }
 
 .centered-button:hover {
@@ -87,7 +87,7 @@
 
 .title-section h1 {
   color: #333;
-  font-size: 3vw;
+  font-size: max(3vw, 3vh);
   font-weight: 700;
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
   font-family: 'Roboto', sans-serif;
@@ -95,11 +95,18 @@
 
 .title-section p {
   color: #555;
-  font-size: 1.5vw;
+  font-size: max(2vw, 2vh);
   font-family: 'Roboto', Arial, sans-serif;
   margin: 10px;
   max-width: 800px;
   text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+@media (min-width: 1200px) {
+  .title-section {
+    padding-right: 120px;
+    padding-left: 80px;
+  }
 }
 
 @media (max-width: 768px) {
@@ -108,18 +115,15 @@
     justify-content: flex-start;
   }
 
-  .title-section-text h1 {
-    font-size: 5vw;
-  }
 
   .title-section-text p {
-    font-size: 4vw;
+    font-size: max(3vw, 3vh);
   }
 
   .centered-button {
-    font-size: 4vw;
+    font-size: max(2.5vw,2.5vh);
     padding: 1vh 5vw;
-    border-radius: 6vw;
+    border-radius: max(2vw,2vh);
   }
 
   .title-image-container {
@@ -134,9 +138,7 @@
   }
 }
 
-@media (min-width: 1200px) {
-  .title-section {
-    padding-right: 120px;
-    padding-left: 80px;
-  }
-}
+
+
+
+

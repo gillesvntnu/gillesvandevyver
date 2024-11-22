@@ -130,7 +130,7 @@ h1, h2, h3 {
 // =========================
 
 .slider {
-  --slide-size: 70vh;
+  --slide-size: 70vw;
   --slide-margin: 4vmin;
   
   margin: 0 auto;
@@ -309,7 +309,32 @@ h1, h2, h3 {
   height: 100vh;
   max-height: 100vh;
   overflow-x: hidden;
+  overflow-y: hidden;
   padding-top: 5vh;
 }
 
+// small screens
+@media (max-width: 768px) {
+  .slide__headline {
+    font-size: 2rem; /* Decrease font size */
+  }
+
+  .slide__content {
+
+    > * + * {
+      margin-top: -2vh;
+    }
+  }
+
+  .slide__headline {
+    font-size: 2rem; /* Decrease font size */
+    margin-top: 2rem; /* Add margin to move it down */
+  }
+
+  .slide__action {
+    margin-top: 2rem; /* Add margin to move it down */
+  }
+
+
+}
 
