@@ -330,12 +330,11 @@ h1, h2, h3 {
   // on mobile, make space for browser's controls at the bottom
 
   .slide__image-wrapper {
-    height: calc(75vh - var(--navbar-height));
-    top: 5%;
+    height: calc(70vh - var(--navbar-height));
   }
 
   .slider__controls {
-    top: calc(79vh - var(--navbar-height));
+    top: calc(74vh - var(--navbar-height));
     }
 }
 
