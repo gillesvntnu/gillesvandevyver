@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { BrowserRouter as Router, Switch, Route, useLocation } from 'react-router-dom';
+import { BrowserRouter as HashRouter, Switch, Route, useLocation } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import './App.css';
 import Home from './components/pages/Home';
@@ -23,7 +23,7 @@ function ScrollToTop() {
 function App() {
   return (
       <>
-        <Router>
+        <HashRouter>
           <ScrollToTop />
           <Navbar />
           <Switch>
@@ -33,7 +33,7 @@ function App() {
             <Route path='/gillesvandevyver/projects/pattern-recognition' component={PatternRecognition} />
             <Route path='/gillesvandevyver/projects/natural-language-processing' component={NaturalLanguageProcessing} />
           </Switch>
-        </Router>
+        </HashRouter>
       </>
   );
 }
