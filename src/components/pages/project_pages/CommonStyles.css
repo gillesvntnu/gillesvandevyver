@@ -165,7 +165,7 @@
 
 @media (max-width: 480px) {
     .project-page-container {
-        margin: 0 2%; /* Further reduce margin for very small screens */
+        margin: 0 0%; /* Further reduce margin for very small screens */
     }
 }
 
@@ -190,5 +190,9 @@
     margin: 0;
 }
 
+a {
+    word-break: break-all; /* Allows long words to be broken and wrap to the next line */
+    white-space: normal; /* Ensures the text wraps normally */
+}
 
 
