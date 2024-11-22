@@ -1,6 +1,6 @@
 {
-  "homepage": "https://gillesvntnu.github.io/gillesvandevyver/#",
-  "name": "personal-webpage",
+  "homepage": "https://ayushjaink8.github.io/gillesvandevyver/#",
+  "name": "gillesvandevyver",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
@@ -11,7 +11,7 @@
     "core-js": "^3.38.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "react-router-dom": "^5.2.0",
+    "react-router-dom": "^7.0.0",
     "react-scripts": "^5.0.1",
     "sass": "^1.80.1",
     "webpack": "^5.94.0",

@@ -35,7 +35,7 @@ function Navbar() {
             </div>
             <ul className={click ? 'nav-menu active' : 'nav-menu'}>
               <li className='nav-item'>
-                <Link to='/gillesvandevyver' className='nav-links' onClick={
+                <Link to='/' className='nav-links' onClick={
                   handleHomeClick
                 }>
                   Home
@@ -47,11 +47,11 @@ function Navbar() {
                 </div>
                 {dropdown && (
                     <div className='dropdown-content'>
-                      <Link to='/gillesvandevyver/projects/data-analytics' onClick={closeMobileMenu}>Data Analytics</Link>
-                      <Link to='/gillesvandevyver/projects/finding-hearts' onClick={closeMobileMenu}>Finding hearts</Link>
-                      <Link to='/gillesvandevyver/projects/natural-language-processing' onClick={closeMobileMenu}>Natural language
+                      <Link to='/projects/data-analytics' onClick={closeMobileMenu}>Data Analytics</Link>
+                      <Link to='/projects/finding-hearts' onClick={closeMobileMenu}>Finding hearts</Link>
+                      <Link to='/projects/natural-language-processing' onClick={closeMobileMenu}>Natural language
                         processing</Link>
-                      <Link to='/gillesvandevyver/projects/pattern-recognition' onClick={closeMobileMenu}>Pattern recognition</Link>
+                      <Link to='/projects/pattern-recognition' onClick={closeMobileMenu}>Pattern recognition</Link>
                     </div>
                 )}
               </li>

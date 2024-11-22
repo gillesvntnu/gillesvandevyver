@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { BrowserRouter as HashRouter, Switch, Route, useLocation } from 'react-router-dom';
+import { HashRouter, Routes, Route, useLocation } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import './App.css';
 import Home from './components/pages/Home';
@@ -26,13 +26,13 @@ function App() {
         <HashRouter>
           <ScrollToTop />
           <Navbar />
-          <Switch>
-            <Route path='/' exact component={Home} />
-            <Route path='/projects/data-analytics' component={DataAnalytics} />
-            <Route path='/projects/finding-hearts' component={FindingHearts} />
-            <Route path='/projects/pattern-recognition' component={PatternRecognition} />
-            <Route path='/projects/natural-language-processing' component={NaturalLanguageProcessing} />
-          </Switch>
+          <Routes>
+            <Route path='/' element={<Home />} />
+            <Route path='/projects/data-analytics' element={<DataAnalytics />} />
+            <Route path='/projects/finding-hearts' element={<FindingHearts />} />
+            <Route path='/projects/pattern-recognition' element={<PatternRecognition />} />
+            <Route path='/projects/natural-language-processing' element={<NaturalLanguageProcessing />} />
+          </Routes>
         </HashRouter>
       </>
   );
