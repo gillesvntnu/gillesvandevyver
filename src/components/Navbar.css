@@ -104,6 +104,8 @@
   text-decoration: none;
   display: block;
   transition: background-color 0.3s ease;
+  white-space: normal;
+  word-break: keep-all;
 }
 
 /* Hover effect for dropdown items */
