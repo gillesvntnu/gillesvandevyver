@@ -1,16 +1,14 @@
 import React, { useEffect } from 'react';
 import '../../App.css';
 import TitleSection from '../TitleSection';
-import ContactSection from '../ContactSection'; // Import the new ContactSection component
+import ContactSection from '../ContactSection';
 import Carousel from '../carousel';
-
-// Function to handle smooth scrolling to the next section with an offset
 
 export const getScrollPosition = (sectionId) => {
     const currentSection = document.getElementById(sectionId);
     if (currentSection) {
-        const navbarHeight = document.querySelector('nav')?.offsetHeight || 0; // Fallback to 0 if navbar not found
-        const sectionOffsetTop = currentSection.offsetTop; // Calculate offsetTop relative to the document
+        const navbarHeight = document.querySelector('nav')?.offsetHeight || 0;
+        const sectionOffsetTop = currentSection.offsetTop;
         const targetScrollPosition = sectionOffsetTop - navbarHeight;
         return targetScrollPosition;
     }
@@ -18,59 +16,49 @@ export const getScrollPosition = (sectionId) => {
 }
 
 export const scrollToSection = (sectionId, scrollY = 0) => {
-
     const sectionOffsetTop = getScrollPosition(sectionId);
-
-    // log the values to the console
     console.log('sectionOffsetTop:', sectionOffsetTop);
-
     window.scrollTo({
-      top: sectionOffsetTop,
-      behavior: 'smooth',
+        top: sectionOffsetTop,
+        behavior: 'smooth',
     });
 };
 
 function Home() {
-  useEffect(() => {
-    const adjustPadding = () => {
-      const navbar = document.querySelector('nav'); // Adjust the selector to match your navbar
-      const titleSectionParagraph = document.querySelector('.title-section p');
-      const screenWidth = window.innerWidth;
+    useEffect(() => {
+        document.title = 'gillesvandevyver.com';
 
-      if (navbar && titleSectionParagraph) {
-        const navbarHeight = navbar.offsetHeight;
+        const adjustPadding = () => {
+            const navbar = document.querySelector('nav');
+            const titleSectionParagraph = document.querySelector('.title-section p');
+            const screenWidth = window.innerWidth;
 
-        //if (screenWidth >= 768) { // Only adjust padding for screens wider than 768px
-        //  const navbarHeight = navbar.offsetHeight;
-        //  titleSectionParagraph.style.paddingTop = `${navbarHeight}px`;
-        //} else {
-        //  // reset to default padding
-        //  titleSectionParagraph.style.paddingTop = '0';
-        //}
-      }
-    };
+            if (navbar && titleSectionParagraph) {
+                const navbarHeight = navbar.offsetHeight;
+            }
+        };
 
-    adjustPadding(); // Initial adjustment
-    window.addEventListener('resize', adjustPadding); // Adjust on window resize
+        adjustPadding();
+        window.addEventListener('resize', adjustPadding);
 
-    return () => {
-      window.removeEventListener('resize', adjustPadding); // Cleanup on component unmount
-    };
-  }, []); // Empty dependency array to run only once after the component mounts
+        return () => {
+            window.removeEventListener('resize', adjustPadding);
+        };
+    }, []);
 
-  return (
-    <>
-      <div id="titleSection" className="title-section">
-        <TitleSection />
-      </div>
-      <div id="carousel">
-        <Carousel />
-      </div>
-      <div id="contactSection">
-        <ContactSection />
-      </div>
-    </>
-  );
+    return (
+        <>
+            <div id="titleSection" className="title-section">
+                <TitleSection />
+            </div>
+            <div id="carousel">
+                <Carousel />
+            </div>
+            <div id="contactSection">
+                <ContactSection />
+            </div>
+        </>
+    );
 }
 
 export default Home;

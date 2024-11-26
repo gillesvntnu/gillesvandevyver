@@ -2,8 +2,8 @@ import React from 'react';
 import './carousel.scss';
 import data_analytics_pic from '../images/data_analytics/data_analytics.jpeg'
 import computer_vision_pic from '../images/finding_hearts/computer_vision_meddical_imaging.jpg'
-import spectrogram_pic from '../images/sound_waves.jpeg'
-import chatbot_pic from '../images/chatbot.jpeg'
+import spectrogram_pic from '../images/pattern-recognition/sound_waves.jpeg'
+import chatbot_pic from '../images/nlp/chatbot.jpeg'
 
 const slideData = [
   {
