@@ -1,7 +1,7 @@
 {
   "files": {
-    "main.css": "/static/css/main.b56d1551.css",
-    "main.js": "/static/js/main.69b13fdc.js",
+    "main.css": "/static/css/main.7b3ed402.css",
+    "main.js": "/static/js/main.9e214247.js",
     "static/media/vit1.png": "/static/media/vit1.cfccadac46f695909a6a.png",
     "static/media/vit2.png": "/static/media/vit2.1d1ea18c6a47c73cbb58.png",
     "static/media/agreement_pic5.png": "/static/media/agreement_pic5.6bb3cf72fd223bb26a5d.png",
@@ -24,18 +24,18 @@
     "static/media/quality_pic1.png": "/static/media/quality_pic1.cb24a315876a927e369c.png",
     "static/media/data_analytics.jpeg": "/static/media/data_analytics.ade8b19a203098c00612.jpeg",
     "static/media/powerbi_sweco_example_no_bg.png": "/static/media/powerbi_sweco_example_no_bg.7a6fa8ddc4b55a58072e.png",
+    "static/media/nlp1.png": "/static/media/nlp1.160b8169c0ca0e4f77e2.png",
     "static/media/fa-regular-400.ttf": "/static/media/fa-regular-400.17a6e1aebccdbaa39e78.ttf",
     "static/media/sarimax.png": "/static/media/sarimax.f652b18a9ff78b8355c0.png",
-    "static/media/nlp1.png": "/static/media/nlp1.ce032a6cf484b82a6692.png",
     "static/media/fa-regular-400.woff2": "/static/media/fa-regular-400.bc3722686635b5f86132.woff2",
     "static/media/fa-v4compatibility.ttf": "/static/media/fa-v4compatibility.0f6cb412603527bda691.ttf",
     "static/media/fa-v4compatibility.woff2": "/static/media/fa-v4compatibility.6cfec8414be20e2c3426.woff2",
     "index.html": "/index.html",
-    "main.b56d1551.css.map": "/static/css/main.b56d1551.css.map",
-    "main.69b13fdc.js.map": "/static/js/main.69b13fdc.js.map"
+    "main.7b3ed402.css.map": "/static/css/main.7b3ed402.css.map",
+    "main.9e214247.js.map": "/static/js/main.9e214247.js.map"
   },
   "entrypoints": [
-    "static/css/main.b56d1551.css",
-    "static/js/main.69b13fdc.js"
+    "static/css/main.7b3ed402.css",
+    "static/js/main.9e214247.js"
   ]
 }
