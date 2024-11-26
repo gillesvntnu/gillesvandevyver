@@ -6,7 +6,6 @@ import { scrollToSection } from './pages/Home'; // Import the scrollToNextSectio
 function TitleSection() {
   return (
       <div className="title-section" id="titleSection">
-
           <div className='title-section-text'>
               <p>Gilles Van De Vyver</p>
               <h1>Software engineering & <br/> Machine learning expertise</h1>
