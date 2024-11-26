@@ -315,11 +315,21 @@ h1, h2, h3 {
   padding-top: 5vh;
 }
 
+
+
+
 // small screens
 @media (max-width: 768px) {
   .slide__headline {
     font-size: 2rem; /* Decrease font size */
   }
+
+  .slider__controls .btn {
+    --size: 3rem; /* Increase size */
+    background-color: rgb(45, 55, 114);
+    border-radius: 50%; /* Make the background circular */
+  }
+
 
   .slider {
     --slide-width: 80vw;
