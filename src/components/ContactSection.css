@@ -15,7 +15,8 @@
   font-size: 3rem; /* Reduce font size */
   font-weight: 700;
   color: #f0f0f0;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+  text-shadow: 0.67vw 0.67vw 1.33vw rgba(0, 0, 0, 0.1);
+
 }
 
 .contact-section {
@@ -49,16 +50,18 @@
   align-items: center;
   margin-bottom: 1rem; /* Reduce margin between contact items */
   transition: transform 0.2s ease-in-out;
+  word-break: break-all; /* Allows long words to be broken and wrap to the next line */
+  white-space: normal; /* Ensures the text wraps normally */
 }
 
 .contact-item i {
-  margin-right: 10px;
+  margin-right: 3.33vw;
 }
 
 .copy-icon {
   position: relative;
   right: 0;
-  margin-left: 10px;
+  margin-left: 3.33vw;
   font-size: 0.8em;
   color: #888;
   opacity: 0;
@@ -75,7 +78,7 @@
 }
 
 .copied-message {
-  margin-top: 10px;
+  margin-top: 3.33vh;
   font-size: 1.2rem;
   color: white;
   opacity: 0;
