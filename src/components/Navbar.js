@@ -2,15 +2,19 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import './Navbar.css';
-import {getScrollPosition, scrollToSection} from './pages/Home'; // Import the scrollToNextSection function
+import {scrollToSection} from './pages/Home'; // Import the scrollToNextSection function
 
 function Navbar() {
   const [click, setclick] = useState(false);
   const [dropdown, setDropdown] = useState(false);
 
   const handleClick = () => setclick(!click);
-  const closeMobileMenu = () => setclick(false);
+
   const toggleDropdown = () => setDropdown(!dropdown);
+  const closeMobileMenu = () => {
+    setclick(false);
+    toggleDropdown();
+  }
 
 
   const scrollTo = (sectionId) => {
