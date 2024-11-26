@@ -127,6 +127,8 @@
         flex-direction: column-reverse;
     }
 
+
+
     .image-container {
         max-width: 62.1%; /* Increase the max-width for part 2 */
         min-width: 62.1%; /* Increase the min-width for part 2 */
@@ -160,6 +162,10 @@
     .project-page-image-left {
         margin: 2vh 0 0 0; /* Adjust margin for images */
         max-width: 100%; /* Ensure images take full width */
+    }
+
+    .vertical-card .image-container{
+        max-width: 100%;
     }
 }
 
