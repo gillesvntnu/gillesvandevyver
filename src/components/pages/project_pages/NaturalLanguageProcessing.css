@@ -26,6 +26,4 @@
 .resized-nlp-image{
     max-width: 100%;
     width: 72%; /* Display the image at 50% of its true size */
-    align-self: flex-start;
-
 }
