@@ -47,7 +47,8 @@
   position: relative;
   cursor: pointer;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
+  justify-content: flex-start;
   margin-bottom: 1rem; /* Reduce margin between contact items */
   transition: transform 0.2s ease-in-out;
   word-break: break-all; /* Allows long words to be broken and wrap to the next line */
@@ -55,13 +56,14 @@
 }
 
 .contact-item i {
-  margin-right: 3.33vw;
+  margin-right: 1vw;
 }
+
 
 .copy-icon {
   position: relative;
   right: 0;
-  margin-left: 3.33vw;
+  margin-left: 0.5vw;
   font-size: 0.8em;
   color: #888;
   opacity: 0;
@@ -99,6 +101,10 @@
   font-size: 0.8rem; /* Reduce font size */
   color: #888;
   text-align: center;
+}
+
+.link-item:hover {
+  text-decoration: underline;
 }
 
 @media (max-width: 768px) {
