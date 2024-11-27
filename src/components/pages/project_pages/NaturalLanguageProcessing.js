@@ -19,7 +19,7 @@ const NaturalLanguageProcessing = () => {
                 <div>
                     <h2> Word2Mat: using matrices to capture word order in NLP </h2>
                     <p>
-                        It's 2019, a group of deep learning students decide to do our own deep learning project.
+                        It's 2019, a group of deep learning students decide to do their own deep learning project.
                         Our interest gets sparked by the idea of Word2Vec, a model that represents words as vectors.
                         This basically means words a re represented as a series of numbers that a computer can
                         understand.
