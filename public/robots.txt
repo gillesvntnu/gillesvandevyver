@@ -1,0 +1,3 @@
+User-agent: *
+Disallow:
+Sitemap: https://gillesvandevyver.com/sitemap.xml
