@@ -9,7 +9,7 @@ function DataAnalytics() {
             <h1>Data Analytics</h1>
             <div className="tldr">
                 <p><strong>TL;DR: </strong>
-                    The data analytics projects at ArcelorMittal and Sweco Belgium focused on using statistics
+                    Data analytics projects at ArcelorMittal and Sweco Belgium with focus on using statistics
                     and classical machine learning to analyze employee behavior and work environments,
                     emphasizing clear reporting and data visualization.
                     <br/>

@@ -17,7 +17,7 @@ function FindingHearts() {
             <h1>Finding Hearts</h1>
             <div className="tldr">
                 <p><strong>TL;DR: </strong>
-                    Academic projects focused on robust and real-time image analysis for cardiac ultrasound during my
+                    Academic projects focused on reliable and real-time image analysis for cardiac ultrasound during my
                     PhD.
                     The results are published in two first-author papers. YouTube demos:&nbsp;
                     <a href="https://www.youtube.com/watch?v=mj4PZtV6kkE&ab_channel=gillesvandevyver">Demo 1</a>,&nbsp;

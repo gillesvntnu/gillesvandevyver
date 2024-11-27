@@ -11,8 +11,7 @@ function PatternRecognition() {
             <div className="tldr">
                 <p><strong>TL;DR: </strong>
                     The first project uses supervised deep learning for tennis court detection in satellite images.
-                    The second project uses the vision transformer for anomaly detection in spectrograms from sound
-                    waves of industrial machines.
+                    The second project uses the vision transformer for detecting broken industrial machines.
                     <br/>
                     <strong>Technologies used:</strong> Python, TensorFlow (Keras), YOLOv4, Vision Transformer
                 </p>
