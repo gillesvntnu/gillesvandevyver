@@ -61,7 +61,7 @@ function PatternRecognition() {
                             Adapted Spectrogram Transformer for Unsupervised Cross-Domain Acoustic Anomaly Detection
                         </a> <br/> <br/>
                         It presented as a lecture at the&nbsp;
-                        <a href="https://www.apsipa2022.org/">
+                        <a href="https://ieeexplore.ieee.org/xpl/conhome/9979726/proceeding">
                             2022 APSIPA annual summit and conference
                         </a>
                     </p>
