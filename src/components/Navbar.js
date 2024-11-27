@@ -11,9 +11,11 @@ function Navbar() {
   const handleClick = () => setclick(!click);
 
   const toggleDropdown = () => setDropdown(!dropdown);
-  const closeMobileMenu = () => {
-    setclick(false);
+  const closeMobileMenu = () => setclick(false);
+
+  const handleProjectsClick= () => {
     toggleDropdown();
+    closeMobileMenu();
   }
 
 
@@ -51,11 +53,11 @@ function Navbar() {
                 </div>
                 {dropdown && (
                     <div className='dropdown-content'>
-                      <Link to='/projects/data-analytics' onClick={closeMobileMenu}>Data Analytics</Link>
-                      <Link to='/projects/finding-hearts' onClick={closeMobileMenu}>Finding hearts</Link>
-                      <Link to='/projects/natural-language-processing' onClick={closeMobileMenu}>Natural language
+                      <Link to='/projects/data-analytics' onClick={handleProjectsClick}>Data Analytics</Link>
+                      <Link to='/projects/finding-hearts' onClick={handleProjectsClick}>Finding hearts</Link>
+                      <Link to='/projects/natural-language-processing' onClick={handleProjectsClick}>Natural language
                         processing</Link>
-                      <Link to='/projects/pattern-recognition' onClick={closeMobileMenu}>Pattern recognition</Link>
+                      <Link to='/projects/pattern-recognition' onClick={handleProjectsClick}>Pattern recognition</Link>
                     </div>
                 )}
               </li>
