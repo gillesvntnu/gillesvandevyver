@@ -1,8 +1,31 @@
 // src/components/Navbar.js
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import './Navbar.css';
-import {scrollToSection} from './pages/Home'; // Import the scrollToNextSection function
+import { scrollToSection } from './pages/Home';
+
+const ContactLink = ({ onClick }) => {
+  const navigate = useNavigate();
+  const [navigationComplete, setNavigationComplete] = useState(false);
+
+  useEffect(() => {
+    if (navigationComplete) {
+      onClick();
+      setNavigationComplete(false);
+    }
+  }, [navigationComplete, onClick]);
+
+  const handleClick = () => {
+    navigate('/');
+    setNavigationComplete(true);
+  };
+
+  return (
+      <div className='nav-links' onClick={handleClick}>
+        Contact
+      </div>
+  );
+};
 
 function Navbar() {
   const [click, setclick] = useState(false);
@@ -13,23 +36,18 @@ function Navbar() {
   const toggleDropdown = () => setDropdown(!dropdown);
   const closeMobileMenu = () => setclick(false);
 
-  const handleProjectsClick= () => {
+  const handleProjectsClick = () => {
     toggleDropdown();
     closeMobileMenu();
-  }
-
+  };
 
   const scrollTo = (sectionId) => {
-    window.scrollTo({
-      top: 0,
-      behavior: 'instant',
-    });
     scrollToSection(sectionId);
-    }
+  };
 
   const handleHomeClick = () => {
     closeMobileMenu();
-    scrollTo("titleSection");
+    scrollTo('titleSection');
   };
 
   return (
@@ -41,9 +59,7 @@ function Navbar() {
             </div>
             <ul className={click ? 'nav-menu active' : 'nav-menu'}>
               <li className='nav-item'>
-                <Link to='/' className='nav-links' onClick={
-                  handleHomeClick
-                }>
+                <Link to='/' className='nav-links' onClick={handleHomeClick}>
                   Home
                 </Link>
               </li>
@@ -55,19 +71,18 @@ function Navbar() {
                     <div className='dropdown-content'>
                       <Link to='/projects/data-analytics' onClick={handleProjectsClick}>Data Analytics</Link>
                       <Link to='/projects/finding-hearts' onClick={handleProjectsClick}>Finding hearts</Link>
-                      <Link to='/projects/natural-language-processing' onClick={handleProjectsClick}>Natural language
-                        processing</Link>
+                      <Link to='/projects/natural-language-processing' onClick={handleProjectsClick}>Natural language processing</Link>
                       <Link to='/projects/pattern-recognition' onClick={handleProjectsClick}>Pattern recognition</Link>
                     </div>
                 )}
               </li>
               <li className='nav-item'>
-                <a href='#' className='nav-links' onClick={() => {
+                <ContactLink onClick={() => {
+                  // go to home
+
                   closeMobileMenu();
-                  scrollTo("contactSection");
-                }}>
-                  Contact
-                </a>
+                  scrollTo('contactSection');
+                }} />
               </li>
             </ul>
           </div>
