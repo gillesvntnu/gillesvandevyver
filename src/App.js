@@ -9,6 +9,7 @@ import DataAnalytics from "./components/pages/project_pages/DataAnalytics";
 import FindingHearts from "./components/pages/project_pages/FindingHearts";
 import PatternRecognition from "./components/pages/project_pages/PatternRecognition";
 import NaturalLanguageProcessing from './components/pages/project_pages/NaturalLanguageProcessing';
+import PdfViewer from './components/PdfViewer';
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -32,6 +33,7 @@ function App() {
             <Route path='/projects/finding-hearts' element={<FindingHearts />} />
             <Route path='/projects/pattern-recognition' element={<PatternRecognition />} />
             <Route path='/projects/natural-language-processing' element={<NaturalLanguageProcessing />} />
+            <Route path="/recommendation-letter-Sam-Michiels" element={<PdfViewer />} />
           </Routes>
         </HashRouter>
       </>
