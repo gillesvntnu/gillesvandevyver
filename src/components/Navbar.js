@@ -77,9 +77,12 @@ function Navbar() {
                 )}
               </li>
               <li className='nav-item'>
+                <Link to='/recommendation-letter-Sam-Michiels' className='nav-links' onClick={closeMobileMenu}>
+                  Recommendation
+                </Link>
+              </li>
+              <li className='nav-item'>
                 <ContactLink onClick={() => {
-                  // go to home
-
                   closeMobileMenu();
                   scrollTo('contactSection');
                 }} />

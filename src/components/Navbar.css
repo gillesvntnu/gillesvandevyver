@@ -145,7 +145,7 @@
     left: 0;
     opacity: 1;
     z-index: 1;
-    height: 20vh;
+    height: auto;
   }
 
   .nav-links {
