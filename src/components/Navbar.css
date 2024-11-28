@@ -5,7 +5,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  font-size: 1.2rem;
+  font-size: 1.2em;
   position: sticky;
   top: 0;
   z-index: 999;
@@ -51,12 +51,13 @@
 .nav-links {
   color: #fff;
   height: 100%;
-  width: 12vw;
   display: flex;
   align-items: center;
   justify-content: center;
   text-decoration: none;
   padding: 0.5rem 1rem;
+  flex: 1 1 0;
+  min-width: 10vw;
 }
 
 .nav-links:hover {
