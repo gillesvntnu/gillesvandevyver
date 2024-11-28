@@ -1,11 +1,12 @@
 {
   "files": {
-    "main.css": "/static/css/main.0e5ad04e.css",
-    "main.js": "/static/js/main.d89c4c89.js",
+    "main.css": "/static/css/main.d1b35830.css",
+    "main.js": "/static/js/main.2ec8e4cc.js",
     "static/media/vit1.png": "/static/media/vit1.cfccadac46f695909a6a.png",
     "static/media/vit2.png": "/static/media/vit2.1d1ea18c6a47c73cbb58.png",
     "static/media/agreement_pic5.png": "/static/media/agreement_pic5.6bb3cf72fd223bb26a5d.png",
     "static/media/quality_pic4.png": "/static/media/quality_pic4.3f13ed4c71744e8c9bd6.png",
+    "static/media/Recommendation_letter_Sam_Michiels.pdf": "/static/media/Recommendation_letter_Sam_Michiels.dbf5b230f088367c92ae.pdf",
     "static/media/fa-solid-900.ttf": "/static/media/fa-solid-900.07ed6d5fa32c1d54af0f.ttf",
     "static/media/tennis_courts.png": "/static/media/tennis_courts.a115dd5ae0cd75e1e011.png",
     "static/media/agreement_pic3.png": "/static/media/agreement_pic3.9f48db8398d620387379.png",
@@ -31,11 +32,11 @@
     "static/media/fa-v4compatibility.ttf": "/static/media/fa-v4compatibility.0f6cb412603527bda691.ttf",
     "static/media/fa-v4compatibility.woff2": "/static/media/fa-v4compatibility.6cfec8414be20e2c3426.woff2",
     "index.html": "/index.html",
-    "main.0e5ad04e.css.map": "/static/css/main.0e5ad04e.css.map",
-    "main.d89c4c89.js.map": "/static/js/main.d89c4c89.js.map"
+    "main.d1b35830.css.map": "/static/css/main.d1b35830.css.map",
+    "main.2ec8e4cc.js.map": "/static/js/main.2ec8e4cc.js.map"
   },
   "entrypoints": [
-    "static/css/main.0e5ad04e.css",
-    "static/js/main.d89c4c89.js"
+    "static/css/main.d1b35830.css",
+    "static/js/main.2ec8e4cc.js"
   ]
 }
