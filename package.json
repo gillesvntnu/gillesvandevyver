@@ -16,6 +16,8 @@
     "react-pdf": "^9.1.1",
     "react-router-dom": "^7.0.0",
     "react-scripts": "^5.0.1",
+    "react-shadow": "^20.5.0",
+    "react-svg": "^16.2.0",
     "sass": "^1.80.1",
     "sitemap": "^8.0.0",
     "webpack": "^5.94.0",
