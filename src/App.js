@@ -33,7 +33,7 @@ function App() {
             <Route path='/projects/finding-hearts' element={<FindingHearts />} />
             <Route path='/projects/pattern-recognition' element={<PatternRecognition />} />
             <Route path='/projects/natural-language-processing' element={<NaturalLanguageProcessing />} />
-            <Route path="/recommendation-letter-Sam-Michiels-pdf" element={<PdfViewer />} />
+            <Route path="/recommendation-pdf" element={<PdfViewer />} />
             <Route path="/recommendation" element={
               <JSXViewer/>
             } />
