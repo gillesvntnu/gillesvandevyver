@@ -55,8 +55,13 @@ function DataAnalytics() {
                     <br/><br/>
                     My contribution to this project involved analyzing the data using time series analysis and
                     forecasting. A common method for time series forecasting is the so-called ARIMA model,
-                    which was a good starting point for this project. When analyzing the data, I noticed that
-                    the safety numbers were largely influenced by the time of the year and week.
+                    which was a good starting point for this project.
+                    These kinds of models are much simpler than neural networks and in this case, this simplicity
+                    was a strength.
+                    The model was easy to interpret and worked well with the relatively small
+                    dataset.
+                    When analyzing the data, I noticed that the safety numbers were largely influenced by the
+                    time of the year and week.
                     For instance, incidents tended to be higher on Fridays and Mondays or just before the summer
                     holidays.
                     I also noticed a pattern where, after major events like safety
