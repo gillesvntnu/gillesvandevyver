@@ -27,15 +27,15 @@ const slideData = [
     src: computer_vision_pic,
     link: '#/projects/finding-hearts'
   },
+  //{
+  //  index: 2,
+  //  headline: 'Natural language processing',
+  //  button: 'Find out more',
+  //  src: chatbot_pic,
+  //  link: '#/projects/natural-language-processing'
+  //},
   {
     index: 2,
-    headline: 'Natural language processing',
-    button: 'Find out more',
-    src: chatbot_pic,
-    link: '#/projects/natural-language-processing'
-  },
-  {
-    index: 3,
     headline: 'Pattern recognition',
     button: 'Find out more',
     src: spectrogram_pic,

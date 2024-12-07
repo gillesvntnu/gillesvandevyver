@@ -32,7 +32,6 @@ function App() {
             <Route path='/projects/data-analytics' element={<DataAnalytics />} />
             <Route path='/projects/finding-hearts' element={<FindingHearts />} />
             <Route path='/projects/pattern-recognition' element={<PatternRecognition />} />
-            <Route path='/projects/natural-language-processing' element={<NaturalLanguageProcessing />} />
             <Route path="/recommendation-pdf" element={<PdfViewer />} />
             <Route path="/recommendation" element={
               <JSXViewer/>
