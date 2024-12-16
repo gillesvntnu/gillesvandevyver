@@ -57,7 +57,7 @@ function ContactSection() {
                 onMouseEnter={() => setHoveredItem('linkedin')}
                 onMouseLeave={() => setHoveredItem(null)}
             >
-              <i className="fab fa-linkedin"></i> linkedin.com/in/gilles-van-de-vyver/
+              <i className="fab fa-linkedin"></i> LinkedIn
             </p>
             <p
                 className='contact-item link-item'
@@ -73,7 +73,7 @@ function ContactSection() {
                 onMouseEnter={() => setHoveredItem('github')}
                 onMouseLeave={() => setHoveredItem(null)}
             >
-              <i className="fab fa-github"></i> github.com/gillesvandevyver
+              <i className="fab fa-github"></i> GitHub
             </p>
           </div>
         </section>

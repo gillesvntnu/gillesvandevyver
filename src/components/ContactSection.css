@@ -107,6 +107,10 @@
   text-decoration: underline;
 }
 
+.contact-item .fa-graduation-cap {
+  font-size: 0.7em;
+}
+
 @media (max-width: 768px) {
   .contact-section-container h2 {
     font-size: 3rem;
