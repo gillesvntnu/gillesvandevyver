@@ -71,6 +71,7 @@ function Navbar() {
                     <div className='dropdown-content'>
                       <Link to='/projects/data-analytics' onClick={handleProjectsClick}>Data Analytics</Link>
                       <Link to='/projects/finding-hearts' onClick={handleProjectsClick}>Finding hearts</Link>
+                      <Link to='/projects/generative-ai' onClick={handleProjectsClick}>Generative AI</Link>
                       <Link to='/projects/pattern-recognition' onClick={handleProjectsClick}>Pattern recognition</Link>
                     </div>
                 )}

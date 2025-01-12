@@ -3,7 +3,7 @@ import './carousel.scss';
 import data_analytics_pic from '../images/data_analytics/data_analytics.jpeg'
 import computer_vision_pic from '../images/finding_hearts/computer_vision_meddical_imaging.jpg'
 import spectrogram_pic from '../images/pattern-recognition/sound_waves.jpeg'
-import chatbot_pic from '../images/nlp/chatbot.jpeg'
+import gen_ai_transition from '../images/gen_ai/gen_ai_transition.gif'
 
 const slideData = [
   {
@@ -36,6 +36,13 @@ const slideData = [
   //},
   {
     index: 2,
+    headline: 'Generative AI',
+    button: 'Find out more',
+    src: gen_ai_transition,
+    link: '#/projects/generative-ai'
+  },
+  {
+    index: 3,
     headline: 'Pattern recognition',
     button: 'Find out more',
     src: spectrogram_pic,

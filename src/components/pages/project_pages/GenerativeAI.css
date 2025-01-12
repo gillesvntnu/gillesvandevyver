@@ -1,0 +1,29 @@
+.arrow {
+    position: absolute;
+    font-size: 1em; /* Adjust size of the arrow */
+    top: -0.4em; /* Adjust the vertical positioning */
+    left: 0; /* Ensure the arrow stays aligned with the letter */
+    z-index: 1; /* Make sure the arrow stays behind the text */
+    transform: translate(-0.2em, -0.85em); /* Fine-tune the horizontal and vertical positioning */
+
+}
+
+.arrow-wrapper {
+    position: relative; /* This creates a containing block for the arrow */
+    display: inline; /* Ensure it takes up no extra horizontal space */
+    line-height: 1; /* Adjust line height if needed */
+    white-space: nowrap; /* Prevents breaking onto a new line */
+
+}
+
+.equation {
+    display: flex;
+    white-space: nowrap; /* Prevents breaking onto a new line */
+    justify-content: center;
+    align-items: center;
+}
+
+.resized-nlp-image{
+    max-width: 100%;
+    width: 72%; /* Display the image at 50% of its true size */
+}
