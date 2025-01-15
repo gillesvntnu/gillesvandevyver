@@ -28,7 +28,7 @@ function ContactSection() {
       <div className='contact-section-container'>
         <h2>Get in touch</h2>
         <section className='contact-section'>
-          <div className='contact-column left-column'>
+          <div className='contact-column'>
             <p
                 className='contact-item'
                 onClick={() => copyToClipboard('gillesvandevyver@hotmail.be', 'E-mail address')}
@@ -49,8 +49,6 @@ function ContactSection() {
               <span className={`copy-icon ${hoveredItem === 'phone' ? 'visible' : ''}`}><i
                   className="fas fa-copy"></i></span>
             </p>
-          </div>
-          <div className='contact-column'>
             <p
                 className='contact-item link-item'
                 onClick={() => goToLink('https://www.linkedin.com/in/gilles-van-de-vyver/')}
@@ -58,22 +56,6 @@ function ContactSection() {
                 onMouseLeave={() => setHoveredItem(null)}
             >
               <i className="fab fa-linkedin"></i> LinkedIn
-            </p>
-            <p
-                className='contact-item link-item'
-                onClick={() => goToLink('https://scholar.google.com/citations?hl=en&user=PFAH_MMAAAAJ', 'Google Scholar profile')}
-                onMouseEnter={() => setHoveredItem('scholar')}
-                onMouseLeave={() => setHoveredItem(null)}
-            >
-              <i className="fas fa-graduation-cap"></i> Google Scholar
-            </p>
-            <p
-                className='contact-item link-item'
-                onClick={() => goToLink('https://github.com/gillesvandevyver', 'GitHub profile')}
-                onMouseEnter={() => setHoveredItem('github')}
-                onMouseLeave={() => setHoveredItem(null)}
-            >
-              <i className="fab fa-github"></i> GitHub
             </p>
           </div>
         </section>
