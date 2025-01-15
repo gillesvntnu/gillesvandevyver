@@ -67,3 +67,14 @@
  * @license https://react-pdf-viewer.dev/license
  * @copyright 2019-2023 Nguyen Huu Phuoc <me@phuoc.ng>
  */
+
+/**
+ * react-router v7.1.1
+ *
+ * Copyright (c) Remix Software Inc.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE.md file in the root directory of this source tree.
+ *
+ * @license MIT
+ */
