@@ -23,19 +23,24 @@
   text-align: center;
   display: flex;
   flex-wrap: wrap;
-  justify-content: center;
+  justify-content: space-around; /* Ensure columns are evenly spaced */
 }
 
 .left-column {
   display: flex;
   flex-direction: column;
-  justify-content: center;
 }
 
-.contact-column {
-  flex: 1;
-  min-width: 30rem;
-  margin: 1rem;
+.contact-item {
+  position: relative;
+  cursor: pointer;
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-start;
+  margin-bottom: 1rem; /* Reduce margin between contact items */
+  transition: transform 0.2s ease-in-out;
+  word-break: break-all; /* Allows long words to be broken and wrap to the next line */
+  white-space: normal; /* Ensures the text wraps normally */
 }
 
 .contact-section p {

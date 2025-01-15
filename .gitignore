@@ -7,3 +7,5 @@ public/videos/
 build/
 
 .idea/
+
+package-lock.json

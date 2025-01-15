@@ -49,15 +49,23 @@ function ContactSection() {
               <span className={`copy-icon ${hoveredItem === 'phone' ? 'visible' : ''}`}><i
                   className="fas fa-copy"></i></span>
             </p>
-            <p
-                className='contact-item link-item'
-                onClick={() => goToLink('https://www.linkedin.com/in/gilles-van-de-vyver/')}
-                onMouseEnter={() => setHoveredItem('linkedin')}
-                onMouseLeave={() => setHoveredItem(null)}
-            >
-              <i className="fab fa-linkedin"></i> LinkedIn
-            </p>
-          </div>
+              <p
+                  className='contact-item link-item'
+                  onClick={() => goToLink('https://www.linkedin.com/in/gilles-van-de-vyver/')}
+                  onMouseEnter={() => setHoveredItem('linkedin')}
+                  onMouseLeave={() => setHoveredItem(null)}
+              >
+                <i className="fab fa-linkedin"></i> LinkedIn
+              </p>
+              <p
+                  className='contact-item link-item'
+                  onClick={() => goToLink('https://github.com/gillesvntnu', 'GitHub profile')}
+                  onMouseEnter={() => setHoveredItem('github')}
+                  onMouseLeave={() => setHoveredItem(null)}
+              >
+                <i className="fab fa-github"></i> GitHub
+              </p>
+            </div>
         </section>
         <div className='bottom-whitespace'>
           <h6 className={`copied-message ${visible ? 'visible' : ''}`}>{copiedMessage}</h6>
