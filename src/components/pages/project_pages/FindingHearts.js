@@ -9,6 +9,7 @@ import quality_pic1 from '../../../images/finding_hearts/quality_pic1.png';
 import quality_pic2 from '../../../images/finding_hearts/quality_pic2.png';
 import quality_pic3 from '../../../images/finding_hearts/quality_pic3.png';
 import quality_pic4 from '../../../images/finding_hearts/quality_pic4.png';
+import quality_pic5 from '../../../images/finding_hearts/quality_pic5.jpg';
 
 
 function FindingHearts() {
@@ -30,14 +31,22 @@ function FindingHearts() {
             <div className="horizontal-card horizontal-card-left">
                 <div className="image-container">
                     <br/> <br/> <br/> <br/><br/><br/><br/>
-                    <img src={agrrement_pic1} alt="" className="project-page-image-left"/>
+                    <a href="https://ieeexplore.ieee.org/document/10458930">
+                        <img src={agrrement_pic1} alt="" className="project-page-image-left"/>
+                    </a>
                     <p>The disagreement of two independent networks is an indication of failure</p>
-                    <img src={agrrement_pic2} alt="" className="project-page-image-left"/>
+                    <a href="https://ieeexplore.ieee.org/document/10458930">
+                        <img src={agrrement_pic2} alt="" className="project-page-image-left"/>
+                    </a>
                     <p> Automatic segmentation of the heart</p>
-                    <img src={agrrement_pic3} alt="" className="project-page-image-left"/>
+                    <a href="https://ieeexplore.ieee.org/document/10458930">
+                        <img src={agrrement_pic3} alt="" className="project-page-image-left"/>
+                    </a>
                     <p> Failing case for the AI. In this case the bad image quality is to blame.
                         The result is a weird shape that does not make sense.</p>
-                    <img src={agrrement_pic5} alt="" className="project-page-image-left"/>
+                    <a href="https://ieeexplore.ieee.org/document/10458930">
+                        <img src={agrrement_pic5} alt="" className="project-page-image-left"/>
+                    </a>
                     <p> AI designed to create an anatomically valid contour.</p>
                     <br/>
                 </div>
@@ -162,10 +171,13 @@ function FindingHearts() {
                             Demo on YouTube</a>,
                     </p>
                     <h3> Publication, presentation and award </h3>
-                    The work is published on ArXiv:&nbsp;
-                    <a href="https://arxiv.org/abs/2408.00591">
+                    The work is published on Ultrasound in Medicine & Biology (UMB):&nbsp;
+                    <a href="https://www.sciencedirect.com/science/article/pii/S0301562924004691">
                         Regional quality estimation for echocardiography using deep learning
-                    </a>. <br/><br/>
+                    </a>. The article is on the front page of the issue: &nbsp;
+                    <a href="https://www.sciencedirect.com/journal/ultrasound-in-medicine-and-biology/vol/51/issue/4">
+                        UMB Volume 51 Issue 4
+                    </a>.<br/><br/>
                     It was presented at the&nbsp;
                     <a href="https://ieee-uffc.org/event/symposium/2024-ultrasonics-ferroelectrics-and-frequency-control-joint-symposium">
                         2024 IEEE International Ultrasonics Symposium
@@ -178,18 +190,34 @@ function FindingHearts() {
                 </div>
                 <div className="image-container">
                     <br/> <br/> <br/> <br/><br/><br/><br/>
-                    <img src={quality_pic1} alt="" className="project-page-image-right"/>
-                    <p> </p>
+                    <a href="https://www.sciencedirect.com/science/article/pii/S0301562924004691">
+                        <img src={quality_pic1} alt="" className="project-page-image-right"/>
+                    </a>
+                    <p></p>
                     <br/>
-                    <img src={quality_pic2} alt="" className="project-page-image-right"/>
-                    <p> These two echoes where obtained using the same scanner, yet the quality is vastly different </p>
+                    <a href="https://www.sciencedirect.com/science/article/pii/S0301562924004691">
+                        <img src={quality_pic2} alt="" className="project-page-image-right"/>
+                    </a>
+                    <p> These two echoes where obtained using the same scanner, yet the quality is vastly
+                        different </p>
                     <br/>
-                    <img src={quality_pic3} alt="" className="project-page-image-right"/>
+                    <a href="https://www.sciencedirect.com/science/article/pii/S0301562924004691">
+                        <img src={quality_pic3} alt="" className="project-page-image-right"/>
+                    </a>
                     <p> The AI labels the image quality of each region of the heart wall </p>
                     <br/>
-                    <img src={quality_pic4} alt="" className="project-page-image-right"/>
-                    <p> The poster presentation was awarded the runner-up prize for best poster in the ASMUS workshop
-                    at MICAII 2024</p>
+                    <a href="https://www.sciencedirect.com/journal/ultrasound-in-medicine-and-biology/vol/51/issue/4"
+                       target="_blank" rel="noopener noreferrer">
+                        <img src={quality_pic5} alt="" className="project-page-image-right small-image"/>
+                    </a>
+                    <p> The article is on the front page of its issue</p>
+                    <a href="https://www.sciencedirect.com/science/article/pii/S0301562924004691">
+                        <img src={quality_pic4} alt="" className="project-page-image-right"/>
+                    </a>
+                    <p> The poster presentation was awarded the runner-up prize for best poster in the ASMUS
+                        workshop
+                        at MICAII 2024</p>
+                    <br/>
                 </div>
             </div>
         </div>

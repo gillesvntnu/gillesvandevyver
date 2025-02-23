@@ -202,3 +202,9 @@ a {
 }
 
 
+.small-image {
+    width: 50%; /* Adjust the width as needed */
+    height: auto; /* Maintain aspect ratio */
+}
+
+
