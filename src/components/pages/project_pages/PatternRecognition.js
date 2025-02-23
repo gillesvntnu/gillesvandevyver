@@ -68,10 +68,14 @@ function PatternRecognition() {
                 </div>
                 <div className="image-container">
                     <br/> <br/> <br/> <br/><br/><br/><br/>
-                    <img src={vit1} alt="Pattern Recognition" className="project-page-image-right"/>
+                    <a href="https://ieeexplore.ieee.org/abstract/document/9980266">
+                        <img src={vit1} alt="Pattern Recognition" className="project-page-image-right"/>
+                    </a>
                     <p> The audio data was represented as spectrograms </p>
-                    <img src={vit2} alt="Pattern Recognition" className="project-page-image-right"/>
-                    <p> The attention mechanism of the vision transformer could also be used on spectrograms </p>
+                    <a href="https://ieeexplore.ieee.org/abstract/document/9980266">
+                        <img src={vit2} alt="Pattern Recognition" className="project-page-image-right"/>
+                    </a>
+                        <p> The attention mechanism of the vision transformer could also be used on spectrograms </p>
                 </div>
             </div>
             <div className="horizontal-card">
