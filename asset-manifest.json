@@ -1,7 +1,7 @@
 {
   "files": {
-    "main.css": "/static/css/main.896bfb17.css",
-    "main.js": "/static/js/main.fa135135.js",
+    "main.css": "/static/css/main.6f05ee0e.css",
+    "main.js": "/static/js/main.49d3c8dc.js",
     "static/media/gen_ai_transition.gif": "/static/media/gen_ai_transition.6254b2fc355232b1e0c1.gif",
     "static/media/vit1.png": "/static/media/vit1.cfccadac46f695909a6a.png",
     "static/media/vit2.png": "/static/media/vit2.1d1ea18c6a47c73cbb58.png",
@@ -9,6 +9,7 @@
     "static/media/quality_pic4.png": "/static/media/quality_pic4.3f13ed4c71744e8c9bd6.png",
     "static/media/Recommendation_letter_Sam_Michiels.pdf": "/static/media/Recommendation_letter_Sam_Michiels.dbf5b230f088367c92ae.pdf",
     "static/media/fa-solid-900.ttf": "/static/media/fa-solid-900.2582b0e4bcf85eceead0.ttf",
+    "static/media/quality_pic5.jpg": "/static/media/quality_pic5.3ff854b56c8836d4e430.jpg",
     "static/media/tennis_courts.png": "/static/media/tennis_courts.a115dd5ae0cd75e1e011.png",
     "static/media/agreement_pic3.png": "/static/media/agreement_pic3.9f48db8398d620387379.png",
     "static/media/computer_vision_meddical_imaging.jpg": "/static/media/computer_vision_meddical_imaging.5357860be0840bba0bf8.jpg",
@@ -31,11 +32,11 @@
     "static/media/fa-v4compatibility.ttf": "/static/media/fa-v4compatibility.da94ef451f4969af06e6.ttf",
     "static/media/fa-v4compatibility.woff2": "/static/media/fa-v4compatibility.ea8f94e1d22e0d35ccd4.woff2",
     "index.html": "/index.html",
-    "main.896bfb17.css.map": "/static/css/main.896bfb17.css.map",
-    "main.fa135135.js.map": "/static/js/main.fa135135.js.map"
+    "main.6f05ee0e.css.map": "/static/css/main.6f05ee0e.css.map",
+    "main.49d3c8dc.js.map": "/static/js/main.49d3c8dc.js.map"
   },
   "entrypoints": [
-    "static/css/main.896bfb17.css",
-    "static/js/main.fa135135.js"
+    "static/css/main.6f05ee0e.css",
+    "static/js/main.49d3c8dc.js"
   ]
 }
