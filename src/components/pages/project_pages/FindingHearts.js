@@ -110,6 +110,7 @@ function FindingHearts() {
                             Demo on YouTube</a>,
                     </p>
                     <h3> Publication and presentation </h3>
+                    <p>
                     The work is published in IEEE access: {'\n'}
                     <a href="https://ieeexplore.ieee.org/document/10458930">
                         Toward Robust Cardiac Segmentation Using Graph Convolutional Networks
@@ -118,6 +119,7 @@ function FindingHearts() {
                     <a href="https://ieee-uffc.org/event/symposium/2023-ieee-international-ultrasonics-symposium/">
                         2023 IEEE International Ultrasonics Symposium
                     </a> as a lecture.<br/><br/>
+                    </p>
                 </div>
             </div>
             <div className="horizontal-card horizontal-card-right">
@@ -171,7 +173,7 @@ function FindingHearts() {
                             Demo on YouTube</a>,
                     </p>
                     <h3> Publication, presentation and award </h3>
-                    The work is published on Ultrasound in Medicine & Biology (UMB):&nbsp;
+                    <p> The work is published on Ultrasound in Medicine & Biology (UMB):&nbsp;
                     <a href="https://www.sciencedirect.com/science/article/pii/S0301562924004691">
                         Regional quality estimation for echocardiography using deep learning
                     </a>. The article is on the cover page of the issue: &nbsp;
@@ -187,6 +189,7 @@ function FindingHearts() {
                         MICCAI (Medical Image Computing and Computer Assisted Intervention) 2024
                     </a> conference as a poster, where it was awarded the runner-up prize for best poster
                     in the ASMUS (Advances in Simplifying Medical Ultrasound) workshop.
+                    </p>
                 </div>
                 <div className="image-container">
                     <br/> <br/> <br/> <br/><br/><br/><br/>
