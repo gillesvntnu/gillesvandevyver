@@ -1,12 +1,14 @@
 {
   "files": {
     "main.css": "/static/css/main.6f05ee0e.css",
-    "main.js": "/static/js/main.fb9ca4aa.js",
+    "main.js": "/static/js/main.9d533c4c.js",
     "static/media/gen_ai_transition.gif": "/static/media/gen_ai_transition.6254b2fc355232b1e0c1.gif",
     "static/media/vit1.png": "/static/media/vit1.cfccadac46f695909a6a.png",
     "static/media/vit2.png": "/static/media/vit2.1d1ea18c6a47c73cbb58.png",
     "static/media/agreement_pic5.png": "/static/media/agreement_pic5.6bb3cf72fd223bb26a5d.png",
+    "static/media/gen_ai_pic3.png": "/static/media/gen_ai_pic3.43302ce0b8259a37a72a.png",
     "static/media/quality_pic4.png": "/static/media/quality_pic4.3f13ed4c71744e8c9bd6.png",
+    "static/media/gen_ai_pic1.png": "/static/media/gen_ai_pic1.c4d19b1d4ff779ab4edd.png",
     "static/media/Recommendation_letter_Sam_Michiels.pdf": "/static/media/Recommendation_letter_Sam_Michiels.dbf5b230f088367c92ae.pdf",
     "static/media/fa-solid-900.ttf": "/static/media/fa-solid-900.2582b0e4bcf85eceead0.ttf",
     "static/media/quality_pic5.jpg": "/static/media/quality_pic5.3ff854b56c8836d4e430.jpg",
@@ -18,9 +20,9 @@
     "static/media/quality_pic3.png": "/static/media/quality_pic3.83ac668f13571c550cfe.png",
     "static/media/fa-brands-400.ttf": "/static/media/fa-brands-400.1815e00441357e01619e.ttf",
     "static/media/quality_pic2.png": "/static/media/quality_pic2.5939cfb5aec697b4d2ed.png",
-    "static/media/wip.jpeg": "/static/media/wip.337bb55f0a654c272106.jpeg",
     "static/media/fa-solid-900.woff2": "/static/media/fa-solid-900.2463b90d9a316e4e5294.woff2",
     "static/media/agreement_pic1.png": "/static/media/agreement_pic1.03e1211e4ba29e32173a.png",
+    "static/media/gen_ai_pic2.png": "/static/media/gen_ai_pic2.cb0df26b301dccfdd10d.png",
     "static/media/fa-brands-400.woff2": "/static/media/fa-brands-400.c210719e60948b211a12.woff2",
     "static/media/sound_waves.jpeg": "/static/media/sound_waves.90afb6956431260ff1ab.jpeg",
     "static/media/quality_pic1.png": "/static/media/quality_pic1.cb24a315876a927e369c.png",
@@ -33,10 +35,10 @@
     "static/media/fa-v4compatibility.woff2": "/static/media/fa-v4compatibility.ea8f94e1d22e0d35ccd4.woff2",
     "index.html": "/index.html",
     "main.6f05ee0e.css.map": "/static/css/main.6f05ee0e.css.map",
-    "main.fb9ca4aa.js.map": "/static/js/main.fb9ca4aa.js.map"
+    "main.9d533c4c.js.map": "/static/js/main.9d533c4c.js.map"
   },
   "entrypoints": [
     "static/css/main.6f05ee0e.css",
-    "static/js/main.fb9ca4aa.js"
+    "static/js/main.9d533c4c.js"
   ]
 }
