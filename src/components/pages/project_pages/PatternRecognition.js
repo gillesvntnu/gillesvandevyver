@@ -60,9 +60,9 @@ function PatternRecognition() {
                         <a href="https://ieeexplore.ieee.org/abstract/document/9980266">
                             Adapted Spectrogram Transformer for Unsupervised Cross-Domain Acoustic Anomaly Detection
                         </a> <br/> <br/>
-                        It presented as a lecture at the&nbsp;
+                        and presented as a lecture at the&nbsp;
                         <a href="https://ieeexplore.ieee.org/xpl/conhome/9979726/proceeding">
-                            2022 APSIPA annual summit and conference
+                            2022 APSIPA annual summit and conference.
                         </a>
                     </p>
                 </div>
@@ -71,18 +71,18 @@ function PatternRecognition() {
                     <a href="https://ieeexplore.ieee.org/abstract/document/9980266">
                         <img src={vit1} alt="Pattern Recognition" className="project-page-image-right"/>
                     </a>
-                    <p> The audio data was represented as spectrograms </p>
+                    <p> The audio data was represented as spectrograms.</p>
                     <a href="https://ieeexplore.ieee.org/abstract/document/9980266">
                         <img src={vit2} alt="Pattern Recognition" className="project-page-image-right"/>
                     </a>
-                        <p> The attention mechanism of the vision transformer could also be used on spectrograms </p>
+                        <p> The attention mechanism of the vision transformer could also be used on spectrograms.</p>
                 </div>
             </div>
             <div className="horizontal-card">
                 <div className="image-container">
                     <br/> <br/> <br/> <br/><br/><br/><br/>
                     <img src={tennis_courts} alt="Pattern Recognition" className="project-page-image-left"/>
-                    <p> It was a challenge for the model to get the exact number of tennis courts </p>
+                    <p> It was a challenge for the model to get the exact number of tennis courts.</p>
                 </div>
                 <div>
                     <h2> Finding tennis courts in satellite images</h2>

@@ -41,7 +41,7 @@ function DataAnalytics() {
                 </div>
                 <div className="image-container">
                     <img src={powerbi_img} alt="Data Analytics" className="project-page-image-right"/>
-                    <p> The values in the image are made up. The real data is confidential </p>
+                    <p> The values in the image are made up. The real data is confidential.</p>
                 </div>
             </div>
             <div className="vertical-card">
@@ -78,7 +78,7 @@ function DataAnalytics() {
                 </p>
                 <div className="image-container">
                     <img src={sarimax_img} alt="Data Analytics" className="project-page-image-right"/>
-                    <p> The values in the image are made up. The real data is confidential </p>
+                    <p> The values in the image are made up. The real data is confidential.</p>
                 </div>
             </div>
         </div>

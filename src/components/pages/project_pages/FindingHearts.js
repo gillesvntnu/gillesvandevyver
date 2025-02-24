@@ -34,7 +34,7 @@ function FindingHearts() {
                     <a href="https://ieeexplore.ieee.org/document/10458930">
                         <img src={agrrement_pic1} alt="" className="project-page-image-left"/>
                     </a>
-                    <p>The disagreement of two independent networks is an indication of failure</p>
+                    <p>The disagreement of two independent networks is an indication of failure.</p>
                     <a href="https://ieeexplore.ieee.org/document/10458930">
                         <img src={agrrement_pic2} alt="" className="project-page-image-left"/>
                     </a>
@@ -202,24 +202,23 @@ function FindingHearts() {
                         <img src={quality_pic2} alt="" className="project-page-image-right"/>
                     </a>
                     <p> These two echoes where obtained using the same scanner, yet the quality is vastly
-                        different </p>
+                        different.</p>
                     <br/>
                     <a href="https://www.sciencedirect.com/science/article/pii/S0301562924004691">
                         <img src={quality_pic3} alt="" className="project-page-image-right"/>
                     </a>
-                    <p> The AI labels the image quality of each region of the heart wall </p>
+                    <p> The AI labels the image quality of each region of the heart wall.</p>
                     <br/>
                     <a href="https://www.sciencedirect.com/journal/ultrasound-in-medicine-and-biology/vol/51/issue/4"
                        target="_blank" rel="noopener noreferrer">
                         <img src={quality_pic5} alt="" className="project-page-image-right small-image"/>
                     </a>
-                    <p> The article is on the cover page of its issue</p>
+                    <p> The article is on the cover page of its issue.</p>
                     <a href="https://www.sciencedirect.com/science/article/pii/S0301562924004691">
                         <img src={quality_pic4} alt="" className="project-page-image-right"/>
                     </a>
                     <p> The poster presentation was awarded the runner-up prize for best poster in the ASMUS
-                        workshop
-                        at MICAII 2024</p>
+                        workshop at MICAII 2024.</p>
                     <br/>
                 </div>
             </div>
