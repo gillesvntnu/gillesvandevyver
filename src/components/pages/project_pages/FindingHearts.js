@@ -174,7 +174,7 @@ function FindingHearts() {
                     The work is published on Ultrasound in Medicine & Biology (UMB):&nbsp;
                     <a href="https://www.sciencedirect.com/science/article/pii/S0301562924004691">
                         Regional quality estimation for echocardiography using deep learning
-                    </a>. The article is on the front page of the issue: &nbsp;
+                    </a>. The article is on the cover page of the issue: &nbsp;
                     <a href="https://www.sciencedirect.com/journal/ultrasound-in-medicine-and-biology/vol/51/issue/4">
                         UMB Volume 51 Issue 4
                     </a>.<br/><br/>
@@ -210,7 +210,7 @@ function FindingHearts() {
                        target="_blank" rel="noopener noreferrer">
                         <img src={quality_pic5} alt="" className="project-page-image-right small-image"/>
                     </a>
-                    <p> The article is on the front page of its issue</p>
+                    <p> The article is on the cover page of its issue</p>
                     <a href="https://www.sciencedirect.com/science/article/pii/S0301562924004691">
                         <img src={quality_pic4} alt="" className="project-page-image-right"/>
                     </a>
