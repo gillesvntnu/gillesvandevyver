@@ -24,7 +24,7 @@ const GenerativeAI = () => {
                     <h2> Generating echo images of the heart </h2>
                     <p>
                         In the AI era, data is gold.
-                        AI tools are only as good as the data it is trained on.
+                        AI tools are only as good as the data on which they are trained.
                         This is especially the case in the medical domain, since measurements are labor intensive
                         and even experienced cardiologists do not agree on a single way of measuring.
                         In practice this means that data from one data center can usually not be used together with
@@ -40,8 +40,8 @@ const GenerativeAI = () => {
                     </p>
                     <h2> The combo </h2>
                     <p>
-                        By using generative AI not to create full images, but only replace parts of the images
-                        where we do not rely on the very precise annotations of the clinician, we can grow and
+                        Using generative AI not to create full images, but only to replace parts of the images
+                        where we do not rely on the very precise annotations of the clinician, we can expand and
                         diversify our dataset without hampering the quality.
                         In other words, we take the parts of the images with precise annotations
                         and put them in another context or setting, also called augmentation.
@@ -49,10 +49,10 @@ const GenerativeAI = () => {
                         we regard so highly.
                     </p>
                     <p>
-                        In this project I focus on echocardiology.
+                        In this project, I focus on echocardiology.
                         Here, the context is about where the heart is inside the image and how it is positioned.
                         Specifically, most of the images in our internal dataset from the hospital are
-                        so called left ventricle (LV) focused, which means that the image is zoomed in on the LV in
+                        so-called left ventricle (LV) focused, which means that the image is zoomed in on the LV in
                         the middle of the image.
                         This is the clinically recommended way of taking images, but in practice, the images are not
                         always taken this way.
@@ -67,11 +67,11 @@ const GenerativeAI = () => {
                     <h2> In conclusion </h2>
                     <p>
                         In this research project, I created a generative model that can augment
-                        a echocardiography dataset to create a more diverse dataset.
+                        an echocardiography dataset to create a more diverse dataset.
                         Deep learning models trained on this dataset can generalize better to different scenarios
                         and be more robust in practice.
                     </p>
-                    <h3> Publication, presentation and award </h3>
+                    <h3> Publication </h3>
                     <p>
                         TBA
                     </p>
