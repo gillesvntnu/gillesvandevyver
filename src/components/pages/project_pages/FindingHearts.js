@@ -85,7 +85,7 @@ function FindingHearts() {
                     </p>
                     <h3> How to solve this problem? </h3>
                     <p>
-                        We made an AI designed specifically to avoid weird shapes and anatomical errors
+                        I made an AI designed specifically to avoid weird shapes and anatomical errors
                         by teaching it to create a contour inspired by human anatomy.
                         While this new AI is not perfect, it does not produce weird shapes.
                         However, we can now use it in an intelligent way. When we have a new ultrasound image,
@@ -104,7 +104,7 @@ function FindingHearts() {
                         To find these cases, we can see how two different AIs, designed to avoid the mistakes
                         of the other, agree on where the heart is.
                         <br/> <br/>
-                        Finally, we made a demo video to show our proof of concept in real-time on the
+                        Finally, I made a demo video to show our proof of concept in real-time on the
                         scanner:&nbsp;
                         <a href="https://www.youtube.com/watch?v=mj4PZtV6kkE&ab_channel=gillesvandevyver">
                             Demo on YouTube</a>,
@@ -145,10 +145,10 @@ function FindingHearts() {
                     <p>
                         Three senior clinicians came together to discuss how they define a good cardiac echo image.
                         Then, they put image quality labels on 458 echo images from 65 different study participants.
-                        With this data, we trained a neural network to mimic the clinicians.
-                        After extensive tuning and testing, we ended up with a model that can label the image
+                        With this data, I trained a neural network to mimic the clinicians.
+                        After extensive tuning and testing, I ended up with a model that can label the image
                         quality of cardiac images in real-time.
-                        When testing the trained model, we found that the model tends to make fewer errors
+                        When testing the trained model, I found that the model tends to make fewer errors
                         than the clinicians among themselves!
                         This means it learned to strike a middle ground between the subjective
                         opinions of the different clinicians.
@@ -158,14 +158,14 @@ function FindingHearts() {
                         Our code is available as a Python library at&nbsp;
                         <a href="https://github.com/GillesVanDeVyver/arqee">
                             https://github.com/GillesVanDeVyver/arqee</a>.
-                        We provide comprehensive tutorials and examples on how to use the code.
+                        I provide comprehensive tutorials and examples on how to use the code.
                     </p>
                     <h3> In conclusion</h3>
                     <p>
-                        We created a real-time quality assessment tool for cardiac ultrasound images.
-                        This tool can be used in many different applications, and we open sourced the code
+                        I created a real-time quality assessment tool for cardiac ultrasound images.
+                        This tool can be used in many different applications, and I open sourced the code
                         to make it available to everyone. <br/><br/>
-                        We made a demo video to show our proof of concept in real-time on the ultrasound
+                        I made a demo video to show our proof of concept in real-time on the ultrasound
                         scanner:&nbsp;
                         <a href="https://www.youtube.com/watch?v=mj4PZtV6kkE&ab_channel=gillesvandevyver">
                             Demo on YouTube</a>,
