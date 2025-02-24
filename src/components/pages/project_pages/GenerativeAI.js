@@ -12,9 +12,9 @@ const GenerativeAI = () => {
             <h1>Gnerative AI</h1>
             <div className="tldr">
                 <p><strong>TL;DR: </strong>
-                    In this research project, I created a generative model that can augment
-                    an echocardiography dataset to create a more diverse dataset,
-                    increasing the feasibility and robustness of deep learning models trained on this dataset.
+                    In this research project, I developed a generative model to augment an echocardiography dataset,
+                    improving its diversity and increasing the feasibility and robustness
+                    of deep learning models trained on it.
                     <br/>
                     <strong>Technologies used:</strong> Diffusion models, Pytorch, Python, C++
                 </p>
