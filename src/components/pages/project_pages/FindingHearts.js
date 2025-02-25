@@ -21,8 +21,8 @@ function FindingHearts() {
                     Academic projects focused on reliable and real-time image analysis for cardiac ultrasound during my
                     PhD.
                     The results are published in two first-author papers. YouTube demos:&nbsp;
-                    <a href="https://www.youtube.com/watch?v=mj4PZtV6kkE&ab_channel=gillesvandevyver">Demo 1</a>,&nbsp;
-                    <a href="https://www.youtube.com/watch?v=JnmtkZS1Fmk&ab_channel=gillesvandevyver">Demo 2</a>.
+                    <a href="https://www.youtube.com/watch?v=JnmtkZS1Fmk&ab_channel=gillesvandevyver">Demo 1</a>.
+                    <a href="https://www.youtube.com/watch?v=mj4PZtV6kkE&ab_channel=gillesvandevyver">Demo 2</a>,&nbsp;
                     <br/>
                     <strong>Technologies used:</strong> Python, C++, PyTorch, graph neural networks
                 </p>
@@ -106,7 +106,7 @@ function FindingHearts() {
                         <br/> <br/>
                         Finally, I made a demo video to show our proof of concept in real-time on the
                         scanner:&nbsp;
-                        <a href="https://www.youtube.com/watch?v=mj4PZtV6kkE&ab_channel=gillesvandevyver">
+                        <a href="https://www.youtube.com/watch?v=JnmtkZS1Fmk&ab_channel=gillesvandevyver">
                             Demo on YouTube</a>,
                     </p>
                     <h3> Publication and presentation </h3>
