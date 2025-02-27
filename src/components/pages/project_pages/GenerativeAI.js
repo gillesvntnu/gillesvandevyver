@@ -38,15 +38,15 @@ const GenerativeAI = () => {
                         This would mean we lose the quality of the annotations in the data from the experienced
                         cardiologists and we are back at square one.
                     </p>
-                    <h2> The combo </h2>
+                    <h2> Augmentation </h2>
                     <p>
-                        Using generative AI not to create full images, but only to replace parts of the images
-                        where we do not rely on the very precise annotations of the clinician, we can expand and
-                        diversify our dataset without hampering the quality.
-                        In other words, we take the parts of the images with precise annotations
-                        and put them in another context or setting, also called augmentation.
-                        This way, our models can work in more different scenarios with the same quality
-                        we regard so highly.
+                        By using generative AI to modify only specific parts of images
+                        without affecting regions that rely on precise clinician annotations,
+                        we can expand and diversify our dataset without compromising quality.
+                        In this approach, we keep the annotated areas and place them in new contexts or settings,
+                        a process known as augmentation.
+                        This allows our models to perform across a wider range of scenarios while maintaining
+                        the high standard of quality.
                     </p>
                     <p>
                         In this project, I focus on echocardiology.
