@@ -1,6 +1,6 @@
 import React from 'react';
 import './TitleSection.css';
-import img1 from '../images/profile_pic.png'; // Adjusted path
+import img1 from '../images/profile_pic_black_white.jpeg'; // Adjusted path
 import { scrollToSection } from './pages/Home'; // Import the scrollToNextSection function
 
 function TitleSection() {
