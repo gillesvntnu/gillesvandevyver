@@ -64,6 +64,13 @@ const GenerativeAI = () => {
                         When training with the augmented images, the model generalizes better and can be used in
                         more scenarios, meaning higher feasibility and robustness.
                     </p>
+                    <h3> Open-source code</h3>
+                    <p>
+                        My code is available as a Python library at&nbsp;
+                        <a href="https://github.com/GillesVanDeVyver/EchoGAINS">
+                            https://github.com/GillesVanDeVyver/EchoGAINS</a>.
+                        I provide a comprehensive tutorial on how to use the code.
+                    </p>
                     <h2> In conclusion </h2>
                     <p>
                         In this research project, I created a generative model that can augment
@@ -77,7 +84,7 @@ const GenerativeAI = () => {
                     </p>
                 </div>
                 <div className="image-container">
-                <br/> <br/> <br/> <br/><br/><br/><br/>
+                    <br/> <br/> <br/> <br/><br/><br/><br/>
                     <a href="">
                         <img src={gen_ai_pic1} alt="" className="project-page-image-right"/>
                     </a>

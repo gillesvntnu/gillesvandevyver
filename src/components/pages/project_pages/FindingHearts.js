@@ -157,7 +157,7 @@ function FindingHearts() {
                     </p>
                     <h3> Open-source code</h3>
                     <p>
-                        Our code is available as a Python library at&nbsp;
+                        My code is available as a Python library at&nbsp;
                         <a href="https://github.com/GillesVanDeVyver/arqee">
                             https://github.com/GillesVanDeVyver/arqee</a>.
                         I provide comprehensive tutorials and examples on how to use the code.
@@ -175,7 +175,7 @@ function FindingHearts() {
                     <h3> Publication, presentation and award </h3>
                     <p> The work is published on Ultrasound in Medicine & Biology (UMB):&nbsp;
                     <a href="https://www.sciencedirect.com/science/article/pii/S0301562924004691">
-                        Regional quality estimation for echocardiography using deep learning
+                        Regional Image Quality Scoring for 2-D Echocardiography Using Deep Learning
                     </a>. The article is on the cover page of the issue: &nbsp;
                     <a href="https://www.sciencedirect.com/journal/ultrasound-in-medicine-and-biology/vol/51/issue/4">
                         UMB Volume 51 Issue 4
