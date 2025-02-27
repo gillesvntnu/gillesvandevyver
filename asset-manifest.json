@@ -1,7 +1,7 @@
 {
   "files": {
     "main.css": "/static/css/main.6f05ee0e.css",
-    "main.js": "/static/js/main.31e87ca3.js",
+    "main.js": "/static/js/main.9ea2ddb5.js",
     "static/media/gen_ai_transition.gif": "/static/media/gen_ai_transition.6254b2fc355232b1e0c1.gif",
     "static/media/vit1.png": "/static/media/vit1.cfccadac46f695909a6a.png",
     "static/media/vit2.png": "/static/media/vit2.1d1ea18c6a47c73cbb58.png",
@@ -15,7 +15,6 @@
     "static/media/tennis_courts.png": "/static/media/tennis_courts.a115dd5ae0cd75e1e011.png",
     "static/media/agreement_pic3.png": "/static/media/agreement_pic3.9f48db8398d620387379.png",
     "static/media/computer_vision_meddical_imaging.jpg": "/static/media/computer_vision_meddical_imaging.5357860be0840bba0bf8.jpg",
-    "static/media/profile_pic.png": "/static/media/profile_pic.fc9258fa103e86aef72d.png",
     "static/media/agreement_pic2.png": "/static/media/agreement_pic2.52625154de2899d235b9.png",
     "static/media/quality_pic3.png": "/static/media/quality_pic3.83ac668f13571c550cfe.png",
     "static/media/fa-brands-400.ttf": "/static/media/fa-brands-400.1815e00441357e01619e.ttf",
@@ -28,6 +27,7 @@
     "static/media/quality_pic1.png": "/static/media/quality_pic1.cb24a315876a927e369c.png",
     "static/media/data_analytics.jpeg": "/static/media/data_analytics.ade8b19a203098c00612.jpeg",
     "static/media/powerbi_sweco_example_no_bg.png": "/static/media/powerbi_sweco_example_no_bg.7a6fa8ddc4b55a58072e.png",
+    "static/media/profile_pic_black_white.jpeg": "/static/media/profile_pic_black_white.b9c6149c64624fd5cbda.jpeg",
     "static/media/fa-regular-400.ttf": "/static/media/fa-regular-400.914997e1bdfc990d0897.ttf",
     "static/media/sarimax.png": "/static/media/sarimax.f652b18a9ff78b8355c0.png",
     "static/media/fa-regular-400.woff2": "/static/media/fa-regular-400.89999bdf5d835c012025.woff2",
@@ -35,10 +35,10 @@
     "static/media/fa-v4compatibility.woff2": "/static/media/fa-v4compatibility.ea8f94e1d22e0d35ccd4.woff2",
     "index.html": "/index.html",
     "main.6f05ee0e.css.map": "/static/css/main.6f05ee0e.css.map",
-    "main.31e87ca3.js.map": "/static/js/main.31e87ca3.js.map"
+    "main.9ea2ddb5.js.map": "/static/js/main.9ea2ddb5.js.map"
   },
   "entrypoints": [
     "static/css/main.6f05ee0e.css",
-    "static/js/main.31e87ca3.js"
+    "static/js/main.9ea2ddb5.js"
   ]
 }
