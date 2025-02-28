@@ -1,7 +1,7 @@
 {
   "files": {
     "main.css": "/static/css/main.6f05ee0e.css",
-    "main.js": "/static/js/main.3e367a9a.js",
+    "main.js": "/static/js/main.6b92aca3.js",
     "static/media/gen_ai_transition.gif": "/static/media/gen_ai_transition.6254b2fc355232b1e0c1.gif",
     "static/media/vit1.png": "/static/media/vit1.cfccadac46f695909a6a.png",
     "static/media/vit2.png": "/static/media/vit2.1d1ea18c6a47c73cbb58.png",
@@ -16,6 +16,7 @@
     "static/media/agreement_pic3.png": "/static/media/agreement_pic3.9f48db8398d620387379.png",
     "static/media/computer_vision_meddical_imaging.jpg": "/static/media/computer_vision_meddical_imaging.5357860be0840bba0bf8.jpg",
     "static/media/agreement_pic2.png": "/static/media/agreement_pic2.52625154de2899d235b9.png",
+    "static/media/gen_ai_pic0.jpg": "/static/media/gen_ai_pic0.430d27ae511d3eb8363d.jpg",
     "static/media/quality_pic3.png": "/static/media/quality_pic3.83ac668f13571c550cfe.png",
     "static/media/fa-brands-400.ttf": "/static/media/fa-brands-400.1815e00441357e01619e.ttf",
     "static/media/quality_pic2.png": "/static/media/quality_pic2.5939cfb5aec697b4d2ed.png",
@@ -35,10 +36,10 @@
     "static/media/fa-v4compatibility.woff2": "/static/media/fa-v4compatibility.ea8f94e1d22e0d35ccd4.woff2",
     "index.html": "/index.html",
     "main.6f05ee0e.css.map": "/static/css/main.6f05ee0e.css.map",
-    "main.3e367a9a.js.map": "/static/js/main.3e367a9a.js.map"
+    "main.6b92aca3.js.map": "/static/js/main.6b92aca3.js.map"
   },
   "entrypoints": [
     "static/css/main.6f05ee0e.css",
-    "static/js/main.3e367a9a.js"
+    "static/js/main.6b92aca3.js"
   ]
 }
