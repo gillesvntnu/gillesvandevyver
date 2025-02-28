@@ -1,5 +1,6 @@
 import React from 'react';
 import './NaturalLanguageProcessing.css';
+import gen_ai_pic0 from '../../../images/gen_ai/gen_ai_pic0.jpg';
 import gen_ai_pic1 from '../../../images/gen_ai/gen_ai_pic1.png';
 import gen_ai_pic2 from '../../../images/gen_ai/gen_ai_pic2.png';
 import gen_ai_pic3 from '../../../images/gen_ai/gen_ai_pic3.png';
@@ -87,24 +88,27 @@ const GenerativeAI = () => {
                 </div>
                 <div className="image-container">
                     <br/> <br/> <br/> <br/><br/><br/><br/>
-                    <a href="">
+                    <a href="https://arxiv.org/abs/2502.20100">
+                        <img src={gen_ai_pic0} alt="" className="project-page-image-right"/>
+                    </a>
+                    <br/><br/>
+                    <a href="https://arxiv.org/abs/2502.20100">
                         <img src={gen_ai_pic1} alt="" className="project-page-image-right"/>
                     </a>
                     <p> Generative augmentations can put existing annotated data in a new context.</p>
-                    <a href="">
+                    <a href="https://arxiv.org/abs/2502.20100">
                         <img src={gen_ai_transition} alt="" className="project-page-image-right small-image"/>
                     </a>
                     <p> The generative AI is a diffusion model that generates content from noise.</p>
-                    <a href="">
+                    <a href="https://arxiv.org/abs/2502.20100">
                         <img src={gen_ai_pic2} alt="" className="project-page-image-right"/>
                     </a>
                     <p> An existing image of a heart is put in a new position and made to look realistic
                         by using the generative model.</p>
-                    <a href="">
+                    <a href="https://arxiv.org/abs/2502.20100">
                         <img src={gen_ai_pic3} alt="" className="project-page-image-right"/>
                     </a>
                     <p> Models trained with the augmented dataset generalize better and are more robust.</p>
-
                     <br/>
                 </div>
             </div>
