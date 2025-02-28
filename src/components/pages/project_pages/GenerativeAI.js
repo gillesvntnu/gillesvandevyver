@@ -15,7 +15,8 @@ const GenerativeAI = () => {
                 <p><strong>TL;DR: </strong>
                     In this research project, I developed a generative model to augment an echocardiography dataset,
                     improving its diversity and increasing the feasibility and robustness
-                    of deep learning models trained on it.
+                    of deep learning models trained on it. <a href="https://www.youtube.com/watch?v=kiuWaPJnLHU">
+                        Demo on YouTube</a>,
                     <br/>
                     <strong>Technologies used:</strong> Diffusion models, Pytorch, Python, C++
                 </p>
@@ -78,6 +79,10 @@ const GenerativeAI = () => {
                         an echocardiography dataset to create a more diverse dataset.
                         Deep learning models trained on this dataset can generalize better to different scenarios
                         and be more robust in practice.
+                        I made a demo video to show our proof of concept in real-time on the ultrasound
+                        scanner:&nbsp;
+                        <a href="https://www.youtube.com/watch?v=kiuWaPJnLHU">
+                            Demo on YouTube</a>,
                     </p>
                     <h3> Publication </h3>
                     <p> The academic paper is available as a preprint on ArXiv:&nbsp;
