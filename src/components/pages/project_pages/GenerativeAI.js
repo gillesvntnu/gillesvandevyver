@@ -30,7 +30,7 @@ const GenerativeAI = () => {
                         In practice this means that data from one data center can usually not be used together with
                         data in another datacenter without losing quality and consistency.
                     </p>
-                    <h2> Generative AI </h2>
+                    <h3> Generative AI </h3>
                     <p>
                         Generative AI can generate highly realistic images in a certain domain.
                         The tricky part is that the generative images are not always accurate and can not really be
@@ -38,7 +38,7 @@ const GenerativeAI = () => {
                         This would mean we lose the quality of the annotations in the data from the experienced
                         cardiologists and we are back at square one.
                     </p>
-                    <h2> Augmentation </h2>
+                    <h3> Augmentation </h3>
                     <p>
                         By using generative AI to modify only specific parts of images
                         without affecting regions that rely on precise clinician annotations,
@@ -71,7 +71,7 @@ const GenerativeAI = () => {
                             https://github.com/GillesVanDeVyver/EchoGAINS</a>.
                         I provide a comprehensive tutorial on how to use the code.
                     </p>
-                    <h2> In conclusion </h2>
+                    <h3> In conclusion </h3>
                     <p>
                         In this research project, I created a generative model that can augment
                         an echocardiography dataset to create a more diverse dataset.
@@ -79,8 +79,10 @@ const GenerativeAI = () => {
                         and be more robust in practice.
                     </p>
                     <h3> Publication </h3>
-                    <p>
-                        TBA
+                    <p> The academic paper is available as a preprint on ArXiv:&nbsp;
+                        <a href="https://arxiv.org/abs/2502.20100">
+                            Generative augmentations for improved cardiac ultrasound segmentation using diffusion models
+                        </a>.
                     </p>
                 </div>
                 <div className="image-container">
