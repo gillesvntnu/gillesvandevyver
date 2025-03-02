@@ -70,6 +70,7 @@ function ContactSection() {
         <div className='bottom-whitespace'>
           <h6 className={`copied-message ${visible ? 'visible' : ''}`}>{copiedMessage}</h6>
         </div>
+        <br/>
         <p className='copyright'>© Copyright 2024 Gilles Van De Vyver. All rights reserved.</p>
       </div>
   );
