@@ -92,7 +92,7 @@ const GenerativeAI = () => {
                     </p>
                 </div>
                 <div className="image-container">
-                    <br/> <br/> <br/> <br/><br/><br/><br/>
+                    <br/>
                     <a href="https://arxiv.org/abs/2502.20100">
                         <img src={gen_ai_pic0} alt="" className="project-page-image-right"/>
                     </a>
