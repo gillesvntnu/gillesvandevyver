@@ -97,6 +97,12 @@ function FindingHearts() {
                         those cases to retrain the AI so that it will not fail the next time it sees a similar
                         case ('active learning').
                     </p>
+                    <h3> Open-source code</h3>
+                    <p>
+                        My code is available as a Python library at&nbsp;
+                        <a href="https://github.com/GillesVanDeVyver/GCN_multistructure">
+                        https://github.com/GillesVanDeVyver/GCN_multistructure</a>.
+                    </p>
                     <h3> In conclusion</h3>
                     <p>
                         If we want to make a more reliable AI, we need to teach it to imitate humans on
@@ -115,10 +121,7 @@ function FindingHearts() {
                     <a href="https://ieeexplore.ieee.org/document/10458930">
                         Toward Robust Cardiac Segmentation Using Graph Convolutional Networks
                     </a>. <br/><br/>
-                    It was also presented at the&nbsp;
-                    <a href="https://ieee-uffc.org/event/symposium/2023-ieee-international-ultrasonics-symposium/">
-                        2023 IEEE International Ultrasonics Symposium
-                    </a> as a lecture.<br/><br/>
+                    It was also presented at the 2023 IUS (IEEE International Ultrasonics Symposium) conference as a lecture.<br/><br/>
                     </p>
                 </div>
             </div>
@@ -180,14 +183,9 @@ function FindingHearts() {
                     <a href="https://www.sciencedirect.com/journal/ultrasound-in-medicine-and-biology/vol/51/issue/4">
                         UMB Volume 51 Issue 4
                     </a>.<br/><br/>
-                    It was presented at the&nbsp;
-                    <a href="https://ieee-uffc.org/event/symposium/2024-ultrasonics-ferroelectrics-and-frequency-control-joint-symposium">
-                        2024 IEEE International Ultrasonics Symposium
-                    </a> as a lecture. <br/><br/>
-                    Additionally, the work was presented at the&nbsp;
-                    <a href="https://conferences.miccai.org/2024/en/">
-                        MICCAI (Medical Image Computing and Computer Assisted Intervention) 2024
-                    </a> conference as a poster, where it was awarded the runner-up prize for best poster
+                    It was presented at the 2024 IUS (IEEE International Ultrasonics Symposium) conference as a lecture. <br/><br/>
+                    Additionally, the work was presented at the MICCAI (Medical Image Computing and Computer Assisted Intervention) 2024
+                    conference, where it was awarded the runner-up prize for best poster
                     in the ASMUS (Advances in Simplifying Medical Ultrasound) workshop.
                     </p>
                 </div>

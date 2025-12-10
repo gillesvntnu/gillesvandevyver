@@ -10,7 +10,7 @@ import gen_ai_transition from '../../../images/gen_ai/gen_ai_transition.gif';
 const GenerativeAI = () => {
     return (
         <div className="project-page-container">
-            <h1>Gnerative AI</h1>
+            <h1>Generative AI</h1>
             <div className="tldr">
                 <p><strong>TL;DR: </strong>
                     In this research project, I developed a generative model to augment an echocardiography dataset,
