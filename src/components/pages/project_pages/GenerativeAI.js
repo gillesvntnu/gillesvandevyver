@@ -81,7 +81,7 @@ const GenerativeAI = () => {
                         and be more robust in practice.
                         I made a demo video to show our proof of concept in real-time on the ultrasound
                         scanner:&nbsp;
-                        <a href="https://www.youtube.com/watch?v=kiuWaPJnLHU">
+                        <a href="https://youtu.be/4lwMv-oU-fA">
                             Demo on YouTube</a>,
                     </p>
                     <h3> Publication </h3>

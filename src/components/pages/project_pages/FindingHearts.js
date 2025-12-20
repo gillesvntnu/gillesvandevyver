@@ -112,7 +112,7 @@ function FindingHearts() {
                         <br/> <br/>
                         Finally, I made a demo video to show our proof of concept in real-time on the
                         scanner:&nbsp;
-                        <a href="https://www.youtube.com/watch?v=JnmtkZS1Fmk&ab_channel=gillesvandevyver">
+                        <a href="https://youtu.be/I9R8kxwj0fw">
                             Demo on YouTube</a>,
                     </p>
                     <h3> Publication and presentation </h3>
@@ -172,7 +172,7 @@ function FindingHearts() {
                         to make it available to everyone. <br/><br/>
                         I made a demo video to show our proof of concept in real-time on the ultrasound
                         scanner:&nbsp;
-                        <a href="https://www.youtube.com/watch?v=mj4PZtV6kkE&ab_channel=gillesvandevyver">
+                        <a href="https://youtu.be/NXkR6rX14HQ">
                             Demo on YouTube</a>,
                     </p>
                     <h3> Publication, presentation and award </h3>
