@@ -41,11 +41,11 @@ function ContactSection() {
             </p>
             <p
                 className='contact-item'
-                onClick={() => copyToClipboard('+32474079443', 'Phone number')}
+                onClick={() => copyToClipboard('+32491148882', 'Phone number')}
                 onMouseEnter={() => setHoveredItem('phone')}
                 onMouseLeave={() => setHoveredItem(null)}
             >
-              <i className="fas fa-phone"></i> +32474079443
+              <i className="fas fa-phone"></i> +32491148882
               <span className={`copy-icon ${hoveredItem === 'phone' ? 'visible' : ''}`}><i
                   className="fas fa-copy"></i></span>
             </p>
