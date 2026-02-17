@@ -31,11 +31,11 @@ function ContactSection() {
           <div className='contact-column'>
             <p
                 className='contact-item'
-                onClick={() => copyToClipboard('gillesvandevyver@hotmail.be', 'E-mail address')}
+                onClick={() => copyToClipboard('gillesvandevyver1@gmail.com', 'E-mail address')}
                 onMouseEnter={() => setHoveredItem('email')}
                 onMouseLeave={() => setHoveredItem(null)}
             >
-              <i className="fas fa-envelope"></i> gillesvandevyver@hotmail.be
+              <i className="fas fa-envelope"></i> gillesvandevyver1@gmail.com
               <span className={`copy-icon ${hoveredItem === 'email' ? 'visible' : ''}`}><i
                   className="fas fa-copy"></i></span>
             </p>

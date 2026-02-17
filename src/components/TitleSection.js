@@ -8,9 +8,10 @@ function TitleSection() {
       <div className="title-section" id="titleSection">
           <div className='title-section-text'>
               <p>Gilles Van De Vyver</p>
-              <h1>Software engineering & <br/> Machine learning expertise</h1>
+              <p> <br /> </p>
+              <h1>Software & Machine Learning Engineer <br />  Building AI for Ultrasound</h1>
               <button className="centered-button" onClick={() => scrollToSection('carousel')}>
-                  Discover my work
+                View my projects
               </button>
           </div>
           <div className="title-image-container">

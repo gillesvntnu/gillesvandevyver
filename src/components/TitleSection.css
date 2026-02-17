@@ -76,7 +76,7 @@
 
 .title-section h1 {
   color: #333;
-  font-size: max(3vw, 3vh);
+  font-size: max(2.5vw, 2.5vh);
   font-weight: 700;
   text-shadow: 0.2vh 0.2vh 0.4vh rgba(0, 0, 0, 0.1);
   font-family: 'Roboto', sans-serif;
@@ -84,7 +84,7 @@
 
 .title-section p {
   color: #555;
-  font-size: max(2vw, 2vh);
+  font-size: max(1.5vw, 1.5vh);
   font-family: 'Roboto', Arial, sans-serif;
   text-shadow: 0.1vh 0.1vh 0.3vh rgba(0, 0, 0, 0.1);
 }
@@ -128,12 +128,12 @@
   }
 
   .title-image-container {
-    max-height: calc(50vh - var(--navbar-height)/2);
+    max-height: calc(40vh - var(--navbar-height)/2);
     padding: 0;
   }
 
   .title-section-text {
-    max-height: calc(50vh - var(--navbar-height)/2);
+    max-height: calc(60vh - var(--navbar-height)/2);
     padding: 0;
   }
 
