@@ -18,7 +18,7 @@
 }
 
 :root {
-  --navbar-height: 64px;
+  --navbar-height: 80px;
 }
 
 /* Title section */
@@ -122,9 +122,9 @@
 }
 
 /* Mobile */
-@media (max-width: 768px) {
+@media (max-width: 960px) {
   :root {
-    --navbar-height: 56px;
+    --navbar-height: 70px;
   }
 
   .title-section {

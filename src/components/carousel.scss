@@ -7,7 +7,7 @@
   --color-focus: #4f46e5;
   --base-duration: 500ms;
   --base-ease: cubic-bezier(0.25, 0.46, 0.45, 0.84);
-  --navbar-height: 64px;
+  --navbar-height: 80px;
 }
 
 // =========================
@@ -323,9 +323,9 @@
 // Mobile
 // =========================
 
-@media (max-width: 768px) {
+@media (max-width: 960px) {
   :root {
-    --navbar-height: 56px;
+    --navbar-height: 70px;
   }
 
   .slide__headline {
