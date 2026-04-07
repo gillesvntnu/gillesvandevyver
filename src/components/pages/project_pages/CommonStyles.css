@@ -1,28 +1,52 @@
 /* CommonStyles.css */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
 .project-page-container {
     padding: 2rem;
-    font-family: sans-serif;
-    color: #333;
+    font-family: 'Inter', sans-serif;
+    color: #374151;
     font-weight: normal;
-    margin: 0 15%; /* Apply margin only to the left and right */
-    line-height: 1.4; /* Adjust this value to increase or decrease the spacing */
-}
-
-.project-page-container * {
-    font-weight: normal;
+    margin: 0 15%;
+    line-height: 1.6;
 }
 
 .project-page-container h1 {
-    font-size: 2.5em;
-    margin-bottom: 1.25rem;
-    font-weight: normal;
+    font-size: 2.25rem;
+    font-weight: 700;
+    color: #111827;
+    letter-spacing: -0.025em;
+    margin-bottom: 1.5rem;
+    line-height: 1.2;
+}
+
+.project-page-container h2 {
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: #1a1a2e;
+    letter-spacing: -0.015em;
+    margin-bottom: 0.75rem;
+    margin-top: 0.25rem;
+    line-height: 1.3;
+    border-bottom: 2px solid #e5e7eb;
+    padding-bottom: 0.4rem;
+}
+
+.project-page-container h3 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #374151;
+    letter-spacing: -0.01em;
+    margin-bottom: 0.5rem;
+    margin-top: 1rem;
+    line-height: 1.35;
 }
 
 .project-page-container p {
-    font-size: 1.2em;
-    line-height: 1.6;
-    margin-bottom: 1.25rem;
-    font-weight: normal;
+    font-size: 1rem;
+    line-height: 1.75;
+    margin-bottom: 1.1rem;
+    font-weight: 400;
+    color: #4b5563;
 }
 
 
@@ -61,7 +85,7 @@
 
 .horizontal-card h2,
 .vertical-card h2 {
-    margin-bottom: 1vh;
+    margin-bottom: 1rem;
 }
 
 .image-container {

@@ -1,17 +1,24 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
 * {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
 }
 
-.home,
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
 
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background-color: #fafafa;
+  color: #1a1a2e;
+}
 
-/* Center the button */
-.centered-button {
-  display: block;
-  margin: 20px auto; /* Adjust the margin as needed */
-  padding: 10px 20px; /* Adjust the padding as needed */
-  font-size: 1rem; /* Adjust the font size as needed */
-  cursor: pointer;
+::selection {
+  background: #4f46e5;
+  color: #fff;
 }

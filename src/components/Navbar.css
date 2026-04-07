@@ -1,68 +1,79 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+
 .navbar {
-  background: linear-gradient(90deg, rgb(28, 27, 27) 0%, rgb(45, 55, 114) 100%);
-  height: 80px;
+  background: linear-gradient(90deg, rgba(12, 12, 18, 0.95) 0%, rgba(20, 36, 82, 0.93) 100%);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  height: 64px;
   width: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
-  font-size: 1.2em;
+  font-size: 0.95rem;
   position: sticky;
   top: 0;
   z-index: 999;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  font-family: 'Inter', sans-serif;
 }
 
 .navbar-container {
   display: flex;
   justify-content: center;
   align-items: center;
+  width: 100%;
+  max-width: 1200px;
+  padding: 0 2rem;
 }
 
 .navbar-logo {
   color: #fff;
   justify-self: start;
-  margin-left: 20px;
   cursor: pointer;
   text-decoration: none;
-  font-size: 2rem;
+  font-size: 1.4rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  letter-spacing: -0.02em;
+}
+
+.nav-menu {
+  display: flex;
+  gap: 0.25rem;
+  list-style: none;
+  text-align: center;
+  justify-content: flex-end;
+  flex: 1;
+  margin: 0;
+  padding: 0;
+}
+
+.nav-item {
+  height: 64px;
   display: flex;
   align-items: center;
 }
 
-.fa-typo3 {
-  margin-left: 0.5rem;
-  font-size: 1.8rem;
-}
-
-.nav-menu {
-  display: grid;
-  grid-template-columns: repeat(4, auto);
-  grid-gap: 10px;
-  list-style: none;
-  text-align: center;
-  width: 80vw;
-  justify-content: end;
-  margin-right: 2rem;
-}
-
-.nav-item {
-  height: 80px;
-}
-
 .nav-links {
-  color: #fff;
+  color: rgba(255, 255, 255, 0.7);
   height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
   text-decoration: none;
-  padding: 0.5rem 1rem;
-  flex: 1 1 0;
-  min-width: 10vw;
+  padding: 0 1.25rem;
+  font-weight: 500;
+  font-size: 0.9rem;
+  letter-spacing: 0.01em;
+  transition: color 0.2s ease;
+  cursor: pointer;
 }
 
 .nav-links:hover {
-  border-bottom: 4px solid #fff;
-  transition: all 0.2s ease-out;
+  color: #fff;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.9);
+  transition: all 0.2s ease;
 }
 
 .fa-bars {
@@ -77,42 +88,45 @@
   display: none;
 }
 
-
-
 /* Dropdown container */
 .navbar .dropdown {
   position: relative;
   display: inline-block;
 }
 
-/* Dropdown content (hidden by default) */
+/* Dropdown content */
 .navbar .dropdown-content {
   display: none;
   position: absolute;
-  background-color: #333;
-  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-  z-index: 1;
-  border-radius: 8px;
-  padding: 10px 0;
-  align-items: center;
-  justify-content: center;
+  top: 64px;
+  background: rgba(20, 20, 28, 0.95);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  z-index: 10;
+  border-radius: 12px;
+  padding: 8px;
+  min-width: 200px;
 }
 
 /* Links inside the dropdown */
 .navbar .dropdown-content a {
-  color: #fff;
-  padding: 12px 16px;
+  color: rgba(255, 255, 255, 0.75);
+  padding: 10px 16px;
   text-decoration: none;
   display: block;
-  transition: background-color 0.3s ease;
-  white-space: normal;
-  word-break: keep-all;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+  border-radius: 8px;
+  font-size: 0.88rem;
+  font-weight: 500;
 }
 
 /* Hover effect for dropdown items */
 .navbar .dropdown-content a:hover {
-  background-color: #575757;
-  border-radius: 8px;
+  background-color: rgba(255, 255, 255, 0.08);
+  color: #fff;
 }
 
 /* Show the dropdown menu on hover */
@@ -121,56 +135,54 @@
 }
 
 
-
-
-
-
+/* Mobile */
 @media screen and (max-width: 960px) {
-  .NavbarItems {
-    position: relative;
+  .navbar {
+    height: 56px;
   }
 
   .nav-menu {
     display: flex;
     flex-direction: column;
     width: 100%;
-    height: 90vh;
     position: absolute;
-    top: 80px;
+    top: 56px;
     left: -100%;
-    opacity: 1;
+    opacity: 0;
+    transition: all 0.3s ease;
   }
 
   .nav-menu.active {
-    background: #242222;
+    background: rgba(15, 15, 20, 0.97);
+    backdrop-filter: blur(16px);
     left: 0;
     opacity: 1;
     z-index: 1;
     height: auto;
+    padding: 1rem 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  }
+
+  .nav-item {
+    height: auto;
   }
 
   .nav-links {
-    color: #fff;
+    color: rgba(255, 255, 255, 0.7);
     display: flex;
     align-items: center;
     text-decoration: none;
-    padding: 0.5rem 1rem;
+    padding: 1rem 2rem;
     height: 100%;
-    width: 100%; /* Adjusted to fit within screen width */
+    width: 100%;
     box-sizing: border-box;
   }
 
   .nav-links:hover {
-    background-color: #fff;
-    color: #242424;
+    background-color: rgba(255, 255, 255, 0.06);
+    color: #fff;
     border-radius: 0;
-  }
-
-  .navbar-logo {
-    position: absolute;
-    top: 0;
-    left: 0;
-    transform: translate(25%, 50%);
+    border-bottom: none;
   }
 
   .menu-icon {
@@ -178,37 +190,30 @@
     position: absolute;
     top: 0;
     right: 0;
-    transform: translate(-100%, 60%);
-    font-size: 1.8rem;
+    transform: translate(-100%, 50%);
+    font-size: 1.5rem;
     cursor: pointer;
+    height: 56px;
+    display: flex;
+    align-items: center;
   }
 
   .fa-times {
     color: #fff;
-    font-size: 2rem;
-  }
-
-  .nav-links-mobile {
-    display: block;
-    text-align: center;
-    margin: 2rem auto;
-    border-radius: 4px;
-    width: 80%;
-    text-decoration: none;
     font-size: 1.5rem;
-    background-color: transparent;
-    color: #fff;
-    padding: 14px 20px;
-    border: 1px solid #fff;
-  }
-
-  .nav-links-mobile:hover {
-    background: #fff;
-    color: #242424;
   }
 
   .navbar .dropdown-content {
+    position: relative;
+    top: 0;
     width: 100%;
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    padding: 0 0 0 1rem;
+  }
+
+  .navbar .dropdown-content a {
+    border-radius: 0;
   }
 }
-
