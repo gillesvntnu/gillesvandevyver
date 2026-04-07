@@ -151,33 +151,38 @@ class Slide extends React.Component {
   class Slider extends React.Component {
     constructor(props) {
       super(props)
-      
+
       this.state = { current: 1 }
+      this.touchStartX = 0
+      this.touchEndX = 0
       this.handlePreviousClick = this.handlePreviousClick.bind(this)
       this.handleNextClick = this.handleNextClick.bind(this)
       this.handleSlideClick = this.handleSlideClick.bind(this)
+      this.handleTouchStart = this.handleTouchStart.bind(this)
+      this.handleTouchMove = this.handleTouchMove.bind(this)
+      this.handleTouchEnd = this.handleTouchEnd.bind(this)
     }
-    
+
     handlePreviousClick() {
       const previous = this.state.current - 1
-          
-      this.setState({ 
-        current: (previous < 0) 
+
+      this.setState({
+        current: (previous < 0)
           ? this.props.slides.length - 1
           : previous
       })
     }
-    
+
     handleNextClick() {
       const next = this.state.current + 1;
-      
-      this.setState({ 
-        current: (next === this.props.slides.length) 
+
+      this.setState({
+        current: (next === this.props.slides.length)
           ? 0
           : next
       })
     }
-    
+
     handleSlideClick(index) {
       if (this.state.current !== index) {
         this.setState({
@@ -185,20 +190,50 @@ class Slide extends React.Component {
         })
       }
     }
-  
+
+    handleTouchStart(e) {
+      this.touchStartX = e.touches[0].clientX
+    }
+
+    handleTouchMove(e) {
+      this.touchEndX = e.touches[0].clientX
+    }
+
+    handleTouchEnd() {
+      const delta = this.touchStartX - this.touchEndX
+      const minSwipeDistance = 50
+
+      if (Math.abs(delta) >= minSwipeDistance) {
+        if (delta > 0) {
+          this.handleNextClick()
+        } else {
+          this.handlePreviousClick()
+        }
+      }
+
+      this.touchStartX = 0
+      this.touchEndX = 0
+    }
+
     render() {
-      const { current, direction } = this.state
-      const { slides, heading } = this.props 
+      const { current } = this.state
+      const { slides, heading } = this.props
       const headingId = `slider-heading__${heading.replace(/\s+/g, '-').toLowerCase()}`
       const wrapperTransform = {
         'transform': `translateX(-${current * (100 / slides.length)}%)`
       }
-      
+
       return (
-        <div className='slider' aria-labelledby={headingId}>
+        <div
+          className='slider'
+          aria-labelledby={headingId}
+          onTouchStart={this.handleTouchStart}
+          onTouchMove={this.handleTouchMove}
+          onTouchEnd={this.handleTouchEnd}
+        >
           <ul className="slider__wrapper" style={wrapperTransform}>
-            <h3 id={headingId} class="visuallyhidden">{heading}</h3>
-            
+            <h3 id={headingId} className="visuallyhidden">{heading}</h3>
+
             {slides.map(slide => {
               return (
                 <Slide
@@ -210,15 +245,15 @@ class Slide extends React.Component {
               )
             })}
           </ul>
-          
+
           <div className="slider__controls">
-            <SliderControl 
+            <SliderControl
               type="previous"
               title="Go to previous slide"
               handleClick={this.handlePreviousClick}
             />
-            
-            <SliderControl 
+
+            <SliderControl
               type="next"
               title="Go to next slide"
               handleClick={this.handleNextClick}
