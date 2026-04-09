@@ -63,22 +63,87 @@
     font-weight: bold;
 }
 
+/* ── Shared card base ──────────────────────────────── */
 .horizontal-card,
 .vertical-card {
-    display: flex;
     margin-top: 3vh;
-    border: 1px solid #ddd; /* Lighter border color */
-    padding: 1rem; /* Add padding */
-    border-radius: 2vh; /* Rounded corners */
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle box shadow */
+    border: 1px solid #ddd;
+    padding: 1rem;
+    border-radius: 2vh;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
+/* ── Horizontal card: CSS Grid with interleaved sections ── */
+.horizontal-card {
+    display: grid;
+    grid-template-columns: 1fr 38.2%;
+}
+
+.horizontal-card-left {
+    grid-template-columns: 38.2% 1fr;
+}
+
+/* Text-only sections (heading + paragraphs together, no paired image) */
+.horizontal-card .text-section {
+    grid-column: 1;
+}
+
+/* Split sections: title above media's first row, body below */
+.horizontal-card .section-title {
+    grid-column: 1;
+}
+
+.horizontal-card .section-body {
+    grid-column: 1;
+}
+
+.horizontal-card .media-section {
+    grid-column: 2;
+    grid-row: span 2;
+    text-align: center;
+    padding: 0.5rem 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Left-aligned image cards */
+.horizontal-card-left .text-section {
+    grid-column: 2;
+}
+
+.horizontal-card-left .section-title {
+    grid-column: 2;
+}
+
+.horizontal-card-left .section-body {
+    grid-column: 2;
+}
+
+.horizontal-card-left .media-section {
+    grid-column: 1;
+}
+
+.horizontal-card .media-section img {
+    max-width: 100%;
+    height: auto;
+}
+
+.horizontal-card .media-section p {
+    font-size: 0.621rem;
+    color: gray;
+    margin-top: 0.25rem;
+    margin-bottom: 0.5rem;
+}
+
+/* ── Vertical card ─────────────────────────────────── */
 .vertical-card {
+    display: flex;
     flex-direction: column;
     align-items: center;
 }
 
-.horizontal-card p,
 .vertical-card p {
     flex: 1;
 }
@@ -88,13 +153,14 @@
     margin-bottom: 1rem;
 }
 
+/* ── Image container (used in vertical cards) ──────── */
 .image-container {
     max-width: 38.2%;
     min-width: 38.2%;
     text-align: center;
     font-size: 0.621rem;
-    color: gray; /* Set the caption color to gray */
-    padding: 1rem; /* Add padding */
+    color: gray;
+    padding: 1rem;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -105,8 +171,8 @@
 .project-page-image-right,
 .project-page-image-left {
     height: auto;
-    align-self: center; /* Center the image vertically */
-    max-width: 100%; /* Ensure image takes full width */
+    align-self: center;
+    max-width: 100%;
 }
 
 .project-page-image-right {
@@ -118,15 +184,14 @@
 }
 
 .vertical-card .image-container {
-    max-width: 62.1%; /* Increase the max-width for part 2 */
-    min-width: 62.1%; /* Increase the min-width for part 2 */
-
+    max-width: 62.1%;
+    min-width: 62.1%;
 }
 
 
 @media (max-width: 1536px) {
     .project-page-container {
-        margin: 0 10%; /* Reduce margin for screens smaller than 1024px */
+        margin: 0 10%;
     }
 
     .image-container {
@@ -136,45 +201,66 @@
 }
 
 
-
 /* Media query for smaller screens */
 @media (max-width: 1280px) {
 
+    .horizontal-card {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
 
-    .horizontal-card,
+    .horizontal-card .text-section,
+    .horizontal-card .section-title,
+    .horizontal-card .section-body {
+        width: 100%;
+    }
+
+    .horizontal-card .media-section {
+        width: 100%;
+        max-width: 62.1%;
+    }
+
     .vertical-card {
         flex-direction: column;
         align-items: center;
     }
 
-    .horizontal-card-left {
-        flex-direction: column-reverse;
-    }
-
-
-
     .image-container {
-        max-width: 62.1%; /* Increase the max-width for part 2 */
-        min-width: 62.1%; /* Increase the min-width for part 2 */
+        max-width: 62.1%;
+        min-width: 62.1%;
     }
 }
 
 /* Media query for smaller screens */
 @media (max-width: 1024px) {
     .project-page-container {
-        margin: 0 7%; /* Reduce margin for screens smaller than 1024px */
+        margin: 0 7%;
+    }
+
+    .horizontal-card .media-section {
+        max-width: 75%;
     }
 
     .image-container {
-        max-width: 75%; /* Increase the max-width for part 2 */
-        min-width: 75%; /* Increase the min-width for part 2 */
+        max-width: 75%;
+        min-width: 75%;
     }
 }
 
 /* Media query for smaller screens */
 @media (max-width: 768px) {
     .project-page-container {
-        margin: 0 5%; /* Reduce margin for screens smaller than 1024px */
+        margin: 0 5%;
+    }
+
+    .horizontal-card .media-section {
+        max-width: 100%;
+    }
+
+    .horizontal-card .media-section img {
+        margin: 0;
+        max-width: 100%;
     }
 
     .image-container {
@@ -184,8 +270,8 @@
 
     .project-page-image-right,
     .project-page-image-left {
-        margin: 2vh 0 0 0; /* Adjust margin for images */
-        max-width: 100%; /* Ensure images take full width */
+        margin: 2vh 0 0 0;
+        max-width: 100%;
     }
 
     .vertical-card .image-container{
@@ -195,40 +281,38 @@
 
 @media (max-width: 480px) {
     .project-page-container {
-        margin: 0 0%; /* Further reduce margin for very small screens */
+        margin: 0 0%;
     }
 }
 
 
 .inline-image-container {
-    display: block; /* Ensure the container is a block element */
-    text-align: center; /* Center the content */
-    margin: 0 auto; /* Center the container itself */
-    vertical-align: middle; /* Align the container with the text */
+    display: block;
+    text-align: center;
+    margin: 0 auto;
+    vertical-align: middle;
 }
 
 .inline-image-container img {
-    display: block; /* Ensure the image is a block element */
+    display: block;
     max-width: 62.1%;
     height: auto;
-    margin: 0 auto 0.5rem auto; /* Center the image and add some space between the image and the caption */
+    margin: 0 auto 0.5rem auto;
 }
 
 .inline-image-container p {
     font-size: 0.8em;
-    color: gray; /* Set the caption color to gray */
+    color: gray;
     margin: 0;
 }
 
 a {
-    word-break: break-all; /* Allows long words to be broken and wrap to the next line */
-    white-space: normal; /* Ensures the text wraps normally */
+    word-break: break-all;
+    white-space: normal;
 }
 
 
 .small-image {
-    width: 50%; /* Adjust the width as needed */
-    height: auto; /* Maintain aspect ratio */
+    width: 50%;
+    height: auto;
 }
-
-

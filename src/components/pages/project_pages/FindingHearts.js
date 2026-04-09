@@ -29,30 +29,16 @@ function FindingHearts() {
             </div>
 
             <div className="horizontal-card horizontal-card-left">
-                <div className="image-container">
-                    <br/> <br/> <br/> <br/><br/><br/><br/>
+                <div className="section-title">
+                    <h2>When different neural networks disagree where the ❤️ is, something is wrong</h2>
+                </div>
+                <div className="media-section">
                     <a href="https://ieeexplore.ieee.org/document/10458930">
-                        <img src={agrrement_pic1} alt="" className="project-page-image-left"/>
+                        <img src={agrrement_pic1} alt=""/>
                     </a>
                     <p>The disagreement of two independent networks is an indication of failure.</p>
-                    <a href="https://ieeexplore.ieee.org/document/10458930">
-                        <img src={agrrement_pic2} alt="" className="project-page-image-left"/>
-                    </a>
-                    <p> Automatic segmentation of the heart</p>
-                    <a href="https://ieeexplore.ieee.org/document/10458930">
-                        <img src={agrrement_pic3} alt="" className="project-page-image-left"/>
-                    </a>
-                    <p> Failing case for the AI. In this case the bad image quality is to blame.
-                        The result is a weird shape that does not make sense.</p>
-                    <a href="https://ieeexplore.ieee.org/document/10458930">
-                        <img src={agrrement_pic5} alt="" className="project-page-image-left"/>
-                    </a>
-                    <p> AI designed to create an anatomically valid contour.</p>
-                    <br/>
                 </div>
-
-                <div>
-                    <h2>When different neural networks disagree where the ❤️ is, something is wrong</h2>
+                <div className="section-body">
                     <p>
                         One in three deaths in the United States is caused by cardiovascular diseases.
                         That's 702,880 per year, or 1 every 45 seconds, in the US alone.
@@ -64,7 +50,17 @@ function FindingHearts() {
                         images to get these measurements right. This takes a lot of time,
                         and the doctor usually only bothers to do this for a single heartbeat.
                     </p>
+                </div>
+                <div className="section-title">
                     <h3> How can AI help us? </h3>
+                </div>
+                <div className="media-section">
+                    <a href="https://ieeexplore.ieee.org/document/10458930">
+                        <img src={agrrement_pic2} alt=""/>
+                    </a>
+                    <p> Automatic segmentation of the heart</p>
+                </div>
+                <div className="section-body">
                     <p>
                         By having an AI to automatically draw the contours of the heart ('segmentation'),
                         we can automate the measurements.
@@ -72,7 +68,18 @@ function FindingHearts() {
                         more robust because we can measure multiple heartbeats and get the exact same
                         answer every time for a given image.
                     </p>
+                </div>
+                <div className="section-title">
                     <h3> So, what's the problem?</h3>
+                </div>
+                <div className="media-section">
+                    <a href="https://ieeexplore.ieee.org/document/10458930">
+                        <img src={agrrement_pic3} alt=""/>
+                    </a>
+                    <p> Failing case for the AI. In this case the bad image quality is to blame.
+                        The result is a weird shape that does not make sense.</p>
+                </div>
+                <div className="section-body">
                     <p>
                         Because we are in the medical sector, we want the AI to be reliable.
                         It should work for every patient. One difficulty can be that ultrasound images can have
@@ -81,9 +88,19 @@ function FindingHearts() {
                         The AI might work well for healthy hearts, but it might fail when the heart has
                         unusual characteristics because the model is not used to these cases.
                         We see that when the model fails, it tends to produce weird shapes that
-                        don’t make any anatomical sense.
+                        don't make any anatomical sense.
                     </p>
+                </div>
+                <div className="section-title">
                     <h3> How to solve this problem? </h3>
+                </div>
+                <div className="media-section">
+                    <a href="https://ieeexplore.ieee.org/document/10458930">
+                        <img src={agrrement_pic5} alt=""/>
+                    </a>
+                    <p> AI designed to create an anatomically valid contour.</p>
+                </div>
+                <div className="section-body">
                     <p>
                         I made an AI designed specifically to avoid weird shapes and anatomical errors
                         by teaching it to create a contour inspired by human anatomy.
@@ -97,6 +114,8 @@ function FindingHearts() {
                         those cases to retrain the AI so that it will not fail the next time it sees a similar
                         case ('active learning').
                     </p>
+                </div>
+                <div className="text-section">
                     <h3> Open-source code</h3>
                     <p>
                         My code is available as a Python library at&nbsp;
@@ -126,8 +145,15 @@ function FindingHearts() {
                 </div>
             </div>
             <div className="horizontal-card horizontal-card-right">
-                <div>
+                <div className="section-title">
                     <h2>Does your heart look good?</h2>
+                </div>
+                <div className="media-section">
+                    <a href="https://www.sciencedirect.com/science/article/pii/S0301562924004691">
+                        <img src={quality_pic1} alt=""/>
+                    </a>
+                </div>
+                <div className="section-body">
                     <p>
                         Ultrasound imaging is amazing.
                         You take your ultrasound probe, put some gel on it, place it on your chest, and voila,
@@ -146,7 +172,18 @@ function FindingHearts() {
                         the improvements in quality.
                         Clearly, a real-time quality assessment tool has many use cases.
                     </p>
+                </div>
+                <div className="section-title">
                     <h3> How does it work? </h3>
+                </div>
+                <div className="media-section">
+                    <a href="https://www.sciencedirect.com/science/article/pii/S0301562924004691">
+                        <img src={quality_pic2} alt=""/>
+                    </a>
+                    <p> These two echoes where obtained using the same scanner, yet the quality is vastly
+                        different.</p>
+                </div>
+                <div className="section-body">
                     <p>
                         Three senior clinicians came together to discuss how they define a good cardiac echo image.
                         Then, they put image quality labels on 458 echo images from 65 different study participants.
@@ -158,14 +195,35 @@ function FindingHearts() {
                         This means it learned to strike a middle ground between the subjective
                         opinions of the different clinicians.
                     </p>
+                </div>
+                <div className="section-title">
                     <h3> Open-source code</h3>
+                </div>
+                <div className="media-section">
+                    <a href="https://www.sciencedirect.com/science/article/pii/S0301562924004691">
+                        <img src={quality_pic3} alt=""/>
+                    </a>
+                    <p> The AI labels the image quality of each region of the heart wall.</p>
+                </div>
+                <div className="section-body">
                     <p>
                         My code is available as a Python library at&nbsp;
                         <a href="https://github.com/GillesVanDeVyver/arqee">
                             https://github.com/GillesVanDeVyver/arqee</a>.
                         I provide comprehensive tutorials and examples on how to use the code.
                     </p>
+                </div>
+                <div className="section-title">
                     <h3> In conclusion</h3>
+                </div>
+                <div className="media-section">
+                    <a href="https://www.sciencedirect.com/journal/ultrasound-in-medicine-and-biology/vol/51/issue/4"
+                       target="_blank" rel="noopener noreferrer">
+                        <img src={quality_pic5} alt="" className="small-image"/>
+                    </a>
+                    <p> The article is on the cover page of its issue.</p>
+                </div>
+                <div className="section-body">
                     <p>
                         I created a real-time quality assessment tool for cardiac ultrasound images.
                         This tool can be used in many different applications, and I open sourced the code
@@ -175,7 +233,18 @@ function FindingHearts() {
                         <a href="https://youtu.be/NXkR6rX14HQ">
                             Demo on YouTube</a>,
                     </p>
+                </div>
+                <div className="section-title">
                     <h3> Publication, presentation and award </h3>
+                </div>
+                <div className="media-section">
+                    <a href="https://www.sciencedirect.com/science/article/pii/S0301562924004691">
+                        <img src={quality_pic4} alt=""/>
+                    </a>
+                    <p> The poster presentation was awarded the runner-up prize for best poster in the ASMUS
+                        workshop at MICCAI 2024.</p>
+                </div>
+                <div className="section-body">
                     <p> The work is published on Ultrasound in Medicine & Biology (UMB):&nbsp;
                     <a href="https://www.sciencedirect.com/science/article/pii/S0301562924004691">
                         Regional Image Quality Scoring for 2-D Echocardiography Using Deep Learning
@@ -188,36 +257,6 @@ function FindingHearts() {
                     conference, where it was awarded the runner-up prize for best poster
                     in the ASMUS (Advances in Simplifying Medical Ultrasound) workshop.
                     </p>
-                </div>
-                <div className="image-container">
-                    <br/> <br/> <br/> <br/><br/><br/><br/>
-                    <a href="https://www.sciencedirect.com/science/article/pii/S0301562924004691">
-                        <img src={quality_pic1} alt="" className="project-page-image-right"/>
-                    </a>
-                    <p></p>
-                    <br/>
-                    <a href="https://www.sciencedirect.com/science/article/pii/S0301562924004691">
-                        <img src={quality_pic2} alt="" className="project-page-image-right"/>
-                    </a>
-                    <p> These two echoes where obtained using the same scanner, yet the quality is vastly
-                        different.</p>
-                    <br/>
-                    <a href="https://www.sciencedirect.com/science/article/pii/S0301562924004691">
-                        <img src={quality_pic3} alt="" className="project-page-image-right"/>
-                    </a>
-                    <p> The AI labels the image quality of each region of the heart wall.</p>
-                    <br/>
-                    <a href="https://www.sciencedirect.com/journal/ultrasound-in-medicine-and-biology/vol/51/issue/4"
-                       target="_blank" rel="noopener noreferrer">
-                        <img src={quality_pic5} alt="" className="project-page-image-right small-image"/>
-                    </a>
-                    <p> The article is on the cover page of its issue.</p>
-                    <a href="https://www.sciencedirect.com/science/article/pii/S0301562924004691">
-                        <img src={quality_pic4} alt="" className="project-page-image-right"/>
-                    </a>
-                    <p> The poster presentation was awarded the runner-up prize for best poster in the ASMUS
-                        workshop at MICAII 2024.</p>
-                    <br/>
                 </div>
             </div>
         </div>

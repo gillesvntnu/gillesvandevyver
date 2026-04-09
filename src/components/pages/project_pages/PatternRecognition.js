@@ -18,18 +18,36 @@ function PatternRecognition() {
             </div>
 
             <div className="horizontal-card">
-                <div>
+                <div className="section-title">
                     <h2> Detecting machine failures with microphones</h2>
+                </div>
+                <div className="media-section">
+                    <a href="https://ieeexplore.ieee.org/abstract/document/9980266">
+                        <img src={vit1} alt="Pattern Recognition"/>
+                    </a>
+                    <p> The audio data was represented as spectrograms.</p>
+                </div>
+                <div className="section-body">
                     <p>
                         Industrial machines can easily cost hundreds of thousands of dollars.
                         Proactive maintenance and repair can save a lot of money by avoiding downtime and the cost of
                         replacing parts or the entire machine.
-                        Microphones are a great choice because they’re usually inexpensive and, unlike just looking
-                        at a machine, the sound can reveal what’s happening inside.
+                        Microphones are a great choice because they're usually inexpensive and, unlike just looking
+                        at a machine, the sound can reveal what's happening inside.
                         The challenge is that the sound is not always easy to interpret and a subtle change in sound
                         can be a sign of a problem. This is where AI can help.
                     </p>
+                </div>
+                <div className="section-title">
                     <h3> The challenge </h3>
+                </div>
+                <div className="media-section">
+                    <a href="https://ieeexplore.ieee.org/abstract/document/9980266">
+                        <img src={vit2} alt="Pattern Recognition"/>
+                    </a>
+                    <p> The attention mechanism of the vision transformer could also be used on spectrograms.</p>
+                </div>
+                <div className="section-body">
                     <p>
                         In a realistic scenario in industrial factories, the sound of the machines can only be
                         recorded when the machine is running correctly.
@@ -39,6 +57,8 @@ function PatternRecognition() {
                         This was the setting for the DCASE (Detection and Classification of Acoustic Scenes and Events)
                         2021 challenge, where I did my master's thesis on.
                     </p>
+                </div>
+                <div className="text-section">
                     <h3> Our solution </h3>
                     <p>
                         At the time of the challenge, the Vision Transformer (ViT) was the new kid on the block in
@@ -66,26 +86,16 @@ function PatternRecognition() {
                         </a>
                     </p>
                 </div>
-                <div className="image-container">
-                    <br/> <br/> <br/> <br/><br/><br/><br/>
-                    <a href="https://ieeexplore.ieee.org/abstract/document/9980266">
-                        <img src={vit1} alt="Pattern Recognition" className="project-page-image-right"/>
-                    </a>
-                    <p> The audio data was represented as spectrograms.</p>
-                    <a href="https://ieeexplore.ieee.org/abstract/document/9980266">
-                        <img src={vit2} alt="Pattern Recognition" className="project-page-image-right"/>
-                    </a>
-                        <p> The attention mechanism of the vision transformer could also be used on spectrograms.</p>
-                </div>
             </div>
-            <div className="horizontal-card">
-                <div className="image-container">
-                    <br/> <br/> <br/> <br/><br/><br/><br/>
-                    <img src={tennis_courts} alt="Pattern Recognition" className="project-page-image-left"/>
+            <div className="horizontal-card horizontal-card-left">
+                <div className="section-title">
+                    <h2> Finding tennis courts in satellite images</h2>
+                </div>
+                <div className="media-section">
+                    <img src={tennis_courts} alt="Pattern Recognition"/>
                     <p> It was a challenge for the model to get the exact number of tennis courts.</p>
                 </div>
-                <div>
-                    <h2> Finding tennis courts in satellite images</h2>
+                <div className="section-body">
                     <p>
                         How many tennis courts are there in all of Flanders, Belgium?
                         That was the question Sweco wanted to know.
@@ -107,6 +117,8 @@ function PatternRecognition() {
                         If the AI could detect tennis courts, it could detect other buildings or objects as well,
                         given the right training data.
                     </p>
+                </div>
+                <div className="text-section">
                     <h3>Exploring AI Capabilities</h3>
                     <p>
                         The YOLOv4 model was a logical choice for this task as it was the current state-of-the-art

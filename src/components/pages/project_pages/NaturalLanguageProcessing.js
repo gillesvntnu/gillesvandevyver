@@ -16,8 +16,15 @@ const NaturalLanguageProcessing = () => {
                 </p>
             </div>
             <div className="horizontal-card">
-                <div>
+                <div className="section-title">
                     <h2> Word2Mat: using matrices to capture word order in NLP </h2>
+                </div>
+                <div className="media-section">
+                    <img src={nlp1} alt="" className="resized-nlp-image"/>
+                    <p> Word2Vec represents words as vectors. In practice, there are 300 numbers/dimensions per word.
+                        Here we show a simplified version with 2 dimensions. </p>
+                </div>
+                <div className="section-body">
                     <p>
                         It's 2019, a group of deep learning students decide to do their own deep learning project.
                         Our interest gets sparked by the idea of Word2Vec, a model that represents words as vectors.
@@ -63,19 +70,15 @@ const NaturalLanguageProcessing = () => {
                         Dunning-Kruger effect? Probably. Valuable experience? Definitely.
                     </p>
                 </div>
-                <div className="image-container">
-                    <br/> <br/> <br/> <br/><br/><br/><br/>
-                    <img src={nlp1} alt="" className="project-page-image-right resized-nlp-image"/>
-                    <p> Word2Vec represents words as vectors. In practice, there are 300 numbers/dimensions per word.
-                        Here we show a simplified version with 2 dimensions. </p>
-                </div>
             </div>
-            <div className="horizontal-card">
-                <div className="image-container">
-                    <img src={wip} alt="" className="project-page-image-left"/>
-                </div>
-                <div>
+            <div className="horizontal-card horizontal-card-left">
+                <div className="section-title">
                     <h2> Personal chatbot </h2>
+                </div>
+                <div className="media-section">
+                    <img src={wip} alt=""/>
+                </div>
+                <div className="section-body">
                     <p>
                         Coming soon!
                     </p>

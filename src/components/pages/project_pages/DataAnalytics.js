@@ -18,7 +18,11 @@ function DataAnalytics() {
                 </p>
             </div>
             <div className="horizontal-card">
-                <div>
+                <div className="media-section">
+                    <img src={powerbi_img} alt="Data Analytics"/>
+                    <p> The values in the image are made up. The real data is confidential.</p>
+                </div>
+                <div className="text-section">
                     <h2>Charging behaviour of employees at Sweco</h2>
                     <p>
                         In Belgium, a company car is a common benefit for employees, especially for consultancy firms.
@@ -38,10 +42,6 @@ function DataAnalytics() {
                         I used Power BI to visualize the results with interactive dashboards. This tool really helps
                         to condense the insights into a clear and concise report.
                     </p>
-                </div>
-                <div className="image-container">
-                    <img src={powerbi_img} alt="Data Analytics" className="project-page-image-right"/>
-                    <p> The values in the image are made up. The real data is confidential.</p>
                 </div>
             </div>
             <div className="vertical-card">

@@ -22,8 +22,15 @@ const GenerativeAI = () => {
                 </p>
             </div>
             <div className="horizontal-card horizontal-card-right">
-                <div>
+                <div className="section-title">
                     <h2> Generating echo images of the heart </h2>
+                </div>
+                <div className="media-section">
+                    <a href="https://arxiv.org/abs/2502.20100">
+                        <img src={gen_ai_pic0} alt=""/>
+                    </a>
+                </div>
+                <div className="section-body">
                     <p>
                         In the AI era, data is gold.
                         AI tools are only as good as the data on which they are trained.
@@ -32,7 +39,17 @@ const GenerativeAI = () => {
                         In practice this means that data from one data center can usually not be used together with
                         data in another datacenter without losing quality and consistency.
                     </p>
+                </div>
+                <div className="section-title">
                     <h3> Generative AI </h3>
+                </div>
+                <div className="media-section">
+                    <a href="https://arxiv.org/abs/2502.20100">
+                        <img src={gen_ai_pic1} alt=""/>
+                    </a>
+                    <p> Generative augmentations can put existing annotated data in a new context.</p>
+                </div>
+                <div className="section-body">
                     <p>
                         Generative AI can generate highly realistic images in a certain domain.
                         The tricky part is that the generative images are not always accurate and can not really be
@@ -40,7 +57,17 @@ const GenerativeAI = () => {
                         This would mean we lose the quality of the annotations in the data from the experienced
                         cardiologists and we are back at square one.
                     </p>
+                </div>
+                <div className="section-title">
                     <h3> Augmentation </h3>
+                </div>
+                <div className="media-section">
+                    <a href="https://arxiv.org/abs/2502.20100">
+                        <img src={gen_ai_transition} alt="" className="small-image"/>
+                    </a>
+                    <p> The generative AI is a diffusion model that generates content from noise.</p>
+                </div>
+                <div className="section-body">
                     <p>
                         By using generative AI to modify only specific parts of images
                         without affecting regions that rely on precise clinician annotations,
@@ -66,14 +93,35 @@ const GenerativeAI = () => {
                         When training with the augmented images, the model generalizes better and can be used in
                         more scenarios, meaning higher feasibility and robustness.
                     </p>
+                </div>
+                <div className="section-title">
                     <h3> Open-source code</h3>
+                </div>
+                <div className="media-section">
+                    <a href="https://arxiv.org/abs/2502.20100">
+                        <img src={gen_ai_pic2} alt=""/>
+                    </a>
+                    <p> An existing image of a heart is put in a new position and made to look realistic
+                        by using the generative model.</p>
+                </div>
+                <div className="section-body">
                     <p>
                         My code is available as a Python library at&nbsp;
                         <a href="https://github.com/GillesVanDeVyver/EchoGAINS">
                             https://github.com/GillesVanDeVyver/EchoGAINS</a>.
                         I provide a comprehensive tutorial on how to use the code.
                     </p>
+                </div>
+                <div className="section-title">
                     <h3> In conclusion </h3>
+                </div>
+                <div className="media-section">
+                    <a href="https://arxiv.org/abs/2502.20100">
+                        <img src={gen_ai_pic3} alt=""/>
+                    </a>
+                    <p> Models trained with the augmented dataset generalize better and are more robust.</p>
+                </div>
+                <div className="section-body">
                     <p>
                         In this research project, I created a generative model that can augment
                         an echocardiography dataset to create a more diverse dataset.
@@ -84,37 +132,14 @@ const GenerativeAI = () => {
                         <a href="https://youtu.be/4lwMv-oU-fA">
                             Demo on YouTube</a>,
                     </p>
+                </div>
+                <div className="text-section">
                     <h3> Publication </h3>
                     <p> The academic paper is available as a preprint on ArXiv:&nbsp;
                         <a href="https://arxiv.org/abs/2502.20100">
                             Generative augmentations for improved cardiac ultrasound segmentation using diffusion models
                         </a>.
                     </p>
-                </div>
-                <div className="image-container">
-                    <br/>
-                    <a href="https://arxiv.org/abs/2502.20100">
-                        <img src={gen_ai_pic0} alt="" className="project-page-image-right"/>
-                    </a>
-                    <br/><br/>
-                    <a href="https://arxiv.org/abs/2502.20100">
-                        <img src={gen_ai_pic1} alt="" className="project-page-image-right"/>
-                    </a>
-                    <p> Generative augmentations can put existing annotated data in a new context.</p>
-                    <a href="https://arxiv.org/abs/2502.20100">
-                        <img src={gen_ai_transition} alt="" className="project-page-image-right small-image"/>
-                    </a>
-                    <p> The generative AI is a diffusion model that generates content from noise.</p>
-                    <a href="https://arxiv.org/abs/2502.20100">
-                        <img src={gen_ai_pic2} alt="" className="project-page-image-right"/>
-                    </a>
-                    <p> An existing image of a heart is put in a new position and made to look realistic
-                        by using the generative model.</p>
-                    <a href="https://arxiv.org/abs/2502.20100">
-                        <img src={gen_ai_pic3} alt="" className="project-page-image-right"/>
-                    </a>
-                    <p> Models trained with the augmented dataset generalize better and are more robust.</p>
-                    <br/>
                 </div>
             </div>
         </div>
