@@ -4,6 +4,7 @@ import data_analytics_pic from '../images/data_analytics/data_analytics.jpeg'
 import computer_vision_pic from '../images/finding_hearts/computer_vision_meddical_imaging.jpg'
 import spectrogram_pic from '../images/pattern-recognition/sound_waves.jpeg'
 import gen_ai_transition from '../images/gen_ai/gen_ai_transition.gif'
+import chatbot_pic from '../images/agentic_ai/chatbot.jpeg'
 
 const slideData = [
   {
@@ -47,6 +48,13 @@ const slideData = [
     button: 'Find out more',
     src: spectrogram_pic,
     link: '#/projects/pattern-recognition'
+  },
+  {
+    index: 4,
+    headline: 'Agentic AI',
+    button: 'Find out more',
+    src: chatbot_pic,
+    link: '#/projects/agentic-ai'
   }
 ];
   

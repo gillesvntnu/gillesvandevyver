@@ -8,6 +8,7 @@ import DataAnalytics from "./components/pages/project_pages/DataAnalytics";
 import FindingHearts from "./components/pages/project_pages/FindingHearts";
 import PatternRecognition from "./components/pages/project_pages/PatternRecognition";
 import GenerativeAI from "./components/pages/project_pages/GenerativeAI";
+import AgenticAI from "./components/pages/project_pages/AgenticAI";
 import PdfViewer from './components/viewers/PDFViewer';
 import JSXViewer from './components/viewers/JSXViewer';
 
@@ -33,6 +34,7 @@ function App() {
             <Route path='/projects/finding-hearts' element={<FindingHearts />} />
             <Route path='/projects/pattern-recognition' element={<PatternRecognition />} />
             <Route path='/projects/generative-ai' element={<GenerativeAI />} />
+            <Route path='/projects/agentic-ai' element={<AgenticAI />} />
             <Route path="/recommendation-pdf" element={<PdfViewer />} />
             <Route path="/recommendation" element={
               <JSXViewer/>
