@@ -4,9 +4,11 @@ import Navbar from './components/Navbar';
 import './App.css';
 import Home from './components/pages/Home';
 import '@fortawesome/fontawesome-free/css/all.min.css';
-import DataAnalytics from "./components/pages/project_pages/DataAnalytics";
-import FindingHearts from "./components/pages/project_pages/FindingHearts";
-import PatternRecognition from "./components/pages/project_pages/PatternRecognition";
+// import DataAnalytics from "./components/pages/project_pages/DataAnalytics";
+// import FindingHearts from "./components/pages/project_pages/FindingHearts";
+import RobustComputerVision from "./components/pages/project_pages/RobustComputerVision";
+import ImageQuality from "./components/pages/project_pages/ImageQuality";
+// import PatternRecognition from "./components/pages/project_pages/PatternRecognition";
 import GenerativeAI from "./components/pages/project_pages/GenerativeAI";
 import AgenticAI from "./components/pages/project_pages/AgenticAI";
 import PdfViewer from './components/viewers/PDFViewer';
@@ -30,9 +32,11 @@ function App() {
           <Navbar />
           <Routes>
             <Route path='/' element={<Home />} />
-            <Route path='/projects/data-analytics' element={<DataAnalytics />} />
-            <Route path='/projects/finding-hearts' element={<FindingHearts />} />
-            <Route path='/projects/pattern-recognition' element={<PatternRecognition />} />
+            {/* <Route path='/projects/data-analytics' element={<DataAnalytics />} /> */}
+            {/* <Route path='/projects/finding-hearts' element={<FindingHearts />} /> */}
+            <Route path='/projects/robust-computer-vision' element={<RobustComputerVision />} />
+            <Route path='/projects/image-quality' element={<ImageQuality />} />
+            {/* <Route path='/projects/pattern-recognition' element={<PatternRecognition />} /> */}
             <Route path='/projects/generative-ai' element={<GenerativeAI />} />
             <Route path='/projects/agentic-ai' element={<AgenticAI />} />
             <Route path="/recommendation-pdf" element={<PdfViewer />} />

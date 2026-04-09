@@ -11,16 +11,6 @@ const GenerativeAI = () => {
     return (
         <div className="project-page-container">
             <h1>Generative AI</h1>
-            <div className="tldr">
-                <p><strong>TL;DR: </strong>
-                    In this research project, I developed a generative model to augment an echocardiography dataset,
-                    improving its diversity and increasing the feasibility and robustness
-                    of deep learning models trained on it. <a href="https://www.youtube.com/watch?v=kiuWaPJnLHU">
-                        Demo on YouTube</a>,
-                    <br/>
-                    <strong>Technologies used:</strong> Diffusion models, Pytorch, Python, C++
-                </p>
-            </div>
             <div className="horizontal-card horizontal-card-right">
                 <div className="section-title">
                     <h2> Generating echo images of the heart </h2>
@@ -35,7 +25,7 @@ const GenerativeAI = () => {
                         In the AI era, data is gold.
                         AI tools are only as good as the data on which they are trained.
                         This is especially the case in the medical domain, since measurements are labor intensive
-                        and even experienced cardiologists do not agree on a single way of measuring.
+                        and in practice even experienced cardiologists do not agree on a single way of measuring.
                         In practice this means that data from one data center can usually not be used together with
                         data in another datacenter without losing quality and consistency.
                     </p>
@@ -77,22 +67,6 @@ const GenerativeAI = () => {
                         This allows our models to perform across a wider range of scenarios while maintaining
                         the high standard of quality.
                     </p>
-                    <p>
-                        In this project, I focus on echocardiology.
-                        Here, the context is about where the heart is inside the image and how it is positioned.
-                        Specifically, most of the images in our internal dataset from the hospital are
-                        so-called left ventricle (LV) focused, which means that the image is zoomed in on the LV in
-                        the middle of the image.
-                        This is the clinically recommended way of taking images, but in practice, the images are not
-                        always taken this way.
-                        For example, the operator might not be experienced, the image quality might be better when
-                        deviating from the recommended way, or the heart of the patient itself might make it
-                        difficult or impossible to have a clear, LV-focused image.
-                        When training a deep learning model on only LV-focused images,
-                        the model will not be able to generalize to these other scenarios.
-                        When training with the augmented images, the model generalizes better and can be used in
-                        more scenarios, meaning higher feasibility and robustness.
-                    </p>
                 </div>
                 <div className="section-title">
                     <h3> Open-source code</h3>
@@ -123,11 +97,11 @@ const GenerativeAI = () => {
                 </div>
                 <div className="section-body">
                     <p>
-                        In this research project, I created a generative model that can augment
+                        In this project, I created a generative model that can augment
                         an echocardiography dataset to create a more diverse dataset.
                         Deep learning models trained on this dataset can generalize better to different scenarios
                         and be more robust in practice.
-                        I made a demo video to show our proof of concept in real-time on the ultrasound
+                        I also made a demo video to show our proof of concept in real-time on the ultrasound
                         scanner:&nbsp;
                         <a href="https://youtu.be/4lwMv-oU-fA">
                             Demo on YouTube</a>,

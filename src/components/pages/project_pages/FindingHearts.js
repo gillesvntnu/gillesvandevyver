@@ -12,22 +12,10 @@ import quality_pic4 from '../../../images/finding_hearts/quality_pic4.png';
 import quality_pic5 from '../../../images/finding_hearts/quality_pic5.jpg';
 
 
-function FindingHearts() {
+function RobustVisionEcho() {
     return (
         <div className="project-page-container">
-            <h1>Finding Hearts</h1>
-            <div className="tldr">
-                <p><strong>TL;DR: </strong>
-                    Academic projects focused on reliable and real-time image analysis for cardiac ultrasound during my
-                    PhD.
-                    The results are published in two first-author papers. YouTube demos:&nbsp;
-                    <a href="https://www.youtube.com/watch?v=JnmtkZS1Fmk&ab_channel=gillesvandevyver">Demo 1</a>.
-                    <a href="https://www.youtube.com/watch?v=mj4PZtV6kkE&ab_channel=gillesvandevyver">Demo 2</a>,&nbsp;
-                    <br/>
-                    <strong>Technologies used:</strong> Python, C++, PyTorch, graph neural networks
-                </p>
-            </div>
-
+            <h1> Robust computer vision for Echo</h1>
             <div className="horizontal-card horizontal-card-left">
                 <div className="section-title">
                     <h2>When different neural networks disagree where the ❤️ is, something is wrong</h2>
@@ -42,8 +30,7 @@ function FindingHearts() {
                     <p>
                         One in three deaths in the United States is caused by cardiovascular diseases.
                         That's 702,880 per year, or 1 every 45 seconds, in the US alone.
-                        At the heart of modern cardiology (see what I did there?),
-                        ultrasound imaging is the standard way to assess cardiac health.
+                        Ultrasound imaging is the standard way to assess cardiac health.
                         These imaging techniques allow us to determine important clinical parameters,
                         for example, how much blood the heart is pumping (the 'ejection fraction').
                         In the clinic today, the doctor must draw exactly where the heart is in the ultrasound
@@ -116,20 +103,13 @@ function FindingHearts() {
                     </p>
                 </div>
                 <div className="text-section">
-                    <h3> Open-source code</h3>
+                    <h3> Open-source code and demo</h3>
                     <p>
                         My code is available as a Python library at&nbsp;
                         <a href="https://github.com/GillesVanDeVyver/GCN_multistructure">
                         https://github.com/GillesVanDeVyver/GCN_multistructure</a>.
-                    </p>
-                    <h3> In conclusion</h3>
-                    <p>
-                        If we want to make a more reliable AI, we need to teach it to imitate humans on
-                        the more rare and interesting cases.
-                        To find these cases, we can see how two different AIs, designed to avoid the mistakes
-                        of the other, agree on where the heart is.
-                        <br/> <br/>
-                        Finally, I made a demo video to show our proof of concept in real-time on the
+                        <br/>
+                        I also made a demo video to show our proof of concept in real-time on the
                         scanner:&nbsp;
                         <a href="https://youtu.be/I9R8kxwj0fw">
                             Demo on YouTube</a>,
@@ -161,16 +141,8 @@ function FindingHearts() {
                         But what do you see? For some patients, the images obtained during an echo have great
                         detail and the doctor can make accurate measurements of clinical measurements, while for
                         others the doctor can barely distinguish the contour of your heart.
-                    </p>
-                    <p>
                         In this work, I created a tool that automatically tells you how good or bad the quality
                         of the heart is, in real-time.
-                        This can be useful in quantifying the quality of the image in many ways.
-                        Maybe we are doing a large study on cardiac images and we want to exclude the ones where
-                        the image quality is simply too bad.
-                        Or maybe someone is developing a new ultrasound scanner and wants to quantify
-                        the improvements in quality.
-                        Clearly, a real-time quality assessment tool has many use cases.
                     </p>
                 </div>
                 <div className="section-title">
@@ -189,11 +161,7 @@ function FindingHearts() {
                         Then, they put image quality labels on 458 echo images from 65 different study participants.
                         With this data, I trained a neural network to mimic the clinicians.
                         After extensive tuning and testing, I ended up with a model that can label the image
-                        quality of cardiac images in real-time.
-                        When testing the trained model, I found that the model tends to make fewer errors
-                        than the clinicians among themselves!
-                        This means it learned to strike a middle ground between the subjective
-                        opinions of the different clinicians.
+                        quality of cardiac images in real-time with fewer mistakes than the clinicians among themselves.
                     </p>
                 </div>
                 <div className="section-title">
@@ -228,7 +196,7 @@ function FindingHearts() {
                         I created a real-time quality assessment tool for cardiac ultrasound images.
                         This tool can be used in many different applications, and I open sourced the code
                         to make it available to everyone. <br/><br/>
-                        I made a demo video to show our proof of concept in real-time on the ultrasound
+                        I also made a demo video to show our proof of concept in real-time on the ultrasound
                         scanner:&nbsp;
                         <a href="https://youtu.be/NXkR6rX14HQ">
                             Demo on YouTube</a>,
@@ -263,4 +231,4 @@ function FindingHearts() {
     );
 }
 
-export default FindingHearts;
+export default RobustVisionEcho;

@@ -2,39 +2,33 @@ import React from 'react';
 import './carousel.scss';
 import data_analytics_pic from '../images/data_analytics/data_analytics.jpeg'
 import computer_vision_pic from '../images/finding_hearts/computer_vision_meddical_imaging.jpg'
+import quality_pic from '../images/finding_hearts/quality_pic7.jpg'
 import spectrogram_pic from '../images/pattern-recognition/sound_waves.jpeg'
 import gen_ai_transition from '../images/gen_ai/gen_ai_transition.gif'
 import chatbot_pic from '../images/agentic_ai/chatbot.jpeg'
 
 const slideData = [
+  // {
+  //   index: 0,
+  //   headline: 'Data Analytics',
+  //   button: 'Find out more',
+  //   src: data_analytics_pic,
+  //   link: '#/projects/data-analytics'
+  // },
   {
     index: 0,
-    headline: 'Data Analytics',
-    button: 'Find out more',
-    src: data_analytics_pic,
-    link: '#/projects/data-analytics'
-  },
-  //{
-  //  index: 1,
-  //  headline: 'Generative AI for medical imaging',
-  //  button: 'Find out more',
-  //  src: '',
-  //  link: '/generative-ai'
-  //},
-  {
-    index: 1,
-    headline: 'Finding hearts',
+    headline: 'Robust computer vision',
     button: 'Find out more',
     src: computer_vision_pic,
-    link: '#/projects/finding-hearts'
+    link: '#/projects/robust-computer-vision'
   },
-  //{
-  //  index: 2,
-  //  headline: 'Natural language processing',
-  //  button: 'Find out more',
-  //  src: chatbot_pic,
-  //  link: '#/projects/natural-language-processing'
-  //},
+  {
+    index: 1,
+    headline: 'Image quality',
+    button: 'Find out more',
+    src: quality_pic,
+    link: '#/projects/image-quality'
+  },
   {
     index: 2,
     headline: 'Generative AI',
@@ -42,15 +36,15 @@ const slideData = [
     src: gen_ai_transition,
     link: '#/projects/generative-ai'
   },
+  // {
+  //   index: 2,
+  //   headline: 'Pattern recognition',
+  //   button: 'Find out more',
+  //   src: spectrogram_pic,
+  //   link: '#/projects/pattern-recognition'
+  // },
   {
     index: 3,
-    headline: 'Pattern recognition',
-    button: 'Find out more',
-    src: spectrogram_pic,
-    link: '#/projects/pattern-recognition'
-  },
-  {
-    index: 4,
     headline: 'Agentic AI',
     button: 'Find out more',
     src: chatbot_pic,
