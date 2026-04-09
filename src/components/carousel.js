@@ -156,12 +156,51 @@ class Slide extends React.Component {
       this.state = { current: 1 }
       this.touchStartX = 0
       this.touchEndX = 0
+      this.autoPlayInterval = null
+      this.idleTimeout = null
       this.handlePreviousClick = this.handlePreviousClick.bind(this)
       this.handleNextClick = this.handleNextClick.bind(this)
       this.handleSlideClick = this.handleSlideClick.bind(this)
       this.handleTouchStart = this.handleTouchStart.bind(this)
       this.handleTouchMove = this.handleTouchMove.bind(this)
       this.handleTouchEnd = this.handleTouchEnd.bind(this)
+      this.startAutoPlay = this.startAutoPlay.bind(this)
+      this.stopAutoPlay = this.stopAutoPlay.bind(this)
+      this.resetIdleTimer = this.resetIdleTimer.bind(this)
+    }
+
+    componentDidMount() {
+      this.startAutoPlay()
+    }
+
+    componentWillUnmount() {
+      this.stopAutoPlay()
+      clearTimeout(this.idleTimeout)
+    }
+
+    startAutoPlay() {
+      this.stopAutoPlay()
+      this.autoPlayInterval = setInterval(() => {
+        const next = this.state.current + 1
+        this.setState({
+          current: (next === this.props.slides.length) ? 0 : next
+        })
+      }, 3000)
+    }
+
+    stopAutoPlay() {
+      if (this.autoPlayInterval) {
+        clearInterval(this.autoPlayInterval)
+        this.autoPlayInterval = null
+      }
+    }
+
+    resetIdleTimer() {
+      this.stopAutoPlay()
+      clearTimeout(this.idleTimeout)
+      this.idleTimeout = setTimeout(() => {
+        this.startAutoPlay()
+      }, 3000)
     }
 
     handlePreviousClick() {
@@ -172,6 +211,7 @@ class Slide extends React.Component {
           ? this.props.slides.length - 1
           : previous
       })
+      this.resetIdleTimer()
     }
 
     handleNextClick() {
@@ -182,6 +222,7 @@ class Slide extends React.Component {
           ? 0
           : next
       })
+      this.resetIdleTimer()
     }
 
     handleSlideClick(index) {
@@ -190,6 +231,7 @@ class Slide extends React.Component {
           current: index
         })
       }
+      this.resetIdleTimer()
     }
 
     handleTouchStart(e) {
