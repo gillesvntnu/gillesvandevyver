@@ -5,7 +5,7 @@ import computer_vision_pic from '../images/finding_hearts/computer_vision_meddic
 import quality_pic from '../images/finding_hearts/quality_pic7.jpg'
 import spectrogram_pic from '../images/pattern-recognition/sound_waves.jpeg'
 import gen_ai_transition from '../images/gen_ai/gen_ai_transition.gif'
-import chatbot_pic from '../images/agentic_ai/chatbot.jpeg'
+import chatbot_pic from '../images/agentic_ai/chatbot.png'
 
 const slideData = [
   // {
@@ -24,10 +24,10 @@ const slideData = [
   },
   {
     index: 1,
-    headline: 'Image quality',
+    headline: 'Agentic AI',
     button: 'Find out more',
-    src: quality_pic,
-    link: '#/projects/image-quality'
+    src: chatbot_pic,
+    link: '#/projects/agentic-ai'
   },
   {
     index: 2,
@@ -36,20 +36,19 @@ const slideData = [
     src: gen_ai_transition,
     link: '#/projects/generative-ai'
   },
+  {
+    index: 3,
+    headline: 'Image quality',
+    button: 'Find out more',
+    src: quality_pic,
+    link: '#/projects/image-quality'
+  },
   // {
-  //   index: 2,
   //   headline: 'Pattern recognition',
   //   button: 'Find out more',
   //   src: spectrogram_pic,
   //   link: '#/projects/pattern-recognition'
   // },
-  {
-    index: 3,
-    headline: 'Agentic AI',
-    button: 'Find out more',
-    src: chatbot_pic,
-    link: '#/projects/agentic-ai'
-  }
 ];
   
   
