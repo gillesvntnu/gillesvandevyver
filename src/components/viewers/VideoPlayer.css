@@ -103,27 +103,92 @@
     outline-offset: 2px;
 }
 
-/* When the frame is fullscreened, ensure video fills the screen cleanly */
-.pro-video-frame:fullscreen,
-.pro-video-frame:-webkit-full-screen,
-.pro-video-frame:-moz-full-screen,
+/* When the frame is fullscreened, make the video as large as possible
+   while staying within BOTH the viewport width and height.
+   IMPORTANT: each vendor-prefixed fullscreen pseudo-class must live in
+   its OWN rule. If any one is grouped with commas and the browser
+   doesn't recognize it, the entire rule is dropped. */
+.pro-video-frame:fullscreen {
+    width: 100vw;
+    height: 100vh;
+    max-width: 100vw;
+    max-height: 100vh;
+    padding: 0;
+    margin: 0;
+    border-radius: 0;
+    background: #000;
+    display: block;
+    overflow: hidden;
+}
+.pro-video-frame:-webkit-full-screen {
+    width: 100vw;
+    height: 100vh;
+    max-width: 100vw;
+    max-height: 100vh;
+    padding: 0;
+    margin: 0;
+    border-radius: 0;
+    background: #000;
+    display: block;
+    overflow: hidden;
+}
+.pro-video-frame:-moz-full-screen {
+    width: 100vw;
+    height: 100vh;
+    max-width: 100vw;
+    max-height: 100vh;
+    padding: 0;
+    margin: 0;
+    border-radius: 0;
+    background: #000;
+    display: block;
+    overflow: hidden;
+}
 .pro-video-frame:-ms-fullscreen {
     width: 100vw;
     height: 100vh;
+    max-width: 100vw;
+    max-height: 100vh;
     padding: 0;
+    margin: 0;
     border-radius: 0;
     background: #000;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    display: block;
+    overflow: hidden;
 }
 
-.pro-video-frame:fullscreen .pro-video,
-.pro-video-frame:-webkit-full-screen .pro-video,
-.pro-video-frame:-moz-full-screen .pro-video,
+.pro-video-frame:fullscreen .pro-video {
+    display: block;
+    width: 100vw;
+    height: 100vh;
+    max-width: 100vw;
+    max-height: 100vh;
+    border-radius: 0;
+    object-fit: contain;
+}
+.pro-video-frame:-webkit-full-screen .pro-video {
+    display: block;
+    width: 100vw;
+    height: 100vh;
+    max-width: 100vw;
+    max-height: 100vh;
+    border-radius: 0;
+    object-fit: contain;
+}
+.pro-video-frame:-moz-full-screen .pro-video {
+    display: block;
+    width: 100vw;
+    height: 100vh;
+    max-width: 100vw;
+    max-height: 100vh;
+    border-radius: 0;
+    object-fit: contain;
+}
 .pro-video-frame:-ms-fullscreen .pro-video {
-    width: 100%;
-    height: 100%;
+    display: block;
+    width: 100vw;
+    height: 100vh;
+    max-width: 100vw;
     max-height: 100vh;
     border-radius: 0;
     object-fit: contain;
