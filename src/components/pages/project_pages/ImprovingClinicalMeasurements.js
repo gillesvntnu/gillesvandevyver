@@ -30,7 +30,7 @@ function ImprovingClinicalMeasurements() {
                         sample volume in the myocardium that stays stationary throughout the cardiac cycle.
                     </p>
                     <p>
-                        In this project, we developed a fully automatic pipeline that extracts regional strain and velocity curves
+                        In this project, I developed a fully automatic pipeline that extracts regional strain and velocity curves
                         from TDI recordings without any manual intervention. The tool uses deep learning to segment the
                         myocardium in the TDI recording and tracks the movement of each segment over time.
                         This improves the quality of the measurements, removes the need for manual placement,
