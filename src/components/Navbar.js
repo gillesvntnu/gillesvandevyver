@@ -70,9 +70,10 @@ function Navbar() {
                 {dropdown && (
                     <div className='dropdown-content'>
                       <Link to='/projects/robust-computer-vision' onClick={handleProjectsClick}>Robust computer vision</Link>
-                      <Link to='/projects/image-quality' onClick={handleProjectsClick}>Image quality</Link>
-                      <Link to='/projects/generative-ai' onClick={handleProjectsClick}>Generative AI</Link>
                       <Link to='/projects/agentic-ai' onClick={handleProjectsClick}>Agentic AI</Link>
+                      <Link to='/projects/generative-ai' onClick={handleProjectsClick}>Generative AI</Link>
+                      <Link to='/projects/image-quality' onClick={handleProjectsClick}>Image quality</Link>
+                      <Link to='/projects/improving-clinical-measurements' onClick={handleProjectsClick}>Improving clinical measurements</Link>
                     </div>
                 )}
               </li>

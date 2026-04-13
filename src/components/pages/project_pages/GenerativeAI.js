@@ -1,5 +1,4 @@
 import React from 'react';
-import './NaturalLanguageProcessing.css';
 import VideoPlayer from '../../viewers/VideoPlayer';
 import demoVideo from '../../../vidoes/genertive_ai/gen_augmention_demo.mp4';
 import gen_ai_pic0 from '../../../images/gen_ai/gen_ai_pic0.jpg';
