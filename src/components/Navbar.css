@@ -99,6 +99,8 @@
   display: none;
   position: absolute;
   top: 80px;
+  left: 50%;
+  transform: translateX(-50%);
   background: rgba(20, 20, 28, 0.95);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
