@@ -8,7 +8,7 @@ const AgenticAI = () => {
         <div className="project-page-container">
             <h1>Agentic AI</h1>
             <div className="vertical-card">
-                <VideoPlayer src={demoVideo} type="video/webm" ariaLabel="DeepEcho agentic demo" />
+                <VideoPlayer src={demoVideo} type="video/webm" ariaLabel="DeepEcho agentic demo" maxWidth={1400} />
                 <div style={{marginTop: '2rem'}}>
                     <h2>An AI assistant for cardiac ultrasound analysis</h2>
                     <p>
