@@ -1,7 +1,7 @@
 import React from 'react';
 import './CommonStyles.css';
 import VideoPlayer from '../../viewers/VideoPlayer';
-import demoVideo from '../../../vidoes/ImageQuality/regional_quality_demo.mp4';
+import demoVideo from '../../../videos/ImageQuality/regional_quality_demo.mp4';
 import quality_pic1 from '../../../images/finding_hearts/quality_pic1.png';
 import quality_pic2 from '../../../images/finding_hearts/quality_pic2.png';
 import quality_pic3 from '../../../images/finding_hearts/quality_pic3.png';

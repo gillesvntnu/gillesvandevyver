@@ -1,7 +1,7 @@
 import React from 'react';
 import './CommonStyles.css';
 import VideoPlayer from '../../viewers/VideoPlayer';
-import demoVideo from '../../../vidoes/RobustComputerVision/Agreement_demo.mp4';
+import demoVideo from '../../../videos/RobustComputerVision/Agreement_demo.mp4';
 import agrrement_pic1 from '../../../images/finding_hearts/agreement_pic1.png';
 import agrrement_pic2 from '../../../images/finding_hearts/agreement_pic2.png';
 import agrrement_pic3 from '../../../images/finding_hearts/agreement_pic3.png';
@@ -29,9 +29,9 @@ const RobustComputerVision = () => {
                 <div className="section-body">
                     <p>
                         Echocardiography is the standard imaging modality for assessing cardiac health,
-                        enabling clinicians to derive key parameters like ejection fraction.
+                        enabling clinicians to derive clinical measurements like ejection fraction.
                         In practice, a cardiologist must manually trace the heart's contours in ultrasound images
-                        to obtain these measurements, a time-consuming process typically performed only a single heartbeat.
+                        to obtain these measurements, a time-consuming process typically performed on only a single heartbeat.
                     </p>
                 </div>
                 <div className="section-title">

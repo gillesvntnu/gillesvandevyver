@@ -1,7 +1,7 @@
 import React from 'react';
 import './CommonStyles.css';
 import VideoPlayer from '../../viewers/VideoPlayer';
-import demoVideo from '../../../vidoes/ImprovingClinicalMeasurements/auto_tdi_example.mp4';
+import demoVideo from '../../../videos/ImprovingClinicalMeasurements/auto_tdi_example.mp4';
 import strain_pic from '../../../images/ImprovingClinicalMeasurements/strain.png';
 
 

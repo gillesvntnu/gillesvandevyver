@@ -1,7 +1,7 @@
 import React from 'react';
 import './CommonStyles.css';
 import VideoPlayer from '../../viewers/VideoPlayer';
-import demoVideo from '../../../vidoes/agentic_ai/deepecho_agentic_demo.webm';
+import demoVideo from '../../../videos/agentic_ai/deepecho_agentic_demo.webm';
 
 const AgenticAI = () => {
     return (

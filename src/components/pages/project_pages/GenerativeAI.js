@@ -1,6 +1,6 @@
 import React from 'react';
 import VideoPlayer from '../../viewers/VideoPlayer';
-import demoVideo from '../../../vidoes/genertive_ai/gen_augmention_demo.mp4';
+import demoVideo from '../../../videos/generative_ai/gen_augmentation_demo.mp4';
 import gen_ai_pic0 from '../../../images/gen_ai/gen_ai_pic0.jpg';
 import gen_ai_pic1 from '../../../images/gen_ai/gen_ai_pic1.png';
 import gen_ai_pic2 from '../../../images/gen_ai/gen_ai_pic2.png';
@@ -29,8 +29,8 @@ const GenerativeAI = () => {
                         AI tools are only as good as the data on which they are trained.
                         This is especially the case in the medical domain. 
                         Generative AI can generate highly realistic images.
-                        The tricky part is that the generative images are not always accurate and can not really be
-                        trusted because of hallucations.
+                        The tricky part is that the generative images are not always accurate and cannot really be
+                        trusted because of hallucinations.
                         This would mean we lose the quality of the annotations in the data.
                     </p>
                 </div>

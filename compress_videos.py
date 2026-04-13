@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Compress videos in src/vidoes/ so they fit under GitHub's 100 MB per-file limit.
+Compress videos in src/videos/ so they fit under GitHub's 100 MB per-file limit.
 
 Strategy:
   1. Scale down resolution (default: max 720p on long edge).
@@ -26,7 +26,7 @@ from pathlib import Path
 # Files larger than this will be compressed.
 SIZE_THRESHOLD_MB = 95        # GitHub's hard limit is 100 MB; leave margin.
 DEFAULT_TARGET_MB = 90        # Target output size.
-SEARCH_DIR = Path(__file__).parent / "src" / "vidoes"
+SEARCH_DIR = Path(__file__).parent / "src" / "videos"
 VIDEO_EXTS = {".mp4", ".mov", ".webm", ".mkv", ".avi", ".m4v"}
 
 # Successive attempts: (max_long_edge_px, fps, crf_or_quality)
