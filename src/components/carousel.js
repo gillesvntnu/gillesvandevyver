@@ -244,17 +244,20 @@ class Slide extends React.Component {
 
     handleTouchStart(e) {
       this.touchStartX = e.touches[0].clientX
+      this.touchEndX = e.touches[0].clientX
+      this.touchMoved = false
     }
 
     handleTouchMove(e) {
       this.touchEndX = e.touches[0].clientX
+      this.touchMoved = true
     }
 
     handleTouchEnd() {
       const delta = this.touchStartX - this.touchEndX
       const minSwipeDistance = 50
 
-      if (Math.abs(delta) >= minSwipeDistance) {
+      if (this.touchMoved && Math.abs(delta) >= minSwipeDistance) {
         if (delta > 0) {
           this.handleNextClick()
         } else {
