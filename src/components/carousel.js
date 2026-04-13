@@ -6,6 +6,7 @@ import quality_pic from '../images/finding_hearts/quality_pic7.jpg'
 import spectrogram_pic from '../images/pattern-recognition/sound_waves.jpeg'
 import gen_ai_transition from '../images/gen_ai/gen_ai_transition.gif'
 import chatbot_pic from '../images/agentic_ai/chatbot.png'
+import strain_pic from '../images/ImprovingClinicalMeasurements/strain.png'
 
 const slideData = [
   // {
@@ -42,6 +43,13 @@ const slideData = [
     button: 'Find out more',
     src: quality_pic,
     link: '#/projects/image-quality'
+  },
+  {
+    index: 4,
+    headline: 'Improving clinical measurements',
+    button: 'Find out more',
+    src: strain_pic,
+    link: '#/projects/improving-clinical-measurements'
   },
   // {
   //   headline: 'Pattern recognition',

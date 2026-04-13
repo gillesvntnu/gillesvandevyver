@@ -1,122 +1,97 @@
 import React from 'react';
 import './CommonStyles.css';
+import VideoPlayer from '../../viewers/VideoPlayer';
+import demoVideo from '../../../vidoes/RobustComputerVision/Agreement_demo.mp4';
 import agrrement_pic1 from '../../../images/finding_hearts/agreement_pic1.png';
 import agrrement_pic2 from '../../../images/finding_hearts/agreement_pic2.png';
 import agrrement_pic3 from '../../../images/finding_hearts/agreement_pic3.png';
 import agrrement_pic5 from '../../../images/finding_hearts/agreement_pic5.png';
 
 
-function RobustComputerVision() {
+const RobustComputerVision = () => {
     return (
         <div className="project-page-container">
-            <h1> Robust computer vision for Echo</h1>
-            <div className="horizontal-card horizontal-card-left">
-                <div className="section-title">
-                    <h2>When different neural networks disagree where the ❤️ is, something is wrong</h2>
-                </div>
-                <div className="media-section">
-                    <a href="https://ieeexplore.ieee.org/document/10458930">
-                        <img src={agrrement_pic1} alt=""/>
-                    </a>
-                    <p>The disagreement of two independent networks is an indication of failure.</p>
-                </div>
-                <div className="section-body">
-                    <p>
-                        One in three deaths in the United States is caused by cardiovascular diseases.
-                        That's 702,880 per year, or 1 every 45 seconds, in the US alone.
-                        Ultrasound imaging is the standard way to assess cardiac health.
-                        These imaging techniques allow us to determine important clinical parameters,
-                        for example, how much blood the heart is pumping (the 'ejection fraction').
-                        In the clinic today, the doctor must draw exactly where the heart is in the ultrasound
-                        images to get these measurements right. This takes a lot of time,
-                        and the doctor usually only bothers to do this for a single heartbeat.
-                    </p>
+            <h1>Robust Computer Vision for Echo</h1>
+            <div className="horizontal-card horizontal-card-right">
+
+                <div style={{gridColumn: '1 / -1', display: 'flex', justifyContent: 'center'}}>
+                    <VideoPlayer src={demoVideo} type="video/mp4" ariaLabel="Robust computer vision demo" />
                 </div>
                 <div className="section-title">
-                    <h3> How can AI help us? </h3>
+                    <h2> <br/><br/> Detecting when neural networks disagree on cardiac segmentation</h2>
                 </div>
                 <div className="media-section">
                     <a href="https://ieeexplore.ieee.org/document/10458930">
                         <img src={agrrement_pic2} alt=""/>
                     </a>
-                    <p> Automatic segmentation of the heart</p>
+                    <p>Automatic segmentation of the left ventricle.</p>
                 </div>
                 <div className="section-body">
                     <p>
-                        By having an AI to automatically draw the contours of the heart ('segmentation'),
-                        we can automate the measurements.
-                        This way, we not only save time but also are
-                        more robust because we can measure multiple heartbeats and get the exact same
-                        answer every time for a given image.
+                        Echocardiography is the standard imaging modality for assessing cardiac health,
+                        enabling clinicians to derive key parameters like ejection fraction.
+                        In practice, a cardiologist must manually trace the heart's contours in ultrasound images
+                        to obtain these measurements, a time-consuming process typically performed only a single heartbeat.
                     </p>
                 </div>
                 <div className="section-title">
-                    <h3> So, what's the problem?</h3>
+                    <h3>Automating segmentation with AI</h3>
                 </div>
                 <div className="media-section">
                     <a href="https://ieeexplore.ieee.org/document/10458930">
                         <img src={agrrement_pic3} alt=""/>
                     </a>
-                    <p> Failing case for the AI. In this case the bad image quality is to blame.
-                        The result is a weird shape that does not make sense.</p>
+                    <p>A failing case: poor image quality leads to an anatomically implausible segmentation.</p>
                 </div>
                 <div className="section-body">
                     <p>
-                        Because we are in the medical sector, we want the AI to be reliable.
-                        It should work for every patient. One difficulty can be that ultrasound images can have
-                        bad image quality.
-                        Another difficulty is that each heart is different.
-                        The AI might work well for healthy hearts, but it might fail when the heart has
-                        unusual characteristics because the model is not used to these cases.
-                        We see that when the model fails, it tends to produce weird shapes that
-                        don't make any anatomical sense.
+                        Deep learning models can automatically segment the left ventricle,
+                        removing the need for manual contouring. This not only saves time
+                        but also enables measurement across multiple cardiac cycles,
+                        producing reproducible results.
+                    </p>
+                    <p>
+                        In clinical settings, reliability is critical. Segmentation models can fail
+                        when faced with poor image quality or unusual cardiac anatomy.
+                        In these cases, the model tends to produce anatomically implausible shapes
+                        that would lead to incorrect measurements.
                     </p>
                 </div>
+
                 <div className="section-title">
-                    <h3> How to solve this problem? </h3>
+                    <h3>Disagreement as a failure signal</h3>
+                    <p>
+                        I developed a second segmentation network based on graph convolutional networks,
+                        designed to produce anatomically valid contours by design.
+                        By running both models on the same input and comparing their outputs,
+                        disagreement between the two serves as a reliable indicator of failure.
+                    </p>
+                </div>
+                <div className="media-section">
+                    <a href="https://ieeexplore.ieee.org/document/10458930">
+                        <img src={agrrement_pic1} alt=""/>
+                    </a>
+                </div>
+                <div className="text-section">
+                    <h3>Code and publication</h3>
+                    <p>
+                        The code is available as a Python library
+                        at <a href="https://github.com/GillesVanDeVyver/GCN_multistructure">GitHub</a>.
+                        The work is published in IEEE Access: <a href="https://ieeexplore.ieee.org/document/10458930">
+                        Toward Robust Cardiac Segmentation Using Graph Convolutional Networks</a>,
+                        and was presented as a lecture at the 2023 IEEE International Ultrasonics Symposium.
+                    </p>
                 </div>
                 <div className="media-section">
                     <a href="https://ieeexplore.ieee.org/document/10458930">
                         <img src={agrrement_pic5} alt=""/>
                     </a>
-                    <p> AI designed to create an anatomically valid contour.</p>
+                    <p>An anatomically constrained network produces valid contours by design.</p>
                 </div>
                 <div className="section-body">
-                    <p>
-                        I made an AI designed specifically to avoid weird shapes and anatomical errors
-                        by teaching it to create a contour inspired by human anatomy.
-                        While this new AI is not perfect, it does not produce weird shapes.
-                        However, we can now use it in an intelligent way. When we have a new ultrasound image,
-                        we can run both AIs on it and see whether they agree.
-                        If they disagree on where the heart is, we see that either the input image is not a
-                        correct image of the heart, or the AI made a mistake.
-                        Now we can use this information to warn the user when the AI made a mistake.
-                        We can also use it to find specific cases the segmentation fails on, and then annotate
-                        those cases to retrain the AI so that it will not fail the next time it sees a similar
-                        case ('active learning').
-                    </p>
+
                 </div>
-                <div className="text-section">
-                    <h3> Open-source code and demo</h3>
-                    <p>
-                        My code is available as a Python library at&nbsp;
-                        <a href="https://github.com/GillesVanDeVyver/GCN_multistructure">
-                        https://github.com/GillesVanDeVyver/GCN_multistructure</a>.
-                        <br/>
-                        I also made a demo video to show our proof of concept in real-time on the
-                        scanner:&nbsp;
-                        <a href="https://youtu.be/I9R8kxwj0fw">
-                            Demo on YouTube</a>,
-                    </p>
-                    <h3> Publication and presentation </h3>
-                    <p>
-                    The work is published in IEEE access: {'\n'}
-                    <a href="https://ieeexplore.ieee.org/document/10458930">
-                        Toward Robust Cardiac Segmentation Using Graph Convolutional Networks
-                    </a>. <br/><br/>
-                    It was also presented at the 2023 IUS (IEEE International Ultrasonics Symposium) conference as a lecture.<br/><br/>
-                    </p>
-                </div>
+
             </div>
         </div>
     );

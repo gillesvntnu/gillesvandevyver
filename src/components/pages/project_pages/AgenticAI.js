@@ -1,5 +1,6 @@
 import React from 'react';
 import './CommonStyles.css';
+import VideoPlayer from '../../viewers/VideoPlayer';
 import demoVideo from '../../../vidoes/agentic_ai/deepecho_agentic_demo.webm';
 
 const AgenticAI = () => {
@@ -7,13 +8,7 @@ const AgenticAI = () => {
         <div className="project-page-container">
             <h1>Agentic AI</h1>
             <div className="vertical-card">
-                <video
-                    controls
-                    style={{width: '100%', maxWidth: '800px', borderRadius: '1vh'}}
-                >
-                    <source src={demoVideo} type="video/webm"/>
-                    Your browser does not support the video tag.
-                </video>
+                <VideoPlayer src={demoVideo} type="video/webm" ariaLabel="DeepEcho agentic demo" />
                 <div style={{marginTop: '2rem'}}>
                     <h2>An AI assistant for cardiac ultrasound analysis</h2>
                     <p>
@@ -32,11 +27,10 @@ const AgenticAI = () => {
                         all the intermediate steps: classifying the view, detecting end-systole and end-diastole,
                         segmenting the left ventricle, and computing the final measurement.
                     </p>
-                    <h3>Flexible model backend</h3>
                     <p>
                         The agent supports multiple language model backends.
                         It can run locally using open source models like Ollama, or connect to cloud-hosted
-                        models an API key. The user can switch models on the fly from the interface.
+                        models with an API key. The user can switch models on the fly from the interface.
                     </p>
                     <h3>In conclusion</h3>
                     <p>

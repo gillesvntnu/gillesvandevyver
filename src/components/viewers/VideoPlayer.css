@@ -1,0 +1,78 @@
+/* Professional video player styles */
+
+.pro-video-wrapper {
+    width: 100%;
+    margin: 1.5rem auto;
+    display: flex;
+    justify-content: center;
+}
+
+.pro-video-frame {
+    position: relative;
+    width: 100%;
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+    border-radius: 14px;
+    padding: 10px;
+    box-shadow:
+        0 20px 40px -15px rgba(15, 23, 42, 0.35),
+        0 8px 16px -8px rgba(15, 23, 42, 0.2),
+        0 0 0 1px rgba(255, 255, 255, 0.04) inset;
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.pro-video-frame::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(
+        90deg,
+        transparent 0%,
+        rgba(255, 255, 255, 0.15) 50%,
+        transparent 100%
+    );
+    pointer-events: none;
+    z-index: 2;
+}
+
+.pro-video-frame:hover {
+    transform: translateY(-2px);
+    box-shadow:
+        0 25px 50px -15px rgba(15, 23, 42, 0.4),
+        0 10px 20px -8px rgba(15, 23, 42, 0.25),
+        0 0 0 1px rgba(255, 255, 255, 0.06) inset;
+}
+
+.pro-video {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: 8px;
+    background: #000;
+    outline: none;
+}
+
+/* Hide any residual native controls on iOS/Safari */
+.pro-video::-webkit-media-controls,
+.pro-video::-webkit-media-controls-enclosure,
+.pro-video::-webkit-media-controls-panel,
+.pro-video::-webkit-media-controls-start-playback-button {
+    display: none !important;
+    -webkit-appearance: none;
+}
+
+@media (max-width: 768px) {
+    .pro-video-wrapper {
+        margin: 1rem auto;
+    }
+    .pro-video-frame {
+        padding: 6px;
+        border-radius: 10px;
+    }
+    .pro-video {
+        border-radius: 6px;
+    }
+}
