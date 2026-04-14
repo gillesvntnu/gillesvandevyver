@@ -7,7 +7,7 @@ import json
 import subprocess
 from pathlib import Path
 
-INPUT_PATH = Path("/home/gillesv/PrivateProjects/gillesvandevyver/src/videos/agentic_ai/deepecho_agentic_demo.webm")
+INPUT_PATH = Path("/home/gillesv/PrivateProjects/gillesvandevyver/src/videos/agentic_ai/deepecho_agentic_demo2_original.webm")
 SPEED_FACTOR = 2.0
 
 
