@@ -12,6 +12,7 @@ import ImprovingClinicalMeasurements from "./components/pages/project_pages/Impr
 // import PatternRecognition from "./components/pages/project_pages/PatternRecognition";
 import GenerativeAI from "./components/pages/project_pages/GenerativeAI";
 import AgenticAI from "./components/pages/project_pages/AgenticAI";
+import InteractiveRag from "./components/pages/project_pages/InteractiveRag";
 import PdfViewer from './components/viewers/PDFViewer';
 import JSXViewer from './components/viewers/JSXViewer';
 
@@ -41,6 +42,7 @@ function App() {
             {/* <Route path='/projects/pattern-recognition' element={<PatternRecognition />} /> */}
             <Route path='/projects/generative-ai' element={<GenerativeAI />} />
             <Route path='/projects/agentic-ai' element={<AgenticAI />} />
+            <Route path='/projects/ask-my-research' element={<InteractiveRag />} />
             <Route path="/recommendation-pdf" element={<PdfViewer />} />
             <Route path="/recommendation" element={
               <JSXViewer/>

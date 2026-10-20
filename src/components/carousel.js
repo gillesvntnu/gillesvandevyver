@@ -7,6 +7,7 @@ import spectrogram_pic from '../images/pattern-recognition/sound_waves.jpeg'
 import gen_ai_transition from '../images/gen_ai/gen_ai_transition.gif'
 import chatbot_pic from '../images/agentic_ai/chatbot.png'
 import strain_pic from '../images/ImprovingClinicalMeasurements/strain.png'
+import embedding_space_pic from '../images/rag/embedding_space.jpg'
 
 const slideData = [
   // {
@@ -18,34 +19,41 @@ const slideData = [
   // },
   {
     index: 0,
+    headline: 'Ask my research',
+    button: 'Try it',
+    src: embedding_space_pic,
+    link: '#/projects/ask-my-research'
+  },
+  {
+    index: 1,
     headline: 'Robust computer vision',
     button: 'Find out more',
     src: computer_vision_pic,
     link: '#/projects/robust-computer-vision'
   },
   {
-    index: 1,
+    index: 2,
     headline: 'Agentic AI',
     button: 'Find out more',
     src: chatbot_pic,
     link: '#/projects/agentic-ai'
   },
   {
-    index: 2,
+    index: 3,
     headline: 'Generative AI',
     button: 'Find out more',
     src: gen_ai_transition,
     link: '#/projects/generative-ai'
   },
   {
-    index: 3,
+    index: 4,
     headline: 'Image quality',
     button: 'Find out more',
     src: quality_pic,
     link: '#/projects/image-quality'
   },
   {
-    index: 4,
+    index: 5,
     headline: 'Improving clinical measurements',
     button: 'Find out more',
     src: strain_pic,

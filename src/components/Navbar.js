@@ -69,6 +69,7 @@ function Navbar() {
                 </div>
                 {dropdown && (
                     <div className='dropdown-content'>
+                      <Link to='/projects/ask-my-research' onClick={handleProjectsClick}>Ask my research</Link>
                       <Link to='/projects/robust-computer-vision' onClick={handleProjectsClick}>Robust computer vision</Link>
                       <Link to='/projects/agentic-ai' onClick={handleProjectsClick}>Agentic AI</Link>
                       <Link to='/projects/generative-ai' onClick={handleProjectsClick}>Generative AI</Link>
