@@ -7,6 +7,9 @@ import { DIMS } from './embedder';
 
 const RRF_K = 60;           // reciprocal-rank-fusion damping constant
 const DUPLICATE_THRESHOLD = 0.55; // trigram Jaccard above which two chunks are "the same"
+const SECTION_BOOST = 0.6;  // extra weight when the question matches a section heading
+const UBIQUITOUS_TERM_DF = 0.5;   // "image", "model", "segmentation" are in most chunks
+const MIN_HEADING_COVERAGE = 0.6; // share of a heading the question must account for
 
 const asset = (file) => `${process.env.PUBLIC_URL || ''}/rag/${file}`;
 
@@ -127,15 +130,38 @@ export function retrieve(index, question, queryVector, options = {}) {
     topRanks(semanticScores, pool).forEach(([, chunkIndex], rank) => add(chunkIndex, rank, 'semanticRank', 1));
   }
 
+  // A chunk sitting under a heading the question names is far more likely to be
+  // the answer than one that merely mentions the word in passing. "Which
+  // datasets?" should surface the section called "Datasets", not a sentence in
+  // a discussion that happens to say "dataset".
+  // What matters is how much of the heading the question accounts for, not how
+  // rare the matching word is. Rarity is actively misleading in a corpus that
+  // is one researcher's output: "research" is rare here but says nothing, while
+  // "dataset" is in 40% of chunks yet is precisely what "which datasets?" is
+  // after. So a heading only earns a boost when the question explains most of
+  // it — "Datasets" fully, but "Future work" matched on "work" alone not at all.
+  const queryTerms = new Set(
+    tokenize(question).filter((term) => bm25.documentFrequency(term) <= UBIQUITOUS_TERM_DF),
+  );
+  const sectionBoost = (chunk) => {
+    if (!chunk.section || queryTerms.size === 0) return 1;
+    const headingTerms = [...new Set(tokenize(chunk.section))];
+    if (!headingTerms.length) return 1;
+    const coverage = headingTerms.filter((term) => queryTerms.has(term)).length / headingTerms.length;
+    if (coverage < MIN_HEADING_COVERAGE) return 1;
+    return 1 + SECTION_BOOST * coverage;
+  };
+
   const candidates = [...fused.entries()]
     .map(([chunkIndex, entry]) => ({
       ...chunks[chunkIndex],
       document: documents.get(chunks[chunkIndex].docId),
-      fusedScore: entry.score,
+      fusedScore: entry.score * sectionBoost(chunks[chunkIndex]),
       lexicalRank: entry.lexicalRank,
       semanticRank: entry.semanticRank,
       similarity: semanticScores ? semanticScores[chunkIndex] : null,
       lexicalScore: lexical[chunkIndex],
+      sectionHit: sectionBoost(chunks[chunkIndex]) > 1,
     }))
     .filter((candidate) => !allowed || allowed.has(candidate.docId))
     .sort((a, b) => b.fusedScore - a.fusedScore);
@@ -145,22 +171,74 @@ export function retrieve(index, question, queryVector, options = {}) {
   // single answer can be four restatements of one paragraph.
   const selected = [];
   const fingerprints = [];
-  for (const candidate of candidates) {
-    const fingerprint = trigrams(candidate.text);
+  const perDocument = new Map();
+  const deferred = [];
+
+  // Many questions here are really about the body of work rather than about one
+  // paper ("which datasets are used?"), and every paper has its own answer. A
+  // purely score-ordered list lets the single best-matching paper take every
+  // slot, which hides exactly the comparison the question was asking for. So
+  // each document gets a quota on the first pass; anything crowded out is kept
+  // and used to backfill if there were not enough documents to fill the list.
+  const quota = Math.max(2, Math.ceil(limit / 3));
+
+  const considerDuplicate = (candidate, fingerprint) => {
     const duplicateOf = fingerprints.findIndex((other) => jaccard(fingerprint, other) > DUPLICATE_THRESHOLD);
-    if (duplicateOf !== -1) {
-      selected[duplicateOf].alsoIn = selected[duplicateOf].alsoIn || [];
-      if (!selected[duplicateOf].alsoIn.some((d) => d.id === candidate.document?.id)) {
-        selected[duplicateOf].alsoIn.push(candidate.document);
-      }
+    if (duplicateOf === -1) return false;
+    selected[duplicateOf].alsoIn = selected[duplicateOf].alsoIn || [];
+    if (candidate.document && !selected[duplicateOf].alsoIn.some((d) => d.id === candidate.document.id)) {
+      selected[duplicateOf].alsoIn.push(candidate.document);
+    }
+    return true;
+  };
+
+  for (const candidate of candidates) {
+    if (selected.length >= limit) break;
+    const fingerprint = trigrams(candidate.text);
+    if (considerDuplicate(candidate, fingerprint)) continue;
+    const used = perDocument.get(candidate.docId) || 0;
+    if (used >= quota) {
+      deferred.push([candidate, fingerprint]);
       continue;
     }
+    perDocument.set(candidate.docId, used + 1);
     fingerprints.push(fingerprint);
     selected.push(candidate);
+  }
+
+  for (const [candidate, fingerprint] of deferred) {
     if (selected.length >= limit) break;
+    if (considerDuplicate(candidate, fingerprint)) continue;
+    fingerprints.push(fingerprint);
+    selected.push(candidate);
   }
 
   return selected;
+}
+
+/**
+ * How much to trust a result set.
+ *
+ * Cosine similarity against this corpus runs low in absolute terms, so the
+ * useful signal is not the raw number but whether anything stood out: a real
+ * match is both reasonably similar and clearly ahead of the tail. Returning
+ * "weak" lets the page say it is guessing instead of presenting six barely
+ * related passages with the same confidence as six good ones.
+ */
+export function confidenceOf(results) {
+  if (!results.length) return 'none';
+  const top = results[0];
+  const similarity = top.similarity;
+  const lexicalOnly = similarity === null || similarity === undefined;
+
+  if (lexicalOnly) {
+    return top.lexicalRank === 1 && results.length >= 2 ? 'ok' : 'weak';
+  }
+  const tail = results[results.length - 1].similarity ?? 0;
+  const spread = similarity - tail;
+  if (similarity >= 0.45 || (similarity >= 0.32 && spread >= 0.06)) return 'strong';
+  if (similarity >= 0.28 || (similarity >= 0.22 && spread >= 0.05)) return 'ok';
+  return 'weak';
 }
 
 /**

@@ -9,3 +9,4 @@ build/
 .idea/
 
 package-lock.json
+__pycache__/

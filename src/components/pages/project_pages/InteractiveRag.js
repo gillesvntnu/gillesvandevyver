@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import './CommonStyles.css';
 import './InteractiveRag.css';
-import { loadIndex, retrieve, bestPassage, highlight } from '../../../rag/retriever';
+import { loadIndex, retrieve, bestPassage, highlight, confidenceOf } from '../../../rag/retriever';
 import { loadEmbedder } from '../../../rag/embedder';
 import { synthesizeAnswer, PROVIDERS } from '../../../rag/synthesize';
 import embeddingSpace from '../../../images/rag/embedding_space.jpg';
@@ -244,7 +244,12 @@ const InteractiveRag = () => {
         return;
       }
 
-      update({ stage: apiKey ? 'generating' : 'done', sources, hybrid: Boolean(queryVector) });
+      update({
+        stage: apiKey ? 'generating' : 'done',
+        sources,
+        hybrid: Boolean(queryVector),
+        confidence: confidenceOf(sources),
+      });
 
       if (apiKey) {
         abortRef.current = new AbortController();
@@ -458,6 +463,16 @@ const InteractiveRag = () => {
                   <p className="rag-error">Generation failed: {message.answerError} The passages below are still the retrieval result.</p>
                 )}
 
+                {message.confidence === 'weak' && message.sources.length > 0 && (
+                  <p className="rag-weak-note">
+                    Nothing in the papers matches this closely. That usually means the
+                    question is about the body of work as a whole — &ldquo;which model is
+                    used most often?&rdquo; — rather than about something any single
+                    passage states. Search can only show you passages, so treat these as
+                    a starting point rather than an answer.
+                  </p>
+                )}
+
                 {message.sources.length > 0 && (
                   <>
                     <h4 className="rag-sources-heading">
@@ -465,6 +480,7 @@ const InteractiveRag = () => {
                         ? 'Sources'
                         : `Top ${message.sources.length} passages`}
                       {!message.hybrid && <span className="rag-mode-note"> · keyword search only</span>}
+                      {message.confidence === 'weak' && <span className="rag-mode-note"> · weak match</span>}
                     </h4>
                     <ol className="rag-sources">
                       {message.sources.map((chunk, i) => (

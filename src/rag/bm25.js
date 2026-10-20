@@ -65,4 +65,15 @@ export class BM25Index {
   matchedTerms(query) {
     return [...new Set(tokenize(query))].filter((term) => this.postings.has(term));
   }
+
+  /**
+   * Fraction of chunks containing a term. Everything in this corpus is one
+   * person's echocardiography research, so words like "work", "model" and
+   * "image" are near-universal and carry almost no signal even though they are
+   * not stopwords in general English.
+   */
+  documentFrequency(term) {
+    const postings = this.postings.get(term);
+    return postings ? postings.length / Math.max(this.length, 1) : 0;
+  }
 }
