@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import '../../App.css';
 import TitleSection from '../TitleSection';
+import AboutSection from '../AboutSection';
 import ContactSection from '../ContactSection';
 import Carousel from '../carousel';
 
@@ -50,6 +51,9 @@ function Home() {
         <>
             <div id="titleSection" className="title-section">
                 <TitleSection />
+            </div>
+            <div id="aboutSection">
+                <AboutSection />
             </div>
             <div id="carousel">
                 <Carousel />

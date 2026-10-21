@@ -46,7 +46,7 @@ async function main() {
     console.error('Run `python3 scripts/build_rag_chunks.py` first.');
     process.exit(1);
   }
-  const { documents, chunks } = JSON.parse(fs.readFileSync(CHUNKS_PATH, 'utf8'));
+  const { documents, chunks, attribution } = JSON.parse(fs.readFileSync(CHUNKS_PATH, 'utf8'));
   const titleById = Object.fromEntries(documents.map((d) => [d.id, d.title]));
 
   console.log(`Loading ${MODEL_ID} ...`);
@@ -73,15 +73,22 @@ async function main() {
   fs.writeFileSync(path.join(OUT_DIR, 'embeddings.bin'), Buffer.from(matrix.buffer));
 
   // Strip the fields the browser does not need, keep the payload lean.
+  // PDF chunks carry page numbers; web-article chunks carry a part ordinal and
+  // a heading anchor instead. Both are emitted so one index format serves both
+  // corpora, and the reader treats whichever is absent as absent rather than
+  // printing "p. undefined".
   const corpus = {
     model: MODEL_ID,
     dims: DIMS,
     builtAt: new Date().toISOString().slice(0, 10),
+    attribution: attribution ?? undefined,
     documents: documents.map(({ chunks: _c, ...rest }) => rest),
     chunks: chunks.map((c) => ({
       d: c.doc,
       p: c.page,
-      e: c.pageEnd !== c.page ? c.pageEnd : undefined,
+      e: c.page !== undefined && c.pageEnd !== c.page ? c.pageEnd : undefined,
+      n: c.part,
+      a: c.anchor || undefined,
       s: c.section || undefined,
       t: c.text,
     })),

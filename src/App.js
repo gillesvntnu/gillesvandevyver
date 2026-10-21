@@ -42,6 +42,10 @@ function App() {
             {/* <Route path='/projects/pattern-recognition' element={<PatternRecognition />} /> */}
             <Route path='/projects/generative-ai' element={<GenerativeAI />} />
             <Route path='/projects/agentic-ai' element={<AgenticAI />} />
+            <Route path='/projects/ask-a-bike-question' element={<InteractiveRag />} />
+            {/* The page lived at this URL while it indexed my own papers, and that
+                link has been shared. Pointing the old path at the same component
+                keeps it working; a redirect would only add a bounce. */}
             <Route path='/projects/ask-my-research' element={<InteractiveRag />} />
             <Route path="/recommendation-pdf" element={<PdfViewer />} />
             <Route path="/recommendation" element={

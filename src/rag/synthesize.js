@@ -6,6 +6,8 @@
 // The key is sent straight from the visitor's browser to the provider and is
 // never stored anywhere but their own tab.
 
+import { formatCitation } from './retriever';
+
 export const PROVIDERS = {
   anthropic: {
     label: 'Anthropic',
@@ -21,22 +23,22 @@ export const PROVIDERS = {
   },
 };
 
-const SYSTEM_PROMPT = `You answer questions about the research of Gilles Van De Vyver, a PhD researcher in deep learning for cardiac ultrasound at NTNU.
+const SYSTEM_PROMPT = `You answer questions about bicycles and cycling.
 
-You are given numbered excerpts retrieved from his papers and PhD thesis. Rules:
-- Answer only from the excerpts. Never add facts from your own knowledge.
+You are given numbered excerpts retrieved from Wikipedia articles. Rules:
+- Answer only from the excerpts. Never add facts from your own knowledge, however confident you are about bicycles.
 - Cite with bracketed numbers matching the excerpts, e.g. [1] or [2][3]. Cite every claim.
 - If the excerpts do not contain the answer, say so plainly and mention what they do cover. Do not guess.
+- The excerpts are retrieved by similarity, so some may be irrelevant to the question. Ignore those rather than working them in.
 - Be concise: two or three short paragraphs at most, no headings, no bullet lists.
 - Write in plain prose for a technically literate reader.`;
 
-function buildUserPrompt(question, passages) {
+// The locator comes from formatCitation rather than being rebuilt here, because
+// building it twice is how the page ended up telling the model "page undefined"
+// for every excerpt of a corpus that has no pages.
+export function buildUserPrompt(question, passages) {
   const context = passages
-    .map((chunk, i) => {
-      const pages = chunk.pageEnd > chunk.page ? `pages ${chunk.page}-${chunk.pageEnd}` : `page ${chunk.page}`;
-      const section = chunk.section ? `, section "${chunk.section}"` : '';
-      return `[${i + 1}] ${chunk.document?.title || chunk.docId} (${pages}${section}):\n${chunk.text}`;
-    })
+    .map((chunk, i) => `[${i + 1}] ${formatCitation(chunk)}:\n${chunk.text}`)
     .join('\n\n');
 
   return `Excerpts:\n\n${context}\n\nQuestion: ${question}`;

@@ -1,0 +1,89 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+.about-section-container {
+  background-color: #fafafa;
+  padding: 4.5rem 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-family: 'Inter', sans-serif;
+}
+
+.about-section-container h2 {
+  margin-bottom: 2.5rem;
+  font-size: 2rem;
+  font-weight: 700;
+  color: #0f0f14;
+  letter-spacing: -0.025em;
+}
+
+.about-section {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 3rem;
+  max-width: 1100px;
+  width: 100%;
+}
+
+/* Without the photo the text would stretch to 1100px, which is far too wide to
+   read comfortably, so cap it at a normal measure and centre it instead. */
+.about-section--text-only {
+  max-width: 700px;
+}
+
+.about-text {
+  flex: 1 1 58%;
+  color: #3a3a42;
+  font-size: 1.05rem;
+  line-height: 1.75;
+}
+
+.about-text p {
+  margin: 0 0 1.25rem;
+}
+
+.about-text p:last-child {
+  margin-bottom: 0;
+}
+
+.about-figure {
+  flex: 0 1 38%;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.about-image {
+  width: 100%;
+  height: auto;
+  border-radius: 14px;
+  display: block;
+  object-fit: cover;
+  box-shadow: 0 10px 30px rgba(15, 15, 20, 0.12);
+}
+
+.about-figure figcaption {
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: #76767f;
+  text-align: left;
+}
+
+@media (max-width: 900px) {
+  .about-section {
+    flex-direction: column;
+    gap: 2rem;
+    max-width: 700px;
+  }
+
+  .about-figure {
+    flex: 1 1 auto;
+    width: 100%;
+  }
+
+  .about-section-container {
+    padding: 3rem 1.5rem;
+  }
+}

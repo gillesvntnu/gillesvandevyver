@@ -8,7 +8,7 @@ import { DIMS, MODEL_ID } from './embedder';
 const RRF_K = 60;           // reciprocal-rank-fusion damping constant
 const DUPLICATE_THRESHOLD = 0.55; // trigram Jaccard above which two chunks are "the same"
 const SECTION_BOOST = 0.6;  // extra weight when the question matches a section heading
-const UBIQUITOUS_TERM_DF = 0.5;   // "image", "model", "segmentation" are in most chunks
+const UBIQUITOUS_TERM_DF = 0.5;   // in this corpus that is exactly one word: "bicycle"
 const MIN_HEADING_COVERAGE = 0.6; // share of a heading the question must account for
 
 const asset = (file) => `${process.env.PUBLIC_URL || ''}/rag/${file}`;
@@ -42,9 +42,34 @@ export async function loadIndex() {
     docId: chunk.d,
     page: chunk.p,
     pageEnd: chunk.e || chunk.p,
+    // Web articles have no pages. part is the passage's ordinal inside its
+    // article and anchor is the heading fragment, which together replace the
+    // page number for citation and deep-linking.
+    part: chunk.n,
+    anchor: chunk.a || '',
     section: chunk.s || '',
     text: chunk.t,
   }));
+
+  // A citation of "Article § Section" is not a locator when the section was long
+  // enough to be cut into several passages, and 67% of chunks here sit in a
+  // section with at least one sibling, so two results from one section would
+  // print identically and look like the same passage listed twice. The page
+  // number used to do this disambiguating work; nothing replaced it. These two
+  // fields let a card say "2 of 5" and only when there is in fact more than one.
+  const sectionSizes = new Map();
+  for (const chunk of chunks) {
+    const key = `${chunk.docId}\u0000${chunk.section}`;
+    sectionSizes.set(key, (sectionSizes.get(key) || 0) + 1);
+  }
+  const seen = new Map();
+  for (const chunk of chunks) {
+    const key = `${chunk.docId}\u0000${chunk.section}`;
+    const ordinal = (seen.get(key) || 0) + 1;
+    seen.set(key, ordinal);
+    chunk.sectionPart = ordinal;
+    chunk.sectionParts = sectionSizes.get(key);
+  }
 
   const bm25 = new BM25Index(
     chunks.map((chunk) => {
@@ -54,7 +79,17 @@ export async function loadIndex() {
   );
 
   return {
-    meta: { model: corpus.model, builtAt: corpus.builtAt, dims: corpus.dims || DIMS },
+    // attribution travels with the index rather than being hard-coded in the
+    // page, because it describes the corpus that was actually built. The chunk
+    // text ships inside corpus.json, so the site republishes the source and the
+    // licence notice is an obligation, not a nicety: rebuilding from a
+    // differently-licensed corpus has to change the notice automatically.
+    meta: {
+      model: corpus.model,
+      builtAt: corpus.builtAt,
+      dims: corpus.dims || DIMS,
+      attribution: corpus.attribution || null,
+    },
     documents,
     documentList: corpus.documents,
     chunks,
@@ -141,15 +176,17 @@ export function retrieve(index, question, queryVector, options = {}) {
   }
 
   // A chunk sitting under a heading the question names is far more likely to be
-  // the answer than one that merely mentions the word in passing. "Which
-  // datasets?" should surface the section called "Datasets", not a sentence in
-  // a discussion that happens to say "dataset".
+  // the answer than one that merely mentions the word in passing. "How do rim
+  // brakes work?" should surface the section called "Rim brakes", not a sentence
+  // elsewhere that happens to say "brake".
   // What matters is how much of the heading the question accounts for, not how
-  // rare the matching word is. Rarity is actively misleading in a corpus that
-  // is one researcher's output: "research" is rare here but says nothing, while
-  // "dataset" is in 40% of chunks yet is precisely what "which datasets?" is
-  // after. So a heading only earns a boost when the question explains most of
-  // it — "Datasets" fully, but "Future work" matched on "work" alone not at all.
+  // rare the matching word is. Rarity is actively misleading in a single-subject
+  // corpus: measured over these chunks, "wheel" and "rider" are in about a
+  // quarter of them each and still discriminate perfectly well, while plenty of
+  // rarer words say nothing about the topic. So a heading only earns a boost
+  // when the question explains most of it — "Rim brakes" fully, but "History"
+  // matched on nothing at all, and "Brake types > Disc brakes" only when the
+  // question is actually about disc brakes rather than merely about types.
   const queryTerms = new Set(
     tokenize(question).filter((term) => bm25.documentFrequency(term) <= UBIQUITOUS_TERM_DF),
   );
@@ -176,20 +213,26 @@ export function retrieve(index, question, queryVector, options = {}) {
     .filter((candidate) => !allowed || allowed.has(candidate.docId))
     .sort((a, b) => b.fusedScore - a.fusedScore);
 
-  // Drop near-duplicates. The arXiv preprint and the published version of the
-  // regional-quality paper share most of their text, so without this step a
-  // single answer can be four restatements of one paragraph.
+  // Drop near-duplicates. This was load-bearing for the previous corpus, where
+  // an arXiv preprint and the published version of the same paper shared most of
+  // their text and one answer could be four restatements of one paragraph. On the
+  // Wikipedia corpus it fires once in 180 results across the labelled set, which
+  // is an argument for keeping it rather than removing it: it costs a Jaccard
+  // comparison per candidate, and a corpus where a broad article summarises a
+  // narrow one is exactly where it would be needed again.
   const selected = [];
   const fingerprints = [];
   const perDocument = new Map();
   const deferred = [];
 
-  // Many questions here are really about the body of work rather than about one
-  // paper ("which datasets are used?"), and every paper has its own answer. A
-  // purely score-ordered list lets the single best-matching paper take every
-  // slot, which hides exactly the comparison the question was asking for. So
-  // each document gets a quota on the first pass; anything crowded out is kept
-  // and used to backfill if there were not enough documents to fill the list.
+  // Many questions are answered in several articles at different depths - "how
+  // do disc brakes work?" is covered by Bicycle brake, Mountain bike and Tandem
+  // bicycle, and the general treatment is often not the most similar text. A purely
+  // score-ordered list lets the single best-matching article take every slot,
+  // which buries the broader answer under three consecutive paragraphs of the
+  // narrow one. So each document gets a quota on the first pass; anything crowded
+  // out is kept and used to backfill if there were not enough documents to fill
+  // the list. Unlike the duplicate guard above, this one fires constantly.
   const quota = Math.max(2, Math.ceil(limit / 3));
 
   const considerDuplicate = (candidate, fingerprint) => {
@@ -231,34 +274,48 @@ export function retrieve(index, question, queryVector, options = {}) {
 // index put a good match around 0.45, e5 puts one around 0.86. Re-derive them
 // with `npm run rag:calibrate` before changing WEAK_FLOOR or STRONG_FLOOR.
 //
-// Measured on 26 answerable questions against 7 that no single passage can
-// answer (corpus-wide counts, comparisons, off-topic, gibberish):
+// Measured on the 30 answerable questions in scripts/rag_test/evalset.mjs
+// against the 5 unanswerable ones beside them:
 //
-//   answerable    min 0.808   p10 0.815   median 0.860   max 0.899
-//   unanswerable  min 0.738   median 0.790            max 0.800
+//   answerable    min 0.853   p10 0.868   median 0.900   max 0.929
+//   unanswerable  min 0.767   median 0.798            max 0.824
 //
-// The two groups do not overlap, but the gap is only eight thousandths wide, so
-// the floor sits in the middle of it rather than being padded towards either
-// side. e5 compresses everything into a narrow high band — even gibberish
-// scores 0.80 — which is why the numbers look implausibly high and why
-// eyeballing them is no substitute for the probe.
-const WEAK_FLOOR = 0.804;
-const STRONG_FLOOR = 0.845;
+// e5 compresses everything into a narrow high band — even gibberish scores 0.81
+// — which is why the numbers look implausibly high and why eyeballing them is
+// no substitute for the probe. The floor sits in the middle of the gap between
+// the two groups rather than being padded towards either side.
+//
+// That gap is 0.029 wide here against 0.008 for the earlier corpus of research
+// PDFs, and the reason is corpus breadth rather than better tuning: across 255
+// articles covering mechanics, dynamics, infrastructure and history, a cycling
+// question nearly always has a passage genuinely about it, so the answerable
+// side moved up while the unanswerable side stayed put. A narrower corpus would
+// squeeze the gap shut again, so the margin is not something to rely on.
+const WEAK_FLOOR = 0.838;
+const STRONG_FLOOR = 0.885;
 // Being clearly ahead of the sixth result is corroborating evidence, enough to
 // promote a middling score but never enough to rescue a low one: plenty of
 // genuine matches sit in a cluster of equally good passages and have no spread
 // at all, so a small spread means nothing on its own.
+//
+// Note that the spread alone is not what keeps this honest — an unanswerable
+// question reached a spread of 0.031, close to the threshold. What protects the
+// rule is the conjunction: SPREAD_FLOOR sits above the best unanswerable score
+// of 0.824, so a wide spread can only ever promote a result that was already
+// scoring respectably.
 const STRONG_SPREAD = 0.035;
-const SPREAD_FLOOR = 0.820;
+const SPREAD_FLOOR = 0.855;
 
 /**
  * How much to trust a result set.
  *
  * Returning "weak" lets the page admit it is guessing instead of presenting
- * six barely related passages with the same confidence as six good ones. That
- * matters most for questions that are about the corpus as a whole ("which
- * model does he use most?") rather than about any one passage: no amount of
- * retrieval tuning can answer those, so the honest move is to say so.
+ * six barely related passages with the same confidence as six good ones. The
+ * case it is really for is the question that sounds exactly like one the corpus
+ * should answer but names a fact no article carries — a particular rider's
+ * result, a product someone bought. Those retrieve six plausible cycling
+ * passages and no amount of retrieval tuning will fix that, so the honest move
+ * is to say so.
  */
 export function confidenceOf(results) {
   if (!results.length) return 'none';
@@ -343,6 +400,17 @@ export function highlight(text, question) {
 }
 
 export function formatCitation(chunk) {
+  const title = chunk.document?.title || chunk.docId;
+  // A page number is the right locator for a PDF and meaningless for a web
+  // article, so cite the section instead when there is no page. A section that
+  // was cut into several passages needs the part as well, or two neighbouring
+  // passages cite identically - which matters most in the generation prompt,
+  // where the model is asked to attribute each claim to a distinct excerpt.
+  if (chunk.page === undefined || chunk.page === null) {
+    const part = chunk.sectionParts > 1 ? ` (${chunk.sectionPart} of ${chunk.sectionParts})` : '';
+    if (chunk.section) return `${title} § ${chunk.section}${part}`;
+    return part ? `${title}${part}` : title;
+  }
   const pages = chunk.pageEnd > chunk.page ? `pp. ${chunk.page}-${chunk.pageEnd}` : `p. ${chunk.page}`;
-  return `${chunk.document?.title || chunk.docId}, ${pages}`;
+  return `${title}, ${pages}`;
 }

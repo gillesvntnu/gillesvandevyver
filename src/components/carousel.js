@@ -19,10 +19,10 @@ const slideData = [
   // },
   {
     index: 0,
-    headline: 'Ask my research',
+    headline: 'Ask a bike question',
     button: 'Try it',
     src: embedding_space_pic,
-    link: '#/projects/ask-my-research'
+    link: '#/projects/ask-a-bike-question'
   },
   {
     index: 1,

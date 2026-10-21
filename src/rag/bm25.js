@@ -67,10 +67,12 @@ export class BM25Index {
   }
 
   /**
-   * Fraction of chunks containing a term. Everything in this corpus is one
-   * person's echocardiography research, so words like "work", "model" and
-   * "image" are near-universal and carry almost no signal even though they are
-   * not stopwords in general English.
+   * Fraction of chunks containing a term. Every corpus about one subject has a
+   * word for that subject which is near-universal and carries almost no signal
+   * even though it is not a stopword in general English; here it is "bicycle",
+   * in 62% of chunks. The caller decides what to do about that - see
+   * UBIQUITOUS_TERM_DF in retriever.js - because what counts as ubiquitous is a
+   * property of the corpus, not of BM25.
    */
   documentFrequency(term) {
     const postings = this.postings.get(term);

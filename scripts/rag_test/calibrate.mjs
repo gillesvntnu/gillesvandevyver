@@ -7,19 +7,10 @@
 
 import path from 'node:path';
 import { ROOT, stubFetch, makeEncoder } from './harness.mjs';
-import { QUERIES } from './evalset.mjs';
-
-// Questions no single passage can answer: counting or comparing across the
-// whole corpus, or simply off-topic. These should land below the "ok" line.
-const UNANSWERABLE = [
-  'What is the most used model in gilles work?',
-  'How many papers are there in total?',
-  'Which paper is the best one?',
-  'What is the capital of France?',
-  'asdfgh qwerty zxcvb',
-  'Summarise everything in one sentence.',
-  'What did he publish in 2019?',
-];
+// Both sides of the distribution come from evalset.mjs rather than being
+// restated here, so the queries the floor is measured against are the same ones
+// the regression suite scores.
+import { QUERIES, UNANSWERABLE } from './evalset.mjs';
 
 stubFetch();
 const { loadIndex, retrieve } = await import(path.join(ROOT, 'src/rag/retriever.js'));

@@ -1,10 +1,10 @@
 // Shared tokenizer for the lexical half of the retriever.
 //
 // Domain terms in this corpus are full of internal punctuation and casing
-// ("nnU-Net", "gCNR", "U-Net", "2-D"). A naive \w+ split destroys exactly the
-// terms that carry the most signal, so hyphenated and alphanumeric compounds
-// are kept whole *and* also emitted as their parts, letting a query for
-// "nnunet", "nnU-Net" or "net" all find the same chunk.
+// ("V-brake", "e-bike", "700c", "29er", "650b", "11-speed"). A naive \w+ split
+// destroys exactly the terms that carry the most signal, so hyphenated and
+// alphanumeric compounds are kept whole *and* also emitted as their parts,
+// letting a query for "ebike", "e-bike" or "bike" all find the same chunk.
 
 const STOPWORDS = new Set([
   'a', 'about', 'an', 'and', 'any', 'are', 'as', 'at', 'be', 'been', 'but', 'by',

@@ -35,7 +35,8 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "generate-sitemap": "node generate-sitemap.js",
-    "build-rag-index": "python3 scripts/build_rag_chunks.py && node scripts/build_rag_embeddings.mjs && python3 scripts/build_rag_tile.py",
+    "rag:fetch": "python3 scripts/fetch_wikipedia_cycling.py",
+    "build-rag-index": "python3 scripts/build_rag_chunks_wiki.py && node scripts/build_rag_embeddings.mjs && python3 scripts/build_rag_tile.py",
     "rag:test": "node --import ./scripts/rag_test/register.mjs scripts/rag_test/run.mjs",
     "rag:calibrate": "node --import ./scripts/rag_test/register.mjs scripts/rag_test/calibrate.mjs"
   },

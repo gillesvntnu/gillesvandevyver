@@ -5,15 +5,30 @@ import { loadIndex, retrieve, bestPassage, highlight, confidenceOf } from '../..
 import { loadEmbedder } from '../../../rag/embedder';
 import { synthesizeAnswer, PROVIDERS } from '../../../rag/synthesize';
 import embeddingSpace from '../../../images/rag/embedding_space.jpg';
+import norwayTour from '../../../images/rag/norway_tour.jpg';
 
+// Chosen to show the two halves of the hybrid doing different jobs rather than
+// to flatter it. "Stay upright" shares no word with "self-stability", so only
+// the semantic half finds it; "trail" is the steering term swamped in the
+// corpus by trail-riding and rail-trails, where it means a path.
 const SUGGESTIONS = [
-  'How do graph convolutional networks make segmentation anatomically correct?',
-  'What is gCNR and why use it for image quality?',
-  'Can diffusion models generate realistic cardiac ultrasound?',
-  'How is inter-model agreement used to predict quality?',
-  'What are the limitations of nnU-Net here?',
-  'Which datasets does this research use?',
+  'Why does a moving bicycle stay upright on its own?',
+  'How do rim brakes differ from disc brakes?',
+  'What is trail in bicycle steering geometry?',
+  'How does an internal hub gear work?',
+  'What causes speed wobble in the front wheel?',
+  'Do bicycle helmets reduce the risk of head injury?',
 ];
+
+// The licence name comes from the index, not from here, so that rebuilding over
+// a differently-licensed corpus changes the notice rather than leaving a false
+// one in place. This map only turns that name into a link; an unrecognised
+// licence still gets named, it just does not get linked.
+const LICENCE_URLS = {
+  'CC BY-SA 4.0': 'https://creativecommons.org/licenses/by-sa/4.0/',
+  'CC BY-SA 3.0': 'https://creativecommons.org/licenses/by-sa/3.0/',
+  'CC BY 4.0': 'https://creativecommons.org/licenses/by/4.0/',
+};
 
 const KEY_STORAGE = 'rag-api-key';
 const PROVIDER_STORAGE = 'rag-api-provider';
@@ -81,7 +96,28 @@ function SourceCard({ chunk, index, query, messageId, expandedByDefault }) {
   const [expanded, setExpanded] = useState(expandedByDefault);
   const passage = useMemo(() => bestPassage(chunk, query), [chunk, query]);
   const doc = chunk.document || {};
+  const hasPages = chunk.page !== undefined && chunk.page !== null;
   const pages = chunk.pageEnd > chunk.page ? `pp. ${chunk.page}–${chunk.pageEnd}` : `p. ${chunk.page}`;
+  // Deep-link into the article section when the source is a web page, so the
+  // "read it in context" click lands on the paragraph rather than the top.
+  const sourceHref = doc.url && chunk.anchor && !hasPages
+    ? `${doc.url}#${chunk.anchor}`
+    : doc.url;
+
+  // An encyclopedia article has no publication year: doc.year is when the
+  // extract was fetched, and printing it next to the title would read as a date
+  // of authorship. It belongs in the attribution note instead.
+  const showYear = Boolean(doc.year) && doc.kind !== 'encyclopedia article';
+
+  // Where in the document this passage sits. A page range if the source has
+  // pages; otherwise the section heading, qualified by which part of that
+  // section it is whenever the section runs to more than one passage — without
+  // that, two results from one long section cite identically.
+  const where = [];
+  if (hasPages) where.push(pages);
+  const ofParts = chunk.sectionParts > 1 ? ` (${chunk.sectionPart} of ${chunk.sectionParts})` : '';
+  if (chunk.section) where.push(`${chunk.section}${ofParts}`);
+  else if (ofParts) where.push(`passage ${chunk.sectionPart} of ${chunk.sectionParts}`);
 
   return (
     <li className="rag-source" id={`source-${messageId}-${index + 1}`}>
@@ -89,13 +125,12 @@ function SourceCard({ chunk, index, query, messageId, expandedByDefault }) {
         <span className="rag-source-number">{index + 1}</span>
         <div className="rag-source-meta">
           <span className="rag-source-title">
-            {doc.url
-              ? <a href={doc.url} target="_blank" rel="noopener noreferrer">{doc.title}</a>
+            {sourceHref
+              ? <a href={sourceHref} target="_blank" rel="noopener noreferrer">{doc.title}</a>
               : doc.title}
           </span>
           <span className="rag-source-sub">
-            {doc.venue}{doc.year ? `, ${doc.year}` : ''} · {pages}
-            {chunk.section ? ` · ${chunk.section}` : ''}
+            {[`${doc.venue}${showYear ? `, ${doc.year}` : ''}`, ...where].join(' · ')}
           </span>
         </div>
       </div>
@@ -147,9 +182,10 @@ const InteractiveRag = () => {
   const [provider, setProvider] = useState(() => readSession(PROVIDER_STORAGE, 'anthropic'));
   const [apiKey, setApiKey] = useState(() => readSession(KEY_STORAGE, ''));
   const [excluded, setExcluded] = useState(() => new Set());
+  const [docQuery, setDocQuery] = useState('');
 
   useEffect(() => {
-    document.title = 'Ask my research · gillesvandevyver.com';
+    document.title = 'Ask a bike question · gillesvandevyver.com';
   }, []);
 
   // 1. The index loads first and makes the page usable straight away in
@@ -168,6 +204,7 @@ const InteractiveRag = () => {
           documents: index.documentList.length,
           builtAt: index.meta.builtAt,
           model: index.meta.model,
+          attribution: index.meta.attribution,
         });
         setIndexState({ status: 'ready', error: null });
 
@@ -280,6 +317,16 @@ const InteractiveRag = () => {
     return next;
   });
 
+  // With seven papers the scope control could be seven checkboxes. With 255
+  // articles it needs a way in, so the list is filtered by title and scrolls.
+  // Matching is on the title alone: the ids are slugs of the titles, so there is
+  // nothing else here to match against.
+  const visibleDocuments = useMemo(() => {
+    const needle = docQuery.trim().toLowerCase();
+    if (!needle) return documents;
+    return documents.filter((d) => d.title.toLowerCase().includes(needle));
+  }, [documents, docQuery]);
+
   const modeLabel = embedState.status === 'ready'
     ? 'Hybrid: embeddings + BM25'
     : embedState.status === 'loading'
@@ -288,16 +335,31 @@ const InteractiveRag = () => {
 
   return (
     <div className="project-page-container">
-      <h1>Ask my research</h1>
+      <h1>Ask a bike question</h1>
 
       <div className="rag-hero">
-        <img src={embeddingSpace} alt="" className="rag-hero-image" />
+        {/* Two images, and the pairing is the point: the index above, the reason
+            I built it over bicycles below. The photo is decorative in the strict
+            sense, but it still gets real alt text, because a reader who cannot see
+            it should get the same "this is his own bike" a sighted reader gets. */}
+        <div className="rag-hero-figures">
+          <img src={embeddingSpace} alt="" className="rag-hero-image" />
+          <figure className="rag-photo">
+            <img
+              src={norwayTour}
+              alt="A loaded touring bicycle leaning against a guardrail on an empty coastal road, with a fjord, low cloud and mountains behind it."
+            />
+            <figcaption>
+              My own bike, somewhere on the ride up the length of Norway.
+            </figcaption>
+          </figure>
+        </div>
         <div className="rag-hero-text">
           <p>
-            Every other page here tells you about my work. This one lets you interrogate it.
-            Below is a retrieval-augmented generation system built over my published papers
-            and PhD thesis: ask it a question and it searches the actual text, then shows you
-            the passages it found and where they came from.
+            This is a retrieval-augmented generation system built over 255 Wikipedia
+            articles about cycling — frames, brakes, gearing, handling physics,
+            infrastructure, racing and history. Ask it a question and it searches the
+            actual text, then shows you the passages it found and where they came from.
           </p>
           <p>
             The unusual part is that there is no backend. This site is static, so the entire
@@ -305,11 +367,19 @@ const InteractiveRag = () => {
             the question is embedded locally, and the search happens on your own machine.
             Nothing you type is sent to a server of mine, because there is no server of mine.
           </p>
+          <p>
+            The corpus is cycling because I love bikes and long bikepacking tours. It is
+            also a good test: it mixes careful mechanical explanation with rigid-body
+            dynamics, policy argument and narrative history. The engineering below is the
+            point, and it would work the same over any other collection of text.
+          </p>
           <p className="rag-hero-caption">
-            The image is the index itself: all {stats?.chunks ?? '390-odd'} indexed passages
-            projected from 384 dimensions down to two, coloured by source document.
-            Passages about the same topic land near each other, which is exactly the property
-            the retriever exploits.
+            The scatter plot is the index itself: all {stats?.chunks ?? '3,300-odd'} indexed
+            passages projected from 384 dimensions down to two, coloured by
+            semantic cluster. Passages about the same topic land near each other, which is
+            exactly the property the retriever exploits — the clusters are roughly
+            components, handling physics, infrastructure and safety, off-road riding, and
+            history.
           </p>
         </div>
       </div>
@@ -397,8 +467,38 @@ const InteractiveRag = () => {
 
             <div className="rag-setting-block">
               <h4>Search in</h4>
+              <p className="rag-setting-help">
+                {documents.length - excluded.size} of {documents.length} articles included.
+                Narrowing the scope is a good way to see the retrieval working: ask about
+                braking with only the frame articles selected and it returns nothing at
+                all, rather than dressing up the nearest frame passage as an answer.
+              </p>
+              <div className="rag-doc-controls">
+                <input
+                  type="text"
+                  className="rag-doc-filter"
+                  value={docQuery}
+                  placeholder="Filter articles by title…"
+                  onChange={(event) => setDocQuery(event.target.value)}
+                  aria-label="Filter articles by title"
+                />
+                <button
+                  type="button"
+                  className="rag-link-button"
+                  onClick={() => setExcluded(new Set())}
+                >
+                  All
+                </button>
+                <button
+                  type="button"
+                  className="rag-link-button"
+                  onClick={() => setExcluded(new Set(documents.map((d) => d.id)))}
+                >
+                  None
+                </button>
+              </div>
               <div className="rag-doc-toggles">
-                {documents.map((doc) => (
+                {visibleDocuments.map((doc) => (
                   <label key={doc.id} className="rag-doc-toggle">
                     <input
                       type="checkbox"
@@ -408,6 +508,9 @@ const InteractiveRag = () => {
                     <span>{doc.title}</span>
                   </label>
                 ))}
+                {visibleDocuments.length === 0 && (
+                  <p className="rag-setting-help">No article title contains that.</p>
+                )}
               </div>
             </div>
           </div>
@@ -416,7 +519,7 @@ const InteractiveRag = () => {
         <div className="rag-transcript" ref={transcriptRef}>
           {messages.length === 0 && (
             <div className="rag-empty">
-              <p>Ask anything about the segmentation, image-quality or generative-model work.</p>
+              <p>Ask anything about bicycles — how they are built, how they handle, how they are raced.</p>
               <div className="rag-suggestions">
                 {SUGGESTIONS.map((suggestion) => (
                   <button
@@ -440,12 +543,12 @@ const InteractiveRag = () => {
               </div>
             ) : (
               <div key={message.id} className="rag-turn rag-turn-assistant">
-                {message.stage === 'retrieving' && <p className="rag-thinking">Searching the papers…</p>}
+                {message.stage === 'retrieving' && <p className="rag-thinking">Searching the articles…</p>}
 
                 {message.empty && (
                   <p className="rag-thinking">
-                    Nothing in the indexed documents matches that. Try rephrasing, or ask about
-                    segmentation, image quality, diffusion models or the clinical measurements.
+                    Nothing in the indexed articles matches that. Try rephrasing, or ask about
+                    components, frame design, handling, infrastructure or racing.
                   </p>
                 )}
 
@@ -465,11 +568,11 @@ const InteractiveRag = () => {
 
                 {message.confidence === 'weak' && message.sources.length > 0 && (
                   <p className="rag-weak-note">
-                    Nothing in the papers matches this closely. That usually means the
-                    question is about the body of work as a whole — &ldquo;which model is
-                    used most often?&rdquo; — rather than about something any single
-                    passage states. Search can only show you passages, so treat these as
-                    a starting point rather than an answer.
+                    Nothing in the articles matches this closely. That usually means the
+                    question is one no single passage answers — &ldquo;which frame material
+                    is best?&rdquo; — or that it is about cycling but about something these
+                    articles happen not to cover. Search can only show you passages, so treat
+                    these as a starting point rather than an answer.
                   </p>
                 )}
 
@@ -510,7 +613,7 @@ const InteractiveRag = () => {
             value={question}
             onChange={(event) => setQuestion(event.target.value)}
             placeholder={indexState.status === 'ready'
-              ? 'Ask a question about the papers…'
+              ? 'Ask a question about bicycles…'
               : 'Loading the index…'}
             disabled={indexState.status !== 'ready' || busy}
             aria-label="Your question"
@@ -526,117 +629,92 @@ const InteractiveRag = () => {
           <h2>How it works</h2>
           <p>
             A retrieval-augmented system has two halves. The retriever finds the handful of
-            passages most likely to contain the answer; the generator turns those passages into
-            prose. The retriever is the half that determines whether the answer is right, so it
-            is the half this page puts on display: every answer shows the passages behind it,
-            which document and page each came from, and how it was found.
+            passages most likely to contain the answer; the generator turns those passages
+            into prose. The retriever is the half that decides whether the answer is right,
+            so it is the half this page puts on display: every answer shows the passages
+            behind it, and which article and section each one came from.
           </p>
 
           <h3>Building the index</h3>
           <p>
-            Two build scripts turn the PDFs into something searchable. The first extracts the
-            text, repairs the damage that PDF extraction always does — hyphens splitting words
-            across lines, ligatures, running headers repeated on every page — and discards the
-            reference lists, which otherwise flood the index with the titles of other people's
-            papers. What remains is cut into overlapping passages of roughly a thousand
-            characters, each tagged with its document, page and section.
+            Build scripts download the plain text of each article, cut it into passages of
+            roughly a thousand characters tagged with the article and heading they came
+            from, and throw away the back matter. Each passage is then embedded with the
+            e5-small-v2 sentence transformer. The vectors are squeezed down to one byte per
+            dimension, which turns 3,365 passages into 1.3 MB, small enough to send to a
+            browser.
           </p>
           <p>
-            The second script embeds each passage with the e5-small-v2 sentence transformer and
-            writes the vectors out as a quantised binary. The vectors are unit length, so every
-            component falls in a known range and can be stored as a single byte instead of four
-            floats. That turns the index into a file small enough to simply download.
-          </p>
-
-          <h3>Choosing the encoder by measuring it</h3>
-          <p>
-            The first version of this page used all-MiniLM-L6-v2, the default choice for
-            browser-side embedding, and the retrieval was mediocre in a way that was hard to
-            attribute: a bad answer could be the encoder, the chunking, the keyword half or the
-            fusion. So I wrote down twenty-six questions about these papers together with the
-            documents that answer them and a fact each correct passage has to contain, then ran
-            six candidate models over it with everything else held fixed and keyword search
-            switched off, so that a weak encoder could not hide behind exact word overlap.
-          </p>
-          <p>
-            MiniLM came last. Measuring where the first genuinely correct passage lands, it scored
-            0.83 against 0.96 for e5-small-v2, which put the right passage first for twenty-four
-            of the twenty-six questions rather than nineteen. The larger 768-dimension bge-base
-            did not beat the small models, which is the useful part of the result: the gain came
-            from using an encoder trained for retrieval, not from spending more parameters or
-            more download on the visitor.
+            Picking that encoder was a measurement rather than a guess. I wrote down a set
+            of questions together with the articles that answer them, ran six candidate
+            models over it, and the popular default came last. The gain came from using a
+            model trained for retrieval, not from using a bigger one.
           </p>
 
           <h3>Searching without a server</h3>
           <p>
-            When you ask a question, the same e5 model runs in your browser to embed it, and the
-            result is compared against every stored passage. e5 is asymmetric — it was trained
-            with questions and passages marked differently, so the build script prefixes every
-            passage and the page prefixes every question, and getting that wrong costs most of
-            the advantage it was chosen for. Running alongside it is a BM25 keyword search, built
-            in the browser from the passage text when the page loads.
+            When you ask a question, that same model runs inside your browser to embed it
+            and compares it against every stored passage. Running alongside it is an
+            old-fashioned keyword search, built in the browser when the page loads, and the
+            two rankings are merged into one.
           </p>
           <p>
-            Both halves are necessary. Embeddings are good at paraphrase: ask about "making
-            segmentation anatomically plausible" and they find the right passages even though the
-            papers say "anatomical correctness". Keyword search has the opposite strength — it
-            guarantees that a rare literal string such as gCNR or HUNT4 is matched as itself
-            rather than as something that merely looks similar — and it is also what keeps the
-            page working when the model cannot load at all. The two rankings are merged with
-            reciprocal rank fusion, which combines positions rather than scores and so needs no
-            calibration between a bounded cosine similarity and an unbounded BM25 score.
-          </p>
-          <p>
-            One corpus-specific problem remains. My thesis reproduces three of the papers as
-            chapters, and one paper exists as both a published version and a longer preprint, so
-            a naive index would answer every question with four copies of the same paragraph.
-            The build script indexes only the thesis chapters that are not reproductions, and the
-            retriever discards passages whose character trigrams overlap too heavily with one
-            already selected, noting instead that the text appears in more than one place.
+            Both halves earn their place. The semantic half handles paraphrase: ask how
+            climbing rate is measured in metres per hour and the answer sits in an article
+            titled VAM, which shares not a single word with the question. The keyword half
+            guarantees that a rare literal string like Presta or 700c is matched as itself,
+            and it is what keeps the page working if the model never loads.
           </p>
 
           <h3>The generation step</h3>
           <p>
-            Without an API key the page stops at retrieval, highlights your query terms and shows
-            the most relevant sentences in each passage. This is deliberately the default: it
-            works for everyone, costs nothing, and cannot hallucinate, because every word on
-            screen is lifted verbatim from a paper. If you supply a key in the settings, the
-            retrieved passages are sent to that provider with instructions to answer only from
-            them and to cite each claim, and the citation markers in the answer link back to the
-            passage they came from.
-          </p>
-
-          <h3>What this costs the visitor</h3>
-          <p>
-            The index is about 500 kB and loads with the page. The embedding model is a further
-            33 MB, fetched in the background from a CDN and cached by the browser afterwards.
-            The page is usable in keyword-only mode from the moment the index arrives and
-            upgrades itself to hybrid search when the model finishes loading, so the download
-            never blocks anything. If it fails altogether — an old browser, a blocked CDN — the
-            keyword half carries on alone.
+            Without an API key the page stops at retrieval and shows you the passages with
+            your search terms highlighted. That is the default on purpose: it costs nothing
+            and cannot hallucinate, because every word on screen is lifted verbatim from an
+            article. Paste in your own key and the retrieved passages are sent to a model
+            with instructions to answer only from them and to cite every claim.
           </p>
 
           <h3>Honest limitations</h3>
           <p>
-            Figures, tables and equations are dropped during extraction, so questions whose
-            answers live in a results table will find the surrounding discussion rather than the
-            numbers themselves.
+            Tables, infoboxes and equations are not indexed, so a question whose answer is a
+            number will find the discussion around it rather than the number itself. The
+            deeper limit is that this retrieves passages, so it can only answer what a
+            passage answers. &ldquo;Which frame material is best?&rdquo; has no paragraph
+            anywhere stating a verdict, and the page will tell you it is not confident
+            instead of inventing one &mdash; a warning calibrated against the same question
+            set, with unanswerable questions written in deliberately.
           </p>
           <p>
-            The deeper limit is that this retrieves passages, so it can only answer questions a
-            passage answers. "Which model do you use most often?" requires counting across seven
-            papers, and no paragraph anywhere states the total; the page will return the six
-            passages that look most like the question and tell you it is not confident, which is
-            the honest response but not the one you asked for. That warning is calibrated against
-            the same labelled set: every question the papers do answer scores above 0.808 and
-            every aggregate or off-topic one scores below 0.800, so the cutoff sits in a gap
-            eight thousandths wide — a margin that holds for this corpus and this encoder and
-            would need re-measuring for either.
+            And it is 255 articles, not all of cycling. Ask about a rider, a race or a part
+            it happens not to cover and the honest answer, which the system will give, is
+            that it found nothing.
           </p>
-          <p>
-            And the corpus is only my own work: ask about something I have not published on and
-            the honest answer, which the system will give, is that it found nothing relevant.
-          </p>
+
+          {stats?.attribution && (
+            <>
+              <h3>Attribution</h3>
+              <p>
+                The passages are text from {stats.attribution.source}
+                {stats.attribution.fetched ? `, fetched on ${stats.attribution.fetched}` : ''}, used
+                under{' '}
+                {LICENCE_URLS[stats.attribution.license]
+                  ? (
+                    <a
+                      href={LICENCE_URLS[stats.attribution.license]}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      {stats.attribution.license}
+                    </a>
+                  )
+                  : stats.attribution.license}. Every passage links back to the article and
+                section it came from. Because the text ships inside the index rather than being
+                fetched live, this page redistributes it, so that licence covers the passages
+                reproduced here; the code around them is my own.
+              </p>
+            </>
+          )}
         </div>
       </div>
     </div>
