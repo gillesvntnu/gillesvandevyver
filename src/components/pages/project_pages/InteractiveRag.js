@@ -97,7 +97,7 @@ function SourceCard({ chunk, index, query, messageId, expandedByDefault }) {
   const passage = useMemo(() => bestPassage(chunk, query), [chunk, query]);
   const doc = chunk.document || {};
   const hasPages = chunk.page !== undefined && chunk.page !== null;
-  const pages = chunk.pageEnd > chunk.page ? `pp. ${chunk.page}–${chunk.pageEnd}` : `p. ${chunk.page}`;
+  const pages = chunk.pageEnd > chunk.page ? `pp. ${chunk.page}-${chunk.pageEnd}` : `p. ${chunk.page}`;
   // Deep-link into the article section when the source is a web page, so the
   // "read it in context" click lands on the paragraph rather than the top.
   const sourceHref = doc.url && chunk.anchor && !hasPages
@@ -111,7 +111,7 @@ function SourceCard({ chunk, index, query, messageId, expandedByDefault }) {
 
   // Where in the document this passage sits. A page range if the source has
   // pages; otherwise the section heading, qualified by which part of that
-  // section it is whenever the section runs to more than one passage — without
+  // section it is whenever the section runs to more than one passage. Without
   // that, two results from one long section cite identically.
   const where = [];
   if (hasPages) where.push(pages);
@@ -357,7 +357,7 @@ const InteractiveRag = () => {
         <div className="rag-hero-text">
           <p>
             This is a retrieval-augmented generation system built over 255 Wikipedia
-            articles about cycling — frames, brakes, gearing, handling physics,
+            articles about cycling: frames, brakes, gearing, handling physics,
             infrastructure, racing and history. Ask it a question and it searches the
             actual text, then shows you the passages it found and where they came from.
           </p>
@@ -377,7 +377,7 @@ const InteractiveRag = () => {
             The scatter plot is the index itself: all {stats?.chunks ?? '3,300-odd'} indexed
             passages projected from 384 dimensions down to two, coloured by
             semantic cluster. Passages about the same topic land near each other, which is
-            exactly the property the retriever exploits — the clusters are roughly
+            exactly the property the retriever exploits. The clusters are roughly
             components, handling physics, infrastructure and safety, off-road riding, and
             history.
           </p>
@@ -519,7 +519,7 @@ const InteractiveRag = () => {
         <div className="rag-transcript" ref={transcriptRef}>
           {messages.length === 0 && (
             <div className="rag-empty">
-              <p>Ask anything about bicycles — how they are built, how they handle, how they are raced.</p>
+              <p>Ask anything about bicycles: how they are built, how they handle, how they are raced.</p>
               <div className="rag-suggestions">
                 {SUGGESTIONS.map((suggestion) => (
                   <button
@@ -569,8 +569,8 @@ const InteractiveRag = () => {
                 {message.confidence === 'weak' && message.sources.length > 0 && (
                   <p className="rag-weak-note">
                     Nothing in the articles matches this closely. That usually means the
-                    question is one no single passage answers — &ldquo;which frame material
-                    is best?&rdquo; — or that it is about cycling but about something these
+                    question is one no single passage answers, like &ldquo;which frame material
+                    is best?&rdquo;, or that it is about cycling but about something these
                     articles happen not to cover. Search can only show you passages, so treat
                     these as a starting point rather than an answer.
                   </p>
@@ -682,7 +682,7 @@ const InteractiveRag = () => {
             deeper limit is that this retrieves passages, so it can only answer what a
             passage answers. &ldquo;Which frame material is best?&rdquo; has no paragraph
             anywhere stating a verdict, and the page will tell you it is not confident
-            instead of inventing one &mdash; a warning calibrated against the same question
+            instead of inventing one. That warning is calibrated against the same question
             set, with unanswerable questions written in deliberately.
           </p>
           <p>

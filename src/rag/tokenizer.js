@@ -35,7 +35,7 @@ function stem(token) {
 // Unicode decomposition handles accents that are a letter plus a combining
 // mark ("å" -> "a" + U+030A), but Nordic and Central European alphabets have
 // letters that are atomic and survive NFD untouched. Without this table
-// "Måsøy" tokenizes to "mas", which loses half the name — and this corpus is
+// "Måsøy" tokenizes to "mas", which loses half the name, and this corpus is
 // full of Norwegian authors and place names.
 const LETTER_FOLDS = [
   [/ø/g, 'o'], [/æ/g, 'ae'], [/œ/g, 'oe'], [/ß/g, 'ss'],

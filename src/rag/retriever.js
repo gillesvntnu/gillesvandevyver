@@ -184,7 +184,7 @@ export function retrieve(index, question, queryVector, options = {}) {
   // corpus: measured over these chunks, "wheel" and "rider" are in about a
   // quarter of them each and still discriminate perfectly well, while plenty of
   // rarer words say nothing about the topic. So a heading only earns a boost
-  // when the question explains most of it — "Rim brakes" fully, but "History"
+  // when the question explains most of it: "Rim brakes" fully, but "History"
   // matched on nothing at all, and "Brake types > Disc brakes" only when the
   // question is actually about disc brakes rather than merely about types.
   const queryTerms = new Set(
@@ -280,8 +280,8 @@ export function retrieve(index, question, queryVector, options = {}) {
 //   answerable    min 0.853   p10 0.868   median 0.900   max 0.929
 //   unanswerable  min 0.767   median 0.798            max 0.824
 //
-// e5 compresses everything into a narrow high band — even gibberish scores 0.81
-// — which is why the numbers look implausibly high and why eyeballing them is
+// e5 compresses everything into a narrow high band (even gibberish scores 0.81),
+// which is why the numbers look implausibly high and why eyeballing them is
 // no substitute for the probe. The floor sits in the middle of the gap between
 // the two groups rather than being padded towards either side.
 //
@@ -298,7 +298,7 @@ const STRONG_FLOOR = 0.885;
 // genuine matches sit in a cluster of equally good passages and have no spread
 // at all, so a small spread means nothing on its own.
 //
-// Note that the spread alone is not what keeps this honest — an unanswerable
+// Note that the spread alone is not what keeps this honest: an unanswerable
 // question reached a spread of 0.031, close to the threshold. What protects the
 // rule is the conjunction: SPREAD_FLOOR sits above the best unanswerable score
 // of 0.824, so a wide spread can only ever promote a result that was already
@@ -312,7 +312,7 @@ const SPREAD_FLOOR = 0.855;
  * Returning "weak" lets the page admit it is guessing instead of presenting
  * six barely related passages with the same confidence as six good ones. The
  * case it is really for is the question that sounds exactly like one the corpus
- * should answer but names a fact no article carries — a particular rider's
+ * should answer but names a fact no article carries: a particular rider's
  * result, a product someone bought. Those retrieve six plausible cycling
  * passages and no amount of retrieval tuning will fix that, so the honest move
  * is to say so.
