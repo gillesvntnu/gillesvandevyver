@@ -356,30 +356,27 @@ const InteractiveRag = () => {
         </div>
         <div className="rag-hero-text">
           <p>
-            This is a retrieval-augmented generation system built over 255 Wikipedia
-            articles about cycling: frames, brakes, gearing, handling physics,
-            infrastructure, racing and history. Ask it a question and it searches the
-            actual text, then shows you the passages it found and where they came from.
+            Ask a question about bicycles and this searches 255 Wikipedia articles about
+            them: frames, brakes, gearing, handling physics, infrastructure, racing and
+            history. It shows you the passages it found and where they came from.
           </p>
           <p>
-            The unusual part is that there is no backend. This site is static, so the entire
-            retrieval pipeline runs inside your browser tab: the index is downloaded once,
-            the question is embedded locally, and the search happens on your own machine.
-            Nothing you type is sent to a server of mine, because there is no server of mine.
+            There is no backend. The site is static, so the whole search runs inside your
+            browser tab. The index is downloaded once, your question is embedded on your own
+            machine, and nothing you type is sent to a server of mine.
           </p>
           <p>
-            The corpus is cycling because I love bikes and long bikepacking tours. It is
-            also a good test: it mixes careful mechanical explanation with rigid-body
-            dynamics, policy argument and narrative history. The engineering below is the
-            point, and it would work the same over any other collection of text.
+            The corpus is cycling because I love bikes and bikepacking. It is also a good
+            test: it mixes careful mechanical explanation with rigid-body dynamics, policy
+            argument and narrative history. The engineering below is the point, and it would
+            work the same over any other collection of text.
           </p>
           <p className="rag-hero-caption">
             The scatter plot is the index itself: all {stats?.chunks ?? '3,300-odd'} indexed
-            passages projected from 384 dimensions down to two, coloured by
-            semantic cluster. Passages about the same topic land near each other, which is
-            exactly the property the retriever exploits. The clusters are roughly
-            components, handling physics, infrastructure and safety, off-road riding, and
-            history.
+            passages projected from 384 dimensions down to two, coloured by semantic cluster.
+            Passages about the same topic land near each other, which is exactly the property
+            the retriever exploits. The clusters are roughly components, handling physics,
+            infrastructure and safety, off-road riding, and history.
           </p>
         </div>
       </div>
@@ -417,10 +414,10 @@ const InteractiveRag = () => {
             <div className="rag-setting-block">
               <h4>Written answers (optional)</h4>
               <p className="rag-setting-help">
-                Retrieval runs locally and needs nothing from you. If you paste your own API key,
-                the retrieved passages are additionally sent to that provider to be written up as
-                a cited answer. The key goes from your browser straight to the provider, is kept
-                only in this tab, and disappears when you close it.
+                Retrieval runs locally and needs nothing from you. Paste your own API key and the
+                retrieved passages are also sent to that provider to be written up as a cited
+                answer. The key goes straight from your browser to the provider, stays in this tab
+                only, and disappears when you close it.
               </p>
               <div className="rag-setting-row">
                 <select
@@ -469,9 +466,9 @@ const InteractiveRag = () => {
               <h4>Search in</h4>
               <p className="rag-setting-help">
                 {documents.length - excluded.size} of {documents.length} articles included.
-                Narrowing the scope is a good way to see the retrieval working: ask about
-                braking with only the frame articles selected and it returns nothing at
-                all, rather than dressing up the nearest frame passage as an answer.
+                Narrowing the scope is a good way to see the search working: ask about braking
+                with only the frame articles selected and it returns nothing, instead of
+                dressing up the nearest frame passage as an answer.
               </p>
               <div className="rag-doc-controls">
                 <input
@@ -568,10 +565,9 @@ const InteractiveRag = () => {
 
                 {message.confidence === 'weak' && message.sources.length > 0 && (
                   <p className="rag-weak-note">
-                    Nothing in the articles matches this closely. That usually means the
-                    question is one no single passage answers, like &ldquo;which frame material
-                    is best?&rdquo;, or that it is about cycling but about something these
-                    articles happen not to cover. Search can only show you passages, so treat
+                    Nothing in the articles matches this closely. Usually that means no single
+                    passage answers the question, like &ldquo;which frame material is
+                    best?&rdquo;, or it is about something these articles do not cover. Treat
                     these as a starting point rather than an answer.
                   </p>
                 )}
@@ -628,67 +624,51 @@ const InteractiveRag = () => {
         <div className="rag-prose">
           <h2>How it works</h2>
           <p>
-            A retrieval-augmented system has two halves. The retriever finds the handful of
-            passages most likely to contain the answer; the generator turns those passages
-            into prose. The retriever is the half that decides whether the answer is right,
-            so it is the half this page puts on display: every answer shows the passages
-            behind it, and which article and section each one came from.
+            A retrieval system has two halves: the retriever finds the passages most likely
+            to hold the answer, the generator writes them up. The retriever is the half that
+            decides whether the answer is right, so this page shows its work.
           </p>
 
-          <h3>Building the index</h3>
+          <h3>How is the index built?</h3>
           <p>
-            Build scripts download the plain text of each article, cut it into passages of
-            roughly a thousand characters tagged with the article and heading they came
-            from, and throw away the back matter. Each passage is then embedded with the
-            e5-small-v2 sentence transformer. The vectors are squeezed down to one byte per
-            dimension, which turns 3,365 passages into 1.3 MB, small enough to send to a
+            A script cuts each article into passages of about a thousand characters and
+            embeds them with e5-small-v2. The vectors are squeezed to one byte per
+            dimension, which turns 3,365 passages into 1.3 MB. Small enough to send to a
             browser.
           </p>
+
+          <h3>Why that model?</h3>
           <p>
-            Picking that encoder was a measurement rather than a guess. I wrote down a set
-            of questions together with the articles that answer them, ran six candidate
-            models over it, and the popular default came last. The gain came from using a
-            model trained for retrieval, not from using a bigger one.
+            I measured it. I wrote down a set of questions and the articles that answer
+            them, then ran six models over it. The popular default came last. A model
+            trained for retrieval beat a bigger one.
           </p>
 
-          <h3>Searching without a server</h3>
+          <h3>How does it search without a server?</h3>
           <p>
-            When you ask a question, that same model runs inside your browser to embed it
-            and compares it against every stored passage. Running alongside it is an
-            old-fashioned keyword search, built in the browser when the page loads, and the
-            two rankings are merged into one.
-          </p>
-          <p>
-            Both halves earn their place. The semantic half handles paraphrase: ask how
-            climbing rate is measured in metres per hour and the answer sits in an article
-            titled VAM, which shares not a single word with the question. The keyword half
-            guarantees that a rare literal string like Presta or 700c is matched as itself,
-            and it is what keeps the page working if the model never loads.
+            The same model runs in your browser to embed your question and compares it
+            against every stored passage. A keyword search runs next to it and the two
+            rankings are merged. The semantic half handles paraphrase: a question about
+            climbing rate in metres per hour finds an article called VAM, which shares no
+            word with it. The keyword half catches rare strings like Presta or 700c, and
+            keeps the page working if the model never loads.
           </p>
 
-          <h3>The generation step</h3>
+          <h3>What about the written answers?</h3>
           <p>
-            Without an API key the page stops at retrieval and shows you the passages with
-            your search terms highlighted. That is the default on purpose: it costs nothing
-            and cannot hallucinate, because every word on screen is lifted verbatim from an
-            article. Paste in your own key and the retrieved passages are sent to a model
-            with instructions to answer only from them and to cite every claim.
+            Without an API key the page stops at retrieval and shows the passages with your
+            terms highlighted. It cannot hallucinate, because every word on screen is copied
+            from an article. Paste in your own key and the passages go to a model told to
+            answer only from them and cite every claim.
           </p>
 
-          <h3>Honest limitations</h3>
+          <h3>What does it get wrong?</h3>
           <p>
-            Tables, infoboxes and equations are not indexed, so a question whose answer is a
-            number will find the discussion around it rather than the number itself. The
-            deeper limit is that this retrieves passages, so it can only answer what a
-            passage answers. &ldquo;Which frame material is best?&rdquo; has no paragraph
-            anywhere stating a verdict, and the page will tell you it is not confident
-            instead of inventing one. That warning is calibrated against the same question
-            set, with unanswerable questions written in deliberately.
-          </p>
-          <p>
-            And it is 255 articles, not all of cycling. Ask about a rider, a race or a part
-            it happens not to cover and the honest answer, which the system will give, is
-            that it found nothing.
+            Tables and equations are not indexed, so a question whose answer is a number
+            finds the discussion around it instead. It can only answer what a passage
+            answers: &ldquo;Which frame material is best?&rdquo; has no paragraph stating a
+            verdict, so the page says it is not confident rather than inventing one. And it
+            is 255 articles, not all of cycling.
           </p>
 
           {stats?.attribution && (
@@ -708,10 +688,9 @@ const InteractiveRag = () => {
                       {stats.attribution.license}
                     </a>
                   )
-                  : stats.attribution.license}. Every passage links back to the article and
-                section it came from. Because the text ships inside the index rather than being
-                fetched live, this page redistributes it, so that licence covers the passages
-                reproduced here; the code around them is my own.
+                  : stats.attribution.license}. Every passage links back to the article it came
+                from. The text ships inside the index rather than being fetched live, so this
+                page redistributes it and that licence covers it. The code is my own.
               </p>
             </>
           )}
