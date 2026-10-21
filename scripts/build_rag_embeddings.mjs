@@ -2,7 +2,7 @@
  * Step 2 of the RAG index build: text chunks -> sentence embeddings.
  *
  * Embeds every chunk with the same model the browser uses for the query
- * (Xenova/all-MiniLM-L6-v2, int8-quantised ONNX), so index vectors and query
+ * (Xenova/e5-small-v2, int8-quantised ONNX), so index vectors and query
  * vectors live in exactly the same space.  Vectors are themselves quantised to
  * int8 before being written, which cuts the payload ~4x at a negligible cost
  * in ranking quality (the vectors are unit-norm, so every component is in
@@ -24,15 +24,21 @@ const ROOT = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const CHUNKS_PATH = path.join(ROOT, 'scripts', 'rag_chunks.json');
 const OUT_DIR = path.join(ROOT, 'public', 'rag');
 
-export const MODEL_ID = 'Xenova/all-MiniLM-L6-v2';
+// Must match MODEL_ID in src/rag/embedder.js. The corpus records the model it
+// was built with and the retriever refuses to run against a mismatch, so a
+// stale index fails loudly instead of quietly returning nonsense.
+export const MODEL_ID = 'Xenova/e5-small-v2';
 export const DIMS = 384;
+
+/** e5 is asymmetric. Counterpart of QUERY_PREFIX in src/rag/embedder.js. */
+const PASSAGE_PREFIX = 'passage: ';
 
 env.allowLocalModels = false;
 
 /** Mirror of the browser-side text preparation. Keep the two in sync. */
 function embedText(chunk, docTitle) {
   const section = chunk.section ? `${chunk.section}. ` : '';
-  return `${docTitle}. ${section}${chunk.text}`;
+  return `${PASSAGE_PREFIX}${docTitle}. ${section}${chunk.text}`;
 }
 
 async function main() {

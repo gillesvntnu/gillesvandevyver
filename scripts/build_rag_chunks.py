@@ -58,7 +58,15 @@ BACK_MATTER_HEADING = re.compile(
     r"consent (to publish|for publication)|informed consent|"
     r"supplementary (information|material|data)|additional information|"
     r"publisher'?s note|reprints and permissions|"
-    r"abbreviations|orcid"
+    r"abbreviations|orcid|"
+    # The thesis ends with two pages listing its own papers and conference
+    # talks. It is the worst possible text to index: nothing but author names
+    # and titles, repeated, and BM25 reads a name that appears in only those
+    # chunks as the rarest and most informative term in the corpus. All three
+    # headings are listed because any one of them left out would be read as a
+    # content heading and end the cut the previous one opened.
+    r"publication list|list of publications|"
+    r"publications included in the thesis|presentations and abstracts"
     r")\s*:?\s*$",
     re.IGNORECASE,
 )
@@ -75,6 +83,45 @@ INLINE_FURNITURE = [
     re.compile(r"\*?\s*Corresponding author[.:]?\s*[^\n]{0,60}@[^\s,]+", re.I),
     re.compile(r"Received \d{1,2} \w+ \d{4};\s*revised.{0,200}?\d{4}", re.I | re.S),
 ]
+
+# The masthead block on a journal's first page: corresponding-author footnote,
+# submission dates, DOI, ISSN, copyright line, running header.  It sits at the
+# foot of a column, so the extractor returns it in the middle of the page and
+# it ends up glued onto whichever body paragraph it lands beside.
+#
+# INLINE_FURNITURE cannot catch it.  Those patterns use [^\n], so they match
+# the corresponding-author footnote only when the e-mail address happens to
+# land on the same line; in the Ultrasound in Medicine & Biology paper it does
+# not, and the whole block rode into the Introduction chunk.
+#
+# What makes the block tractable is that it is contiguous.  Once one of these
+# markers appears, the following lines are masthead too, until real prose
+# resumes.  So the markers only have to open the cut and MASTHEAD_CONTINUES
+# decides where it closes.
+MASTHEAD_OPENS = re.compile(
+    r"^\s*(?:"
+    r"\*\s*Corresponding author\b"
+    r"|E-?mail address(es)?\s*:"
+    r"|(Received|Submitted)\s+\d{1,2}\s+\w+\s+\d{4}\b"
+    r"|\d{4}-\d{3}[\dX]/"                     # ISSN, e.g. "0301-5629/"
+    r"|(?-i:\d{1,2}(?=[A-Z][a-z]{2,}))"       # affiliation marker, "1Department"
+    r")",
+    re.I,
+)
+
+MASTHEAD_CONTINUES = re.compile(
+    r"(https?://|www\.|\S+@\S+\.\w+"
+    r"|©|\bThe Authors?\(?s?\)?\b|\ball rights reserved\b|\bcreativecommons\b"
+    r"|\bopen access\b|\bContents lists available\b|\bjournal homepage\b"
+    r"|\bPublished by\b|\bdoi\b|\bISSN\b|\bemail\b"
+    r"|(?-i:\d{1,2}(?=[A-Z][a-z]{2,}))"       # "2SINTEF Health, Trondheim ..."
+    r"|\b(Received|Revised|Accepted)\s+\d{1,2}\s+\w+\s+\d{4}\b)",
+    re.I,
+)
+
+# Ceiling on how much one marker may swallow, so a marker firing somewhere
+# unexpected cannot take a column of real text down with it.
+MASTHEAD_MAX_LINES = 14
 
 # A line that is nothing but a citation entry, e.g. "[12] A. Author, ..."
 CITATION_LINE = re.compile(r"^\s*\[\d{1,3}\]\s")
@@ -151,9 +198,17 @@ HEADING_PATTERNS = [
     re.compile(r"^(?:[IVXLC]+\.|\d+(?:\.\d+)+\.?)\s+[A-Z][^.]{2,60}$"),   # 3.2 Methods
     re.compile(r"^[A-Z]\.\s+[A-Z][A-Z \-/&0-9]{3,60}$"),                  # B. GENERAL STRUCTURE
     re.compile(r"^[A-Z][A-Z \-/&0-9]{4,60}$"),                            # METHODS
+    # Unnumbered headings, enumerated as literals rather than matched by shape.
+    # A general "short title-case line" rule was tried and rejected: inside a
+    # reference list it fires on wrapped author names ("Thomas", "Svend") and
+    # inside an appendix table on every row label ("Optimizer", "Epochs"),
+    # which would reopen the back-matter cut on exactly the proper-noun soup
+    # the cut exists to remove. "Thesis outline" is here because it is the one
+    # heading in the corpus that directly follows a back-matter heading, so
+    # without it the publication-list cut runs straight through the paragraph.
     re.compile(r"^(Abstract|Introduction|Background|Methods?|Materials and methods|"
                r"Results?|Discussion|Conclusions?|Related work|Experimental setup|"
-               r"Limitations|Future work|Datasets?)\s*$", re.IGNORECASE),
+               r"Limitations|Future work|Datasets?|Thesis outline)\s*$", re.IGNORECASE),
 ]
 
 # Fingerprints of a bibliography entry.  Used both to find where a reference
@@ -220,6 +275,47 @@ def strip_back_matter(raw: str, in_back_matter: bool):
     return "\n".join(kept), in_back_matter
 
 
+def strip_masthead(raw: str) -> str:
+    """Remove the journal masthead block from a page.
+
+    Mirror of strip_back_matter at the other end of the paper: open the cut on
+    a marker, then keep cutting while the lines still look like furniture.  A
+    line continues the block if it carries a furniture marker (URL, e-mail,
+    copyright, publisher) or is too short to be prose, which is what lets the
+    cut run through the ISSN line, the licence sentence and the running header
+    in one go.
+
+    A real section heading closes the cut even though it is short, so the
+    "Background" heading of a structured abstract survives a masthead block
+    that happens to be printed directly above it.
+    """
+    lines = raw.split("\n")
+    kept = []
+    i = 0
+    while i < len(lines):
+        if not MASTHEAD_OPENS.match(lines[i]):
+            kept.append(lines[i])
+            i += 1
+            continue
+        start = i
+        while i < len(lines) and i - start < MASTHEAD_MAX_LINES:
+            line = lines[i].strip()
+            if MASTHEAD_OPENS.match(line) or MASTHEAD_CONTINUES.search(line):
+                i += 1
+                continue
+            # Short lines are swept up as continuation, except headings: the
+            # block is full of them (titles, journal names, author fragments)
+            # and listing each one would be endless.
+            if len(line.split()) <= 10 and not is_heading(line):
+                i += 1
+                continue
+            break
+        if i == start:  # nothing consumed; do not loop forever
+            kept.append(lines[i])
+            i += 1
+    return "\n".join(kept)
+
+
 def normalise(text: str) -> str:
     for src, dst in LIGATURES.items():
         text = text.replace(src, dst)
@@ -229,6 +325,10 @@ def normalise(text: str) -> str:
     text = text.replace("\u2019", "'").replace("\u2018", "'")
     text = text.replace("\u201c", '"').replace("\u201d", '"')
     text = text.replace("\u00a0", " ")
+    # Symbol fonts map bullets, envelopes and daggers into the private use
+    # area, so they survive as meaningless codepoints glued to the next word
+    # ("\uf02aemail:"). Drop them rather than let them split tokens.
+    text = re.sub(r"[\ue000-\uf8ff]", "", text)
     for pattern in INLINE_FURNITURE:
         text = pattern.sub(" ", text)
     text = re.sub(r"[ \t]{2,}", " ", text)
@@ -370,6 +470,7 @@ def chunk_document(doc_cfg):
         # paragraphs are assembled, so none of it can be packed into a chunk
         # alongside real text.
         kept, in_back_matter = strip_back_matter(raw, in_back_matter)
+        kept = strip_masthead(kept)
 
         for heading, para in page_to_paragraphs(kept, header_counts):
             if BACK_MATTER_HEADING.match(heading or ""):

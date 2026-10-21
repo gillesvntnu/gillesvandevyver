@@ -542,27 +542,49 @@ const InteractiveRag = () => {
             characters, each tagged with its document, page and section.
           </p>
           <p>
-            The second script embeds each passage with a MiniLM sentence transformer and writes
-            the vectors out as a quantised binary. The vectors are unit length, so every
+            The second script embeds each passage with the e5-small-v2 sentence transformer and
+            writes the vectors out as a quantised binary. The vectors are unit length, so every
             component falls in a known range and can be stored as a single byte instead of four
             floats. That turns the index into a file small enough to simply download.
           </p>
 
+          <h3>Choosing the encoder by measuring it</h3>
+          <p>
+            The first version of this page used all-MiniLM-L6-v2, the default choice for
+            browser-side embedding, and the retrieval was mediocre in a way that was hard to
+            attribute: a bad answer could be the encoder, the chunking, the keyword half or the
+            fusion. So I wrote down twenty-six questions about these papers together with the
+            documents that answer them and a fact each correct passage has to contain, then ran
+            six candidate models over it with everything else held fixed and keyword search
+            switched off, so that a weak encoder could not hide behind exact word overlap.
+          </p>
+          <p>
+            MiniLM came last. Measuring where the first genuinely correct passage lands, it scored
+            0.83 against 0.96 for e5-small-v2, which put the right passage first for twenty-four
+            of the twenty-six questions rather than nineteen. The larger 768-dimension bge-base
+            did not beat the small models, which is the useful part of the result: the gain came
+            from using an encoder trained for retrieval, not from spending more parameters or
+            more download on the visitor.
+          </p>
+
           <h3>Searching without a server</h3>
           <p>
-            When you ask a question, the same MiniLM model runs in your browser to embed it, and
-            the result is compared against every stored passage. Running alongside that is a
-            BM25 keyword search, built in the browser from the passage text when the page loads.
+            When you ask a question, the same e5 model runs in your browser to embed it, and the
+            result is compared against every stored passage. e5 is asymmetric — it was trained
+            with questions and passages marked differently, so the build script prefixes every
+            passage and the page prefixes every question, and getting that wrong costs most of
+            the advantage it was chosen for. Running alongside it is a BM25 keyword search, built
+            in the browser from the passage text when the page loads.
           </p>
           <p>
             Both halves are necessary. Embeddings are good at paraphrase: ask about "making
             segmentation anatomically plausible" and they find the right passages even though the
-            papers say "anatomical correctness". They are noticeably worse at exact technical
-            tokens — a query for gCNR or nnU-Net returns loosely related material, because those
-            strings barely registered during the model's training. Keyword search has exactly the
-            opposite profile. The two rankings are merged with reciprocal rank fusion, which
-            combines positions rather than scores and so needs no calibration between a bounded
-            cosine similarity and an unbounded BM25 score.
+            papers say "anatomical correctness". Keyword search has the opposite strength — it
+            guarantees that a rare literal string such as gCNR or HUNT4 is matched as itself
+            rather than as something that merely looks similar — and it is also what keeps the
+            page working when the model cannot load at all. The two rankings are merged with
+            reciprocal rank fusion, which combines positions rather than scores and so needs no
+            calibration between a bounded cosine similarity and an unbounded BM25 score.
           </p>
           <p>
             One corpus-specific problem remains. My thesis reproduces three of the papers as
@@ -586,8 +608,8 @@ const InteractiveRag = () => {
 
           <h3>What this costs the visitor</h3>
           <p>
-            The index is about 600 kB and loads with the page. The embedding model is a further
-            25 MB, fetched in the background from a CDN and cached by the browser afterwards.
+            The index is about 500 kB and loads with the page. The embedding model is a further
+            33 MB, fetched in the background from a CDN and cached by the browser afterwards.
             The page is usable in keyword-only mode from the moment the index arrives and
             upgrades itself to hybrid search when the model finishes loading, so the download
             never blocks anything. If it fails altogether — an old browser, a blocked CDN — the
@@ -598,10 +620,22 @@ const InteractiveRag = () => {
           <p>
             Figures, tables and equations are dropped during extraction, so questions whose
             answers live in a results table will find the surrounding discussion rather than the
-            numbers themselves. MiniLM truncates long passages, so the tail of a very long
-            paragraph contributes less to its vector than the head. And the corpus is only my own
-            work: ask about something I have not published on and the honest answer, which the
-            system will give, is that it found nothing relevant.
+            numbers themselves.
+          </p>
+          <p>
+            The deeper limit is that this retrieves passages, so it can only answer questions a
+            passage answers. "Which model do you use most often?" requires counting across seven
+            papers, and no paragraph anywhere states the total; the page will return the six
+            passages that look most like the question and tell you it is not confident, which is
+            the honest response but not the one you asked for. That warning is calibrated against
+            the same labelled set: every question the papers do answer scores above 0.808 and
+            every aggregate or off-topic one scores below 0.800, so the cutoff sits in a gap
+            eight thousandths wide — a margin that holds for this corpus and this encoder and
+            would need re-measuring for either.
+          </p>
+          <p>
+            And the corpus is only my own work: ask about something I have not published on and
+            the honest answer, which the system will give, is that it found nothing relevant.
           </p>
         </div>
       </div>

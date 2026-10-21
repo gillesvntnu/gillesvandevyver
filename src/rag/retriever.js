@@ -3,7 +3,7 @@
 
 import { BM25Index } from './bm25';
 import { tokenize } from './tokenizer';
-import { DIMS } from './embedder';
+import { DIMS, MODEL_ID } from './embedder';
 
 const RRF_K = 60;           // reciprocal-rank-fusion damping constant
 const DUPLICATE_THRESHOLD = 0.55; // trigram Jaccard above which two chunks are "the same"
@@ -25,6 +25,16 @@ export async function loadIndex() {
 
   const corpus = await corpusResponse.json();
   const vectors = new Int8Array(await vectorResponse.arrayBuffer());
+
+  // Query vectors and chunk vectors are only comparable if they came out of the
+  // same encoder. A mismatch does not throw anywhere downstream, it just
+  // silently returns near-random passages, so catch it here where it is obvious.
+  if (corpus.model && corpus.model !== MODEL_ID) {
+    throw new Error(
+      `Search index was built with ${corpus.model} but the page loads ${MODEL_ID}. `
+      + 'Rebuild it with `node scripts/build_rag_embeddings.mjs`.',
+    );
+  }
 
   const documents = new Map(corpus.documents.map((doc) => [doc.id, doc]));
   const chunks = corpus.chunks.map((chunk, index) => ({
@@ -216,14 +226,39 @@ export function retrieve(index, question, queryVector, options = {}) {
   return selected;
 }
 
+// Confidence thresholds. These are properties of the encoder, not of the idea
+// of similarity, and they do NOT survive a model change: the previous MiniLM
+// index put a good match around 0.45, e5 puts one around 0.86. Re-derive them
+// with `npm run rag:calibrate` before changing WEAK_FLOOR or STRONG_FLOOR.
+//
+// Measured on 26 answerable questions against 7 that no single passage can
+// answer (corpus-wide counts, comparisons, off-topic, gibberish):
+//
+//   answerable    min 0.808   p10 0.815   median 0.860   max 0.899
+//   unanswerable  min 0.738   median 0.790            max 0.800
+//
+// The two groups do not overlap, but the gap is only eight thousandths wide, so
+// the floor sits in the middle of it rather than being padded towards either
+// side. e5 compresses everything into a narrow high band — even gibberish
+// scores 0.80 — which is why the numbers look implausibly high and why
+// eyeballing them is no substitute for the probe.
+const WEAK_FLOOR = 0.804;
+const STRONG_FLOOR = 0.845;
+// Being clearly ahead of the sixth result is corroborating evidence, enough to
+// promote a middling score but never enough to rescue a low one: plenty of
+// genuine matches sit in a cluster of equally good passages and have no spread
+// at all, so a small spread means nothing on its own.
+const STRONG_SPREAD = 0.035;
+const SPREAD_FLOOR = 0.820;
+
 /**
  * How much to trust a result set.
  *
- * Cosine similarity against this corpus runs low in absolute terms, so the
- * useful signal is not the raw number but whether anything stood out: a real
- * match is both reasonably similar and clearly ahead of the tail. Returning
- * "weak" lets the page say it is guessing instead of presenting six barely
- * related passages with the same confidence as six good ones.
+ * Returning "weak" lets the page admit it is guessing instead of presenting
+ * six barely related passages with the same confidence as six good ones. That
+ * matters most for questions that are about the corpus as a whole ("which
+ * model does he use most?") rather than about any one passage: no amount of
+ * retrieval tuning can answer those, so the honest move is to say so.
  */
 export function confidenceOf(results) {
   if (!results.length) return 'none';
@@ -236,8 +271,9 @@ export function confidenceOf(results) {
   }
   const tail = results[results.length - 1].similarity ?? 0;
   const spread = similarity - tail;
-  if (similarity >= 0.45 || (similarity >= 0.32 && spread >= 0.06)) return 'strong';
-  if (similarity >= 0.28 || (similarity >= 0.22 && spread >= 0.05)) return 'ok';
+  if (similarity >= STRONG_FLOOR) return 'strong';
+  if (similarity >= SPREAD_FLOOR && spread >= STRONG_SPREAD) return 'strong';
+  if (similarity >= WEAK_FLOOR) return 'ok';
   return 'weak';
 }
 
