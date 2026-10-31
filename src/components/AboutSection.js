@@ -21,10 +21,14 @@ function AboutSection() {
           <div className="about-text">
             <p>
               I work on applied AI: models that have to run on real data, on real hardware, in
-              the field. A model that works in a paper and a model that works in practice are
-              different things, and most of my time goes into fixing that gap. These days that
-              is on an embedded ultrasound device at Sonofit. Before that, a PhD on reliable
-              deep learning for echocardiography at NTNU.
+              the field. An AI model that works great in a paper is often not the best in
+              practice. Distribution shift, overfitting, power consumption, memory constraints
+              all have a say. The best model is not the largest or newest model, but the one
+              that actually gives you what you need when you need it.
+            </p>
+            <p>
+              The model is only one part. In practice, you need data collection, deployment,
+              monitoring, evaluation, and continuous improvement to create real impact with AI.
             </p>
             <p>
               Outside of that I am usually either on a mountain, on a bike, or both. A healthy
