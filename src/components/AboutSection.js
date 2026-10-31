@@ -20,13 +20,11 @@ function AboutSection() {
         <section className={`about-section ${bikePhoto ? '' : 'about-section--text-only'}`}>
           <div className="about-text">
             <p>
-              I work on applied AI: models that have to run on real data, on real hardware, in
-              the field. An AI model that works great in a paper is often not the best in
-              practice. Distribution shift, overfitting, power consumption, memory constraints
-              all have a say. The best model is not the largest or newest model, but the one
-              that actually gives you what you need when you need it. The model is only one
-              part. In practice, you need data collection, deployment, monitoring, evaluation,
-              and continuous improvement to create real impact with AI.
+              I work on applied AI. Distribution shift, overfitting, power consumption, memory
+              constraints all have a say. The best model is not the largest or newest model,
+              but the one that actually gives you what you need when you need it. The model is
+              only one part. In practice, you need data collection, deployment, monitoring,
+              evaluation, and continuous improvement to create real impact with AI.
             </p>
           </div>
           {bikePhoto && (
