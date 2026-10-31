@@ -24,15 +24,9 @@ function AboutSection() {
               the field. An AI model that works great in a paper is often not the best in
               practice. Distribution shift, overfitting, power consumption, memory constraints
               all have a say. The best model is not the largest or newest model, but the one
-              that actually gives you what you need when you need it.
-            </p>
-            <p>
-              The model is only one part. In practice, you need data collection, deployment,
-              monitoring, evaluation, and continuous improvement to create real impact with AI.
-            </p>
-            <p>
-              Outside of that I am usually either on a mountain, on a bike, or both. A healthy
-              mind in a healthy body, a bit cringe but it has truth in it.
+              that actually gives you what you need when you need it. The model is only one
+              part. In practice, you need data collection, deployment, monitoring, evaluation,
+              and continuous improvement to create real impact with AI.
             </p>
           </div>
           {bikePhoto && (
