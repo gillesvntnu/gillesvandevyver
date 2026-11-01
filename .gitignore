@@ -14,8 +14,7 @@ __pycache__/
 # Built from public/rag/corpus.json by vespa/scripts/make_feed.py, about 4 MB
 # each. Derived from a file that is already in the repository, so checking them
 # in would store the same text a third time.
-vespa/feed.json
-vespa/feed-streaming.json
+vespa/feed*.json
 
 # A local copy of the Vespa CLI, downloaded by run_local.sh if one is not
 # already on PATH.

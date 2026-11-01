@@ -26,6 +26,14 @@
 # The page works without it; the streaming/indexed comparison is the only thing
 # that needs it, and it says so plainly rather than failing oddly.
 #
+# Feeding all 3,365 passages takes 15-40 minutes, nearly all of it embedding.
+# To see the page working in a couple of minutes instead, feed a slice:
+#
+#     ./vespa/scripts/run_local.sh --limit 200 --no-streaming
+#
+# A limited feed is written to its own file (feed-200.json), so it can never be
+# mistaken later for the full one and reused.
+#
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
@@ -36,14 +44,31 @@ CLI_DIR="$ROOT/vespa/.cli"
 CONTAINER="vespa-cycling"
 
 WITH_STREAMING=1
-for arg in "$@"; do
-  case "$arg" in
+LIMIT=""
+# A while loop rather than a for loop, so that --limit can take its value as a
+# separate word (--limit 200) as well as attached (--limit=200). People type
+# the first form.
+while [ $# -gt 0 ]; do
+  case "$1" in
     --no-streaming) WITH_STREAMING=0 ;;
+    --limit) shift; LIMIT="${1:-}" ;;
+    --limit=*) LIMIT="${1#*=}" ;;
     # Print the header comment rather than a second, driftable copy of it.
     -h|--help) sed -n '2,/^[^#]/p' "${BASH_SOURCE[0]}" | sed '$d; s/^#\s\{0,1\}//'; exit 0 ;;
-    *) echo "Unknown option: $arg" >&2; exit 2 ;;
+    *) echo "Unknown option: $1" >&2; exit 2 ;;
   esac
+  shift
 done
+
+if [ -n "$LIMIT" ]; then
+  case "$LIMIT" in
+    ''|*[!0-9]*) echo "--limit wants a number, got: '$LIMIT'" >&2; exit 2 ;;
+  esac
+  # Its own filenames. Reusing feed.json for a slice would leave a file that
+  # looks like the full corpus and is not, and the next run would reuse it.
+  FEED_FILE="$ROOT/vespa/feed-${LIMIT}.json"
+  STREAMING_FEED_FILE="$ROOT/vespa/feed-streaming-${LIMIT}.json"
+fi
 
 # The two ONNX models are 133 MB and 436 MB and are held in memory alongside
 # Vespa itself. 4 GB is not enough; the container dies part-way through feeding
@@ -121,8 +146,13 @@ done
 # ------------------------------------------------------------------- 4. deploy
 # The first deploy downloads both ONNX models (about 570 MB) inside the
 # container, so the timeout is generous. Later deploys reuse the cached models.
+#
+# If this reaches the deadline, read the deploy output above for a WARNING
+# before the wait started - a config definition the config server cannot
+# resolve makes the container fail to start, and the symptom is this timeout
+# rather than an error. `docker logs vespa-cycling` has the detail.
 log "Deploying the application package..."
-"$VESPA_BIN" deploy --wait 900 "$APP_DIR"
+"$VESPA_BIN" deploy --wait 1800 "$APP_DIR"
 
 log "Waiting for the query endpoint on :8080..."
 for attempt in $(seq 1 180); do
@@ -136,8 +166,9 @@ done
 
 # -------------------------------------------------------------------- 5. feeds
 if [ ! -f "$FEED_FILE" ] || { [ "$WITH_STREAMING" = "1" ] && [ ! -f "$STREAMING_FEED_FILE" ]; }; then
-  log "Building the feeds from public/rag/corpus.json..."
-  python3 "$ROOT/vespa/scripts/make_feed.py" -o "$FEED_FILE" --streaming-out "$STREAMING_FEED_FILE"
+  log "Building the feeds from public/rag/corpus.json${LIMIT:+ (first $LIMIT passages)}..."
+  python3 "$ROOT/vespa/scripts/make_feed.py" -o "$FEED_FILE" \
+    --streaming-out "$STREAMING_FEED_FILE" ${LIMIT:+--limit "$LIMIT"}
 else
   log "Reusing the existing feed files (delete them to rebuild)."
 fi
@@ -148,10 +179,13 @@ fi
 # minutes for all 3,365 passages on a laptop, and almost none of it is Vespa's
 # indexing.
 log "Feeding the indexed cluster. This is the slow step: both embedders run"
-echo "    over every passage on CPU. Budget 15-40 minutes for the full corpus."
-echo "    For a quick trial instead, stop here (ctrl-C) and run:"
-echo "      python3 vespa/scripts/make_feed.py --limit 200 -o /tmp/small.json --no-streaming"
-echo "      $VESPA_BIN feed /tmp/small.json"
+echo "    over every passage on CPU."
+if [ -n "$LIMIT" ]; then
+  echo "    $LIMIT passages this run, so a couple of minutes."
+else
+  echo "    Budget 15-40 minutes for the full corpus. For a quick trial instead,"
+  echo "    stop here (ctrl-C) and re-run with: --limit 200 --no-streaming"
+fi
 echo
 "$VESPA_BIN" feed "$FEED_FILE"
 

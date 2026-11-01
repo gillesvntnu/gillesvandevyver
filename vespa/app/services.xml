@@ -6,8 +6,7 @@
   what a laptop Docker run can hold. The two content clusters hold the same
   passages in the two storage modes Vespa offers - indexed and streaming - so
   the page can run one question through both and show what the difference costs.
-  The other interesting parts are the two embedder components and the CORS
-  filters.
+  The other interesting part is the pair of embedder components.
 
   The embedders matter because they are what let the browser page be a thin
   client. The question arrives as plain text and Vespa turns it into vectors
@@ -15,11 +14,6 @@
   the page would have to carry an embedding model, which is exactly the job the
   in-browser version of this project does and exactly the job this version is
   meant to hand to a server.
-
-  The CORS filters matter because without them a static site on another origin
-  cannot call this endpoint at all: the browser sends a preflight OPTIONS first
-  and refuses the real request if that preflight is not answered. These two
-  filters are built into Vespa, so no custom Java bundle is needed.
 -->
 <services version="1.0">
 
@@ -64,51 +58,52 @@
     </component>
 
     <!--
-      Cross-origin access for the browser page.
+      No <http> block, so Vespa creates its default server on 8080.
 
-      allowedUrls is "*" because this is a read-only demo over a public
-      Wikipedia corpus running on a laptop. On a deployment that anyone else can
-      reach, replace the item with the exact origin that should be allowed
-      (https://gillesvandevyver.com) - a wildcard there would let any page on
-      the web spend your cluster's CPU.
+      There was a CORS filter chain here, and it is the reason the first deploy
+      of this package never converged:
 
-      The binding is http://*/search/ because that is the only endpoint the page
-      calls. Feeding and config go through other paths that no browser touches.
+        WARNING Unable to find config definition
+                'jdisc.http.filter.security.cors.cors-filter.def'
 
-      The bundle is jdisc-security-filters and the config name is
-      jdisc.http.filter.security.cors.cors-filter. Both are worth stating
-      precisely, because getting either wrong fails at deploy time with a
-      message about a missing component rather than about CORS.
+      The config server validates every <config name="..."> against a config
+      definition it knows about, and the CORS definition is not among the ones
+      shipped in share/vespa/configdefinitions. Deploy then hangs rather than
+      failing, which is a slow way to learn this.
+
+      It is not needed for local use anyway. The dev server proxies /search/
+      through to :8080 (see the "proxy" field in package.json), so the page and
+      the engine are the same origin as far as the browser is concerned and no
+      preflight happens. That is both simpler and more robust than configuring
+      CORS correctly.
+
+      CORS only becomes necessary for a page served from another origin - a
+      deployed site on gillesvandevyver.com calling a cluster on your laptop.
+      If you want that, the documented mechanism for filters that live in JDisc
+      bundles is <filter-config>, not <config>:
+
+        <http>
+          <filtering strict-mode="false">
+            <request-chain id="cors-request-chain">
+              <filter id="com.yahoo.jdisc.http.filter.security.cors.CorsPreflightRequestFilter"
+                      bundle="jdisc-security-filters">
+                <filter-config>
+                  <corsAllowedUrls>https://gillesvandevyver.com</corsAllowedUrls>
+                </filter-config>
+              </filter>
+              <binding>http://*/search/</binding>
+            </request-chain>
+            ...
+          </filtering>
+          <server port="8080" id="default"/>
+        </http>
+
+      That form is untested here - verify it against a running container before
+      trusting it, and check the key name with:
+
+        docker exec vespa-cycling \
+          ls /opt/vespa/share/vespa/configdefinitions/ | grep -i cors
     -->
-    <http>
-      <filtering strict-mode="false">
-        <request-chain id="cors-request-chain">
-          <filter id="com.yahoo.jdisc.http.filter.security.cors.CorsPreflightRequestFilter"
-                  bundle="jdisc-security-filters">
-            <config name="jdisc.http.filter.security.cors.cors-filter">
-              <allowedUrls>
-                <item>*</item>
-              </allowedUrls>
-            </config>
-          </filter>
-          <binding>http://*/search/</binding>
-        </request-chain>
-
-        <response-chain id="cors-response-chain">
-          <filter id="com.yahoo.jdisc.http.filter.security.cors.CorsResponseFilter"
-                  bundle="jdisc-security-filters">
-            <config name="jdisc.http.filter.security.cors.cors-filter">
-              <allowedUrls>
-                <item>*</item>
-              </allowedUrls>
-            </config>
-          </filter>
-          <binding>http://*/search/</binding>
-        </response-chain>
-      </filtering>
-
-      <server port="8080" id="default"/>
-    </http>
 
     <nodes>
       <node hostalias="node1"/>

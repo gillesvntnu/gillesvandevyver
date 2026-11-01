@@ -58,9 +58,14 @@ cluster is empty.
 For a quick trial, feed a slice instead of the whole corpus:
 
 ```
-python3 vespa/scripts/make_feed.py --limit 200 -o /tmp/small.json --no-streaming
-vespa feed /tmp/small.json
+./vespa/scripts/run_local.sh --limit 200 --no-streaming
 ```
+
+That is the two-minute version. A limited feed goes to its own file
+(`feed-200.json`) so that it cannot be mistaken for the full corpus and reused on
+a later run. The article list on the page stays at all 255 names either way — the
+manifest is written whole regardless of `--limit` — so some of those checkboxes
+will filter to nothing until the rest is fed.
 
 Then start the site with `npm start` and open `/#/projects/vespa`. It defaults to
 `http://localhost:8080`, so it should find the cluster without being told. To
@@ -78,7 +83,7 @@ filter and the three streaming cases. Stop the cluster with
 
 ```
 app/
-  services.xml                     two content clusters, two embedders, CORS
+  services.xml                     two content clusters, two embedders
   schemas/passage.sd               indexed: fields, tensors, four rank profiles
   schemas/article_passage.sd       streaming: the same, minus the index structures
   search/query-profiles/default.xml  query defaults
@@ -109,16 +114,15 @@ static, so that the control can be drawn before the cluster answers.
 The application package works unchanged on [Vespa Cloud](https://cloud.vespa.ai),
 with two edits.
 
-First, tighten CORS. `services.xml` currently allows any origin, which is
-reasonable for a read-only demo on localhost and not reasonable for anything
-reachable from outside. Replace the wildcard in both the request chain and the
-response chain:
-
-```xml
-<allowedUrls>
-  <item>https://gillesvandevyver.com</item>
-</allowedUrls>
-```
+First, add CORS, which `services.xml` deliberately does not configure. Locally it
+is unnecessary — `npm start` proxies `/search/` through to port 8080, so the
+browser only ever sees one origin — but a page served from somewhere else is a
+cross-origin caller and will be refused at the preflight. The commented block at
+the top of `services.xml` has the shape of the filter chain and the one thing to
+check before trusting it: the mechanism for filters living in JDisc bundles is
+`<filter-config>`, not `<config name="...">`. The latter is validated against a
+config definition the config server does not ship, and the failure mode is a
+deploy that hangs until the timeout rather than one that reports an error.
 
 Second, add token authentication, because an open query endpoint on the public
 internet is someone else's free compute:

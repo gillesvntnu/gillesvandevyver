@@ -611,8 +611,7 @@ question goes through both and you can see what each one gives up.
 is in the four rank profiles at the bottom, and everything in parts three and four
 is in the field definitions at the top. `app/schemas/article_passage.sd` is the
 streaming half, and is shorter mostly by subtraction — read it against the first.
-`app/services.xml` holds the two content clusters, the two embedders, and the CORS
-filters that let a browser on another origin call the cluster at all.
+`app/services.xml` holds the two content clusters and the two embedders.
 `scripts/queries.sh` runs eleven `curl` commands covering each rank profile, the
 grouping expression, both kinds of filter and all three streaming cases — the
 fastest way to see the raw JSON behind everything described here.

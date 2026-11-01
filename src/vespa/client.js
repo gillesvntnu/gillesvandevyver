@@ -19,8 +19,19 @@
  * Baked in at build time from the environment when there is one, so a deploy
  * can point at a real cluster without a code change, and overridable at runtime
  * from the page's settings panel so a visitor can point it at their own.
+ *
+ * Under `npm start` the default is the empty string, meaning "same origin".
+ * That is not a missing value: the dev server proxies /search/ through to
+ * localhost:8080 (the "proxy" field in package.json), so the request never
+ * crosses an origin and the browser never sends a CORS preflight. Naming
+ * localhost:8080 directly here would reintroduce exactly the cross-origin call
+ * the proxy exists to avoid, since :3000 and :8080 are different origins.
+ *
+ * A production build has no dev server to proxy through, so it names the
+ * cluster and does need CORS configured on it.
  */
-export const DEFAULT_ENDPOINT = process.env.REACT_APP_VESPA_ENDPOINT || 'http://localhost:8080';
+export const DEFAULT_ENDPOINT = process.env.REACT_APP_VESPA_ENDPOINT
+  || (process.env.NODE_ENV === 'development' ? '' : 'http://localhost:8080');
 
 export const ENDPOINT_STORAGE = 'vespa-endpoint';
 export const TOKEN_STORAGE = 'vespa-token';
@@ -265,8 +276,12 @@ async function post(endpoint, token, body, signal) {
     // would leak information about the network to the page. So the message has
     // to cover all three rather than guess.
     throw new Error(
-      `Could not reach ${base}. The cluster may not be running, or it may be `
-      + 'running without the CORS filters that let a browser on another origin call it.',
+      base
+        ? `Could not reach ${base}. The cluster may not be running, or it may be `
+          + 'running without the CORS configuration that lets a browser on another '
+          + 'origin call it.'
+        : 'Could not reach the cluster through the dev-server proxy. It is probably '
+          + 'not running yet: start it with ./vespa/scripts/run_local.sh',
     );
   }
 
