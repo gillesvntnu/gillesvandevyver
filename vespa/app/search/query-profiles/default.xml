@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!--
+  Query profile: server-side defaults for every query that does not say
+  otherwise.
+
+  The point of putting these here rather than in the JavaScript is that they can
+  be changed by redeploying the application, without touching, rebuilding or
+  redeploying the site. A timeout that turns out to be too tight, or a default
+  ranking profile that should change, is an operations decision; baking it into
+  a React bundle makes it a frontend release instead.
+
+  The page overrides ranking.profile and hits on every request, because those
+  are genuinely the user's choice. It does not send timing or timeout, so these
+  are what it gets.
+-->
+<query-profile id="default">
+
+    <!-- Used when the page does not name a profile. -->
+    <field name="ranking.profile">hybrid</field>
+
+    <field name="hits">6</field>
+
+    <!-- Returns the query/summary/total breakdown in the response, which the
+         page displays. ColBERT reranking is visibly slower than BM25 and the
+         honest thing is to show that rather than describe it. -->
+    <field name="presentation.timing">true</field>
+
+    <!-- Generous, because the first ColBERT query after a deploy pays for
+         loading a 436 MB ONNX model and will otherwise time out and look
+         broken. Steady-state queries land far inside this. -->
+    <field name="timeout">10s</field>
+
+</query-profile>

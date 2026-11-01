@@ -1,0 +1,218 @@
+#
+# The same passages as passage.sd, stored for streaming mode.
+#
+# Streaming mode searches one group at a time. The group here is the article,
+# so a query never looks at more than the few dozen passages of a single
+# article, and the document id carries the group:
+#
+#     id:cycling:article_passage:g=bicycle-brake:bicycle-brake-7
+#                                 ^^^^^^^^^^^^^^
+#
+# Read this file against passage.sd. Almost all of the difference is things
+# that are *not* here:
+#
+#   - no hnsw block on the embedding field. There is no graph to build, and a
+#     nearestNeighbor over a streaming group is exact.
+#   - no fast-search on anything. fast-search builds a B-tree so that a lookup
+#     does not have to scan; streaming scans by definition, so the B-tree would
+#     be memory spent to speed up something that is not happening.
+#   - no ColBERT field at all. Not because it could not work, but because the
+#     interesting claim about streaming mode is how little it stores per
+#     document, and a second set of per-token vectors is by far the largest
+#     thing in the indexed schema. Keeping it would undercut the point.
+#
+# What that buys is not query speed - inside a group streaming is slower - but
+# per-document cost. Nothing is built ahead of a query, so a corpus of a
+# million small groups costs a million small groups' worth of disk and no
+# index. That is the shape of personal data: mailboxes, chat histories,
+# per-customer documents, where every query belongs to exactly one group and an
+# index across groups would be work no query ever uses.
+#
+schema article_passage {
+
+    document article_passage {
+
+        # The group this passage belongs to, repeated as a field.
+        #
+        # It is already in the document id, and the query already selects on it
+        # via streaming.groupname, so matching never needs this. It is here to
+        # be returned in the summary and to be grouped on, which the id cannot
+        # do.
+        field doc_id type string {
+            indexing: attribute | summary
+            rank: filter
+        }
+
+        field title type string {
+            indexing: index | summary
+            index: enable-bm25
+        }
+
+        field title_facet type string {
+            indexing: attribute | summary
+            rank: filter
+        }
+
+        field url type string {
+            indexing: summary
+        }
+
+        field section type string {
+            indexing: index | summary
+            index: enable-bm25
+        }
+
+        field anchor type string {
+            indexing: summary
+        }
+
+        field part type int {
+            indexing: attribute | summary
+        }
+
+        field section_part type int {
+            indexing: attribute | summary
+        }
+
+        field section_parts type int {
+            indexing: attribute | summary
+        }
+
+        # Carried over so that the grouping demo works identically in both
+        # modes. Within one article the clusters are nearly constant, which is
+        # itself worth seeing: an article is a coherent subject.
+        field cluster type int {
+            indexing: attribute | summary
+            rank: filter
+        }
+
+        field cluster_name type string {
+            indexing: attribute | summary
+            rank: filter
+        }
+
+        field text type string {
+            indexing: index | summary
+            index: enable-bm25
+        }
+    }
+
+    # Same embedder, same prefixes, same 384 dimensions as the indexed schema,
+    # so a question embeds to the identical vector in both modes and any
+    # difference in the results is a difference in retrieval rather than in the
+    # model.
+    #
+    # bfloat16 and `attribute` with an angular distance metric, and that is all.
+    # No `index`, so no HNSW: Vespa compares the query vector against every
+    # passage in the group. At a few dozen passages per group, exact is cheaper
+    # than approximate anyway - a graph only starts paying for itself when
+    # there are enough vectors that you cannot afford to look at them all.
+    field embedding type tensor<bfloat16>(x[384]) {
+        indexing: input title . ". " . input text | embed e5 | attribute
+        attribute {
+            distance-metric: angular
+        }
+    }
+
+    fieldset default {
+        fields: title, section, text
+    }
+
+    # =====================================================================
+    # Rank profiles
+    #
+    # Three, not four: ColBERT needs the per-token field this schema
+    # deliberately does not store. The other three mirror passage.sd so the
+    # page can switch modes without changing the question or the profile.
+    # =====================================================================
+
+    rank-profile base {
+
+        inputs {
+            query(q) tensor<bfloat16>(x[384])
+        }
+
+        # BM25 needs the average field length, and in streaming mode nothing
+        # counts it: there are no corpus-wide term statistics, because there is
+        # no corpus-wide anything. Vespa falls back to assuming 100 words for
+        # every field, which is wrong in both directions here - a title is two
+        # words, a passage is about a hundred and fifty - and the average field
+        # length is what the length normalisation in BM25 normalises against.
+        # Tell it a two-word title averages a hundred words and every title
+        # match looks like a freakishly short, freakishly specific document.
+        #
+        # So they are measured once, offline, over the same corpus that gets
+        # fed, and written down. vespa/scripts/make_feed.py prints the numbers
+        # it computed at the end of every run, and these three came from it; if
+        # the corpus is rebuilt and they drift, that is where the new ones come
+        # from.
+        #
+        # This is the honest cost of streaming mode, and it is not a rounding
+        # error: the same text scores differently in the two clusters unless
+        # these three lines are right.
+        rank-properties {
+            bm25(text).averageFieldLength: 149
+            bm25(title).averageFieldLength: 2
+            bm25(section).averageFieldLength: 4
+        }
+
+        function bm25_score() {
+            expression: bm25(text) + 2.0 * bm25(title) + 2.0 * bm25(section)
+        }
+
+        function vector_score() {
+            expression: closeness(field, embedding)
+        }
+    }
+
+    rank-profile keyword inherits base {
+
+        first-phase {
+            expression: bm25_score
+        }
+
+        match-features {
+            bm25_score
+            bm25(text)
+            bm25(title)
+            bm25(section)
+        }
+    }
+
+    rank-profile semantic inherits base {
+
+        first-phase {
+            expression: vector_score
+        }
+
+        match-features {
+            vector_score
+            closeness(field, embedding)
+            distance(field, embedding)
+        }
+    }
+
+    # Same two-stage shape as the indexed cluster: a cheap first phase on the
+    # content node, then reciprocal rank fusion on the container once the whole
+    # result set is known. rerank-count is lower because a group is smaller
+    # than a corpus - 200 would be the whole of most articles, which makes the
+    # cap meaningless rather than wrong.
+    rank-profile hybrid inherits base {
+
+        first-phase {
+            expression: vector_score + 0.01 * bm25_score
+        }
+
+        global-phase {
+            expression: reciprocal_rank_fusion(bm25_score, vector_score)
+            rerank-count: 100
+        }
+
+        match-features {
+            bm25_score
+            vector_score
+            bm25(text)
+            closeness(field, embedding)
+        }
+    }
+}

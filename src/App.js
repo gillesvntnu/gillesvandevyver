@@ -13,6 +13,7 @@ import ImprovingClinicalMeasurements from "./components/pages/project_pages/Impr
 import GenerativeAI from "./components/pages/project_pages/GenerativeAI";
 import AgenticAI from "./components/pages/project_pages/AgenticAI";
 import InteractiveRag from "./components/pages/project_pages/InteractiveRag";
+import VespaSearch from "./components/pages/project_pages/VespaSearch";
 import PdfViewer from './components/viewers/PDFViewer';
 import JSXViewer from './components/viewers/JSXViewer';
 
@@ -47,6 +48,11 @@ function App() {
                 link has been shared. Pointing the old path at the same component
                 keeps it working; a redirect would only add a bounce. */}
             <Route path='/projects/ask-my-research' element={<InteractiveRag />} />
+            {/* The same corpus as ask-a-bike-question, searched by a real search
+                engine instead of by the browser. Reachable by link only: it needs
+                a Vespa cluster running somewhere to be worth opening, so it is
+                deliberately not in the project carousel. */}
+            <Route path='/projects/vespa' element={<VespaSearch />} />
             <Route path="/recommendation-pdf" element={<PdfViewer />} />
             <Route path="/recommendation" element={
               <JSXViewer/>

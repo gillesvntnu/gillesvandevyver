@@ -1,0 +1,803 @@
+/* VespaSearch.css: styles for the Vespa-backed search page.
+   Same palette as the rest of the site: #252947 accent, #374151 body text.
+   Prefixed vs- rather than rag- so the two search pages can diverge without
+   one of them quietly restyling the other. */
+
+.vs-hero {
+    margin-top: 1rem;
+    max-width: 58rem;
+}
+
+.vs-hero p {
+    margin-bottom: 0.9rem;
+}
+
+.vs-hero-note {
+    font-size: 0.9rem;
+    color: #6b7280;
+    border-left: 3px solid #e5e7eb;
+    padding-left: 0.85rem;
+}
+
+/* ── Card shell ────────────────────────────────────── */
+.vs-card {
+    align-items: stretch;
+    padding: 0;
+    overflow: hidden;
+}
+
+.vs-statusbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.75rem 1.15rem;
+    background: #f7f8fb;
+    border-bottom: 1px solid #e5e7eb;
+    font-size: 0.85rem;
+    color: #4b5563;
+    flex-wrap: wrap;
+}
+
+.vs-status-left {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-width: 0;
+    word-break: break-all;
+}
+
+.vs-dot {
+    width: 0.55rem;
+    height: 0.55rem;
+    border-radius: 50%;
+    flex-shrink: 0;
+    background: #9ca3af;
+}
+
+.vs-dot-loading {
+    background: #f59e0b;
+    animation: vs-pulse 1.3s ease-in-out infinite;
+}
+
+.vs-dot-ready { background: #10b981; }
+.vs-dot-error { background: #ef4444; }
+
+@keyframes vs-pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+}
+
+.vs-link-button {
+    background: none;
+    border: none;
+    padding: 0;
+    font: inherit;
+    font-size: 0.82rem;
+    color: #252947;
+    text-decoration: underline;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.vs-link-button:hover { color: #4f5486; }
+
+/* ── Setup panel, shown when no cluster answers ────── */
+.vs-setup {
+    padding: 1rem 1.15rem;
+    background: #fff8ed;
+    border-bottom: 1px solid #f3e3c8;
+    font-size: 0.85rem;
+    line-height: 1.65;
+    color: #78350f;
+}
+
+.vs-setup p { margin: 0 0 0.65rem 0; color: inherit; }
+
+.vs-setup-lead { font-weight: 600; }
+
+.vs-setup-foot { margin-bottom: 0; font-size: 0.8rem; color: #92400e; }
+
+.vs-code {
+    margin: 0 0 0.75rem 0;
+    padding: 0.6rem 0.8rem;
+    background: #1f2430;
+    color: #e6e8ef;
+    border-radius: 0.5rem;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.82rem;
+    overflow-x: auto;
+}
+
+.vs-setup code,
+.vs-setting-help code,
+.vs-prose code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.92em;
+    background: rgba(37, 41, 71, 0.07);
+    padding: 0.05em 0.3em;
+    border-radius: 0.25em;
+}
+
+/* ── Settings ──────────────────────────────────────── */
+.vs-settings {
+    padding: 1.1rem 1.15rem;
+    background: #fbfbfd;
+    border-bottom: 1px solid #e5e7eb;
+    display: grid;
+    gap: 1.4rem;
+}
+
+.vs-setting-block h4 {
+    margin: 0 0 0.4rem 0;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #1a1a2e;
+}
+
+.vs-setting-help {
+    font-size: 0.8rem;
+    line-height: 1.6;
+    color: #6b7280;
+    margin: 0.45rem 0 0 0;
+}
+
+/* Said when a control is still on screen but has stopped meaning anything —
+   the article checkboxes once streaming mode is on. Leaving them visible and
+   explaining the change is clearer than making them vanish. */
+.vs-setting-muted {
+    border-left: 2px solid #e3e5ee;
+    padding-left: 0.65rem;
+    font-style: italic;
+}
+
+.vs-setting-row,
+.vs-article-controls {
+    display: flex;
+    gap: 0.6rem;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-top: 0.6rem;
+}
+
+.vs-text-input {
+    font: inherit;
+    font-size: 0.85rem;
+    padding: 0.45rem 0.6rem;
+    border: 1px solid #d1d5db;
+    border-radius: 0.5rem;
+    background: #fff;
+    color: #374151;
+    flex: 1;
+    min-width: 11rem;
+}
+
+.vs-token-input { flex: 0 1 14rem; }
+
+.vs-text-input:focus {
+    outline: 2px solid #252947;
+    outline-offset: 1px;
+}
+
+/* 255 titles do not fit anywhere sensible, so the list scrolls inside the
+   settings panel instead of pushing the search box off the screen. */
+.vs-article-toggles {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr));
+    gap: 0.35rem 1rem;
+    max-height: 13rem;
+    overflow-y: auto;
+    margin-top: 0.5rem;
+    padding: 0.5rem 0.6rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.5rem;
+    background: #fff;
+}
+
+.vs-article-toggle {
+    display: flex;
+    gap: 0.55rem;
+    align-items: flex-start;
+    font-size: 0.82rem;
+    color: #4b5563;
+    cursor: pointer;
+    line-height: 1.45;
+}
+
+.vs-article-toggle input {
+    margin-top: 0.2rem;
+    flex-shrink: 0;
+    accent-color: #252947;
+}
+
+/* ── Control rows ──────────────────────────────────────
+   Two of these sit above the composer: "Stored as", which picks the content
+   cluster, and "Ranked by", which picks the rank profile. The row owns the
+   padding so that the groups inside it can be plain flex containers and the
+   label lines up with everything else in the card. */
+.vs-control-row {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    padding: 1rem 1.15rem 0 1.15rem;
+}
+
+.vs-control-label {
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    color: #8b8fa3;
+    flex-shrink: 0;
+}
+
+/* ── Storage mode switch ───────────────────────────── */
+/* A segmented control rather than separate pills: the two options are one
+   either/or choice about where the documents live, not two independent
+   toggles, and a joined control says so. */
+.vs-modes {
+    display: inline-flex;
+    border: 1px solid #d8dae3;
+    border-radius: 999px;
+    overflow: hidden;
+    background: #fff;
+}
+
+.vs-mode {
+    font: inherit;
+    font-size: 0.82rem;
+    font-weight: 500;
+    padding: 0.4rem 0.95rem;
+    border: none;
+    background: transparent;
+    color: #4b5563;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+}
+
+.vs-mode + .vs-mode { border-left: 1px solid #d8dae3; }
+
+.vs-mode:hover:not(:disabled):not(.vs-mode-active) { background: #f1f2f7; }
+
+.vs-mode-active {
+    background: #252947;
+    color: #fff;
+}
+
+.vs-mode:disabled { opacity: 0.5; cursor: default; }
+
+/* The article a streaming query is confined to. Only rendered in streaming
+   mode, where it is not a filter but the entire scope of the search. */
+.vs-group-select {
+    font: inherit;
+    font-size: 0.82rem;
+    max-width: 22rem;
+    padding: 0.35rem 0.6rem;
+    border: 1px solid #d8dae3;
+    border-radius: 7px;
+    background: #fff;
+    color: #252947;
+    cursor: pointer;
+}
+
+.vs-group-select:disabled { opacity: 0.5; cursor: default; }
+
+/* ── Rank profile switch ───────────────────────────── */
+.vs-profiles {
+    display: flex;
+    gap: 0.4rem;
+    flex-wrap: wrap;
+}
+
+.vs-profile {
+    font: inherit;
+    font-size: 0.82rem;
+    font-weight: 500;
+    padding: 0.4rem 0.85rem;
+    border: 1px solid #d8dae3;
+    border-radius: 999px;
+    background: #fff;
+    color: #4b5563;
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s, color 0.15s;
+}
+
+.vs-profile:hover:not(:disabled):not(.vs-profile-active) {
+    border-color: #252947;
+    background: #f1f2f7;
+}
+
+.vs-profile-active {
+    background: #252947;
+    border-color: #252947;
+    color: #fff;
+}
+
+.vs-profile:disabled { opacity: 0.5; cursor: default; }
+
+/* ColBERT in streaming mode. Not a disabled button, because a disabled button
+   implies the thing is there and currently unavailable; this profile does not
+   exist in that schema at all. Dashed, unclickable, and it says why. */
+.vs-profile-absent {
+    border-style: dashed;
+    background: transparent;
+    color: #9ca3af;
+    cursor: default;
+}
+
+.vs-profile-blurb {
+    margin: 0.5rem 0 0 0;
+    padding: 0 1.15rem;
+    font-size: 0.8rem;
+    color: #6b7280;
+    line-height: 1.55;
+}
+
+/* ── Composer ──────────────────────────────────────── */
+.vs-composer {
+    display: flex;
+    gap: 0.6rem;
+    flex-wrap: wrap;
+    padding: 0.9rem 1.15rem;
+}
+
+.vs-composer input {
+    flex: 1;
+    font: inherit;
+    font-size: 0.95rem;
+    padding: 0.6rem 0.85rem;
+    border: 1px solid #d1d5db;
+    border-radius: 0.6rem;
+    background: #fff;
+    color: #374151;
+    min-width: 12rem;
+}
+
+.vs-composer input:focus {
+    outline: 2px solid #252947;
+    outline-offset: 1px;
+}
+
+.vs-composer button {
+    font: inherit;
+    font-size: 0.9rem;
+    font-weight: 600;
+    padding: 0.6rem 1.3rem;
+    border: none;
+    border-radius: 0.6rem;
+    background: #252947;
+    color: #fff;
+    cursor: pointer;
+    transition: background 0.15s;
+    white-space: nowrap;
+}
+
+.vs-composer button:hover:not(:disabled) { background: #363b66; }
+
+.vs-composer button:disabled {
+    background: #c7cadb;
+    cursor: default;
+}
+
+.vs-compare-button {
+    background: #fff !important;
+    color: #252947 !important;
+    border: 1px solid #c7cadb !important;
+    font-weight: 500 !important;
+}
+
+.vs-compare-button:hover:not(:disabled) {
+    background: #f1f2f7 !important;
+    border-color: #252947 !important;
+}
+
+.vs-compare-button:disabled {
+    color: #a8abc0 !important;
+    border-color: #e5e7eb !important;
+}
+
+.vs-active-filter {
+    margin: 0 1.15rem;
+    padding: 0.5rem 0.75rem;
+    background: #eef0f7;
+    border-radius: 0.5rem;
+    font-size: 0.82rem;
+    color: #374151;
+}
+
+/* ── Results ───────────────────────────────────────── */
+.vs-results-area {
+    padding: 0.9rem 1.15rem 1.3rem 1.15rem;
+    border-top: 1px solid #eef0f4;
+    margin-top: 0.4rem;
+}
+
+.vs-empty p {
+    margin-bottom: 0.9rem;
+    color: #6b7280;
+    font-size: 0.95rem;
+}
+
+.vs-suggestions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.vs-suggestion {
+    font: inherit;
+    font-size: 0.82rem;
+    line-height: 1.4;
+    text-align: left;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 999px;
+    background: #f9fafb;
+    color: #374151;
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s;
+}
+
+.vs-suggestion:hover:not(:disabled) {
+    border-color: #252947;
+    background: #f1f2f7;
+}
+
+.vs-suggestion:disabled { opacity: 0.5; cursor: default; }
+
+.vs-error {
+    color: #b45309;
+    background: #fff8ed;
+    border-radius: 0.5rem;
+    padding: 0.65rem 0.85rem;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    margin: 0 0 1rem 0;
+}
+
+.vs-empty-result {
+    color: #4b5563;
+    background: #f8fafc;
+    border-left: 3px solid #cbd5e1;
+    border-radius: 0 0.5rem 0.5rem 0;
+    padding: 0.65rem 0.85rem;
+    font-size: 0.875rem;
+    line-height: 1.6;
+    margin: 0;
+}
+
+.vs-section-heading {
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: #6b7280;
+    margin: 0 0 0.6rem 0;
+}
+
+.vs-section-note {
+    font-weight: 400;
+    text-transform: none;
+    letter-spacing: 0;
+    color: #9ca3af;
+}
+
+p.vs-section-note {
+    font-size: 0.78rem;
+    line-height: 1.6;
+    color: #6b7280;
+    margin: 0.6rem 0 0 0;
+}
+
+/* ── Profile comparison table ──────────────────────── */
+.vs-comparison {
+    margin-bottom: 1.4rem;
+    padding-bottom: 1.2rem;
+    border-bottom: 1px dashed #e5e7eb;
+}
+
+.vs-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.83rem;
+}
+
+.vs-table th {
+    text-align: left;
+    font-weight: 600;
+    color: #6b7280;
+    font-size: 0.74rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    padding: 0 0.6rem 0.4rem 0;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.vs-table td {
+    padding: 0.45rem 0.6rem 0.45rem 0;
+    border-bottom: 1px solid #f3f4f6;
+    color: #374151;
+    vertical-align: top;
+}
+
+.vs-numeric {
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+}
+
+.vs-row-active td {
+    background: #f7f8fb;
+    font-weight: 600;
+}
+
+.vs-table-sub { color: #9ca3af; font-weight: 400; }
+
+/* ── Result list + facet sidebar ───────────────────── */
+.vs-results {
+    display: grid;
+    grid-template-columns: 1fr 17rem;
+    gap: 1.5rem;
+    align-items: start;
+}
+
+.vs-results-main { min-width: 0; }
+
+.vs-result-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 0.75rem;
+}
+
+.vs-result {
+    border: 1px solid #e5e7eb;
+    border-radius: 0.75rem;
+    padding: 0.85rem 1rem;
+    background: #fcfcfd;
+}
+
+.vs-result-head {
+    display: flex;
+    gap: 0.7rem;
+    align-items: flex-start;
+}
+
+.vs-result-number {
+    flex-shrink: 0;
+    width: 1.5rem;
+    height: 1.5rem;
+    border-radius: 50%;
+    background: #252947;
+    color: #fff;
+    font-size: 0.75rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.vs-result-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+    min-width: 0;
+}
+
+.vs-result-title {
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: #1a1a2e;
+    line-height: 1.35;
+}
+
+.vs-result-title a {
+    color: inherit;
+    text-decoration: none;
+    border-bottom: 1px solid #c7cadb;
+}
+
+.vs-result-title a:hover { border-bottom-color: #252947; }
+
+.vs-result-sub {
+    font-size: 0.74rem;
+    color: #6b7280;
+}
+
+.vs-quote {
+    margin: 0.65rem 0 0.55rem 0;
+    padding-left: 0.8rem;
+    border-left: 2px solid #e5e7eb;
+    font-size: 0.875rem;
+    line-height: 1.65;
+    color: #4b5563;
+}
+
+.vs-mark {
+    background: #fff1b8;
+    color: #1a1a2e;
+    padding: 0 0.1em;
+    border-radius: 0.2em;
+}
+
+.vs-ellipsis { color: #9ca3af; }
+
+.vs-result-foot {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.vs-chips {
+    display: flex;
+    gap: 0.3rem;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}
+
+.vs-chip {
+    font-size: 0.68rem;
+    padding: 0.1rem 0.42rem;
+    border-radius: 999px;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+}
+
+.vs-chip-score { background: #eef0f7; color: #252947; font-weight: 600; }
+.vs-chip-semantic { background: #e6f0fb; color: #1d4ed8; }
+.vs-chip-lexical { background: #e7f6ef; color: #047857; }
+
+.vs-chip-cluster {
+    font: inherit;
+    font-size: 0.68rem;
+    padding: 0.1rem 0.42rem;
+    border: 1px dashed #d8dae3;
+    background: #fff;
+    color: #6b7280;
+    cursor: pointer;
+}
+
+.vs-chip-cluster:hover { border-color: #252947; color: #252947; }
+
+/* ── Facets ────────────────────────────────────────── */
+.vs-facets {
+    border: 1px solid #e5e7eb;
+    border-radius: 0.75rem;
+    padding: 0.9rem 0.95rem;
+    background: #fbfbfd;
+    position: sticky;
+    top: 1rem;
+}
+
+.vs-facet-help {
+    font-size: 0.74rem;
+    line-height: 1.55;
+    color: #9ca3af;
+    margin: 0 0 0.7rem 0;
+}
+
+.vs-facet-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 0.5rem;
+}
+
+/* The count bar sits behind the label rather than beside it, so a long cluster
+   name and its bar do not have to fight over the same 17rem. */
+.vs-facet {
+    position: relative;
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
+    width: 100%;
+    font: inherit;
+    font-size: 0.78rem;
+    text-align: left;
+    padding: 0.3rem 0.45rem;
+    border: none;
+    border-radius: 0.35rem;
+    background: #f1f2f7;
+    color: #374151;
+    cursor: pointer;
+    overflow: hidden;
+}
+
+.vs-facet-bar {
+    position: absolute;
+    inset: 0 auto 0 0;
+    background: #dfe2ee;
+    pointer-events: none;
+}
+
+.vs-facet-active .vs-facet-bar { background: #c3c8e0; }
+
+.vs-facet-active { outline: 1px solid #252947; }
+
+.vs-facet:hover .vs-facet-bar { background: #d3d7e8; }
+
+.vs-facet-label {
+    position: relative;
+    flex: 1;
+    line-height: 1.4;
+    min-width: 0;
+}
+
+.vs-facet-count {
+    position: relative;
+    font-size: 0.7rem;
+    color: #6b7280;
+    font-variant-numeric: tabular-nums;
+    flex-shrink: 0;
+}
+
+.vs-facet-sub {
+    list-style: none;
+    margin: 0.3rem 0 0 0.55rem;
+    padding: 0 0 0 0.55rem;
+    border-left: 1px solid #e5e7eb;
+    display: grid;
+    gap: 0.15rem;
+}
+
+.vs-facet-sub li {
+    display: flex;
+    gap: 0.5rem;
+    align-items: baseline;
+}
+
+.vs-facet-sub-label {
+    flex: 1;
+    font-size: 0.72rem;
+    color: #6b7280;
+    line-height: 1.4;
+    min-width: 0;
+}
+
+/* ── Explainer prose ───────────────────────────────── */
+.vs-prose { width: 100%; }
+
+.vs-prose h2 { margin-top: 0; }
+
+/* ── Responsive ────────────────────────────────────── */
+@media (max-width: 1024px) {
+    .vs-results {
+        grid-template-columns: 1fr;
+    }
+
+    /* Below the results rather than beside them, so it stops being sticky and
+       stops being the first thing a narrow screen shows. */
+    .vs-facets {
+        position: static;
+        order: 2;
+    }
+}
+
+@media (max-width: 768px) {
+    .vs-results-area { padding: 0.9rem; }
+
+    .vs-composer {
+        padding: 0.75rem 0.9rem;
+    }
+
+    .vs-composer button { padding: 0.6rem 0.95rem; }
+
+    .vs-control-row { padding: 0.9rem 0.9rem 0 0.9rem; }
+
+    /* The label stops sharing a line with the control and sits above it, so
+       that a long article title has the full width rather than wrapping
+       against "in". */
+    .vs-control-row > .vs-control-label { width: 100%; }
+
+    .vs-group-select { max-width: 100%; flex: 1; }
+
+    .vs-profile-blurb { padding: 0 0.9rem; }
+
+    .vs-statusbar { padding: 0.7rem 0.9rem; }
+
+    .vs-chips { justify-content: flex-start; }
+}

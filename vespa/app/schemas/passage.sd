@@ -1,0 +1,337 @@
+#
+# One document per passage: the same ~3,365 passages cut from 255 Wikipedia
+# cycling articles that the in-browser version of this project searches.
+#
+# The document block holds what the feed script sends. The two fields after it
+# are synthetic: nothing feeds them, Vespa derives them by running an embedder
+# over fields that were fed. That split is worth noticing, because it is what
+# makes the browser page thin - the vectors are Vespa's business, not the
+# client's.
+#
+# This is the indexed half of the application. article_passage.sd holds the
+# same passages in streaming mode, and is best read as a diff against this
+# file: it is mostly this one with the index structures taken out.
+#
+schema passage {
+
+    document passage {
+
+        # Which article this passage came from, as a slug. Used for the "search
+        # only in these articles" control on the page.
+        #
+        # fast-search builds a B-tree over the attribute so that `doc_id in
+        # (...)` with a couple of hundred values resolves by lookup instead of
+        # by scanning every document. rank: filter says this field can never
+        # contribute to a score, only to whether a document matches, which lets
+        # Vespa store it more cheaply.
+        field doc_id type string {
+            indexing: attribute | summary
+            attribute: fast-search
+            rank: filter
+        }
+
+        field title type string {
+            indexing: index | summary
+            index: enable-bm25
+        }
+
+        # Grouping by the article needs the title as an attribute as well as an
+        # index: attributes are in memory and groupable, indexes are tokenised
+        # and searchable, and the two are not interchangeable. Hence a second
+        # field holding the same string. The duplication is deliberate.
+        field title_facet type string {
+            indexing: attribute | summary
+            attribute: fast-search
+            rank: filter
+        }
+
+        field url type string {
+            indexing: summary
+        }
+
+        # The article section this passage sits under, e.g. "Rim brakes".
+        # Indexed because a question often names the section almost word for
+        # word, which is a strong signal.
+        field section type string {
+            indexing: index | summary
+            index: enable-bm25
+        }
+
+        # The heading fragment for deep-linking back into the Wikipedia article.
+        field anchor type string {
+            indexing: summary
+        }
+
+        # Ordinal of this passage within its article, and within its section.
+        # section_parts is how many passages that section was cut into, so a
+        # citation can say "2 of 5" and only when there is in fact more than one.
+        field part type int {
+            indexing: attribute | summary
+        }
+
+        field section_part type int {
+            indexing: attribute | summary
+        }
+
+        field section_parts type int {
+            indexing: attribute | summary
+        }
+
+        # Semantic cluster, assigned by k-means over the passage embeddings at
+        # feed time. This is the same clustering, same seed, that colours the
+        # scatter plot on the in-browser version, so the facets here and the
+        # picture there describe the same partition of the corpus.
+        field cluster type int {
+            indexing: attribute | summary
+            attribute: fast-search
+            rank: filter
+        }
+
+        # A readable label for that cluster, built from its most distinctive
+        # terms. Derived from the data rather than written by hand, so it stays
+        # honest if the corpus is rebuilt.
+        field cluster_name type string {
+            indexing: attribute | summary
+            attribute: fast-search
+            rank: filter
+        }
+
+        field text type string {
+            indexing: index | summary
+            index: enable-bm25
+        }
+    }
+
+    # ---------------------------------------------------------------------
+    # Synthetic fields: Vespa computes these, the feed does not supply them.
+    # ---------------------------------------------------------------------
+
+    # Dense passage vector, 384 dimensions, one per passage.
+    #
+    # The title is concatenated onto the text before embedding. A passage
+    # halfway through an article often never names its own subject - a paragraph
+    # of "Bicycle brake" may say "the pads" and never "brake" - and without the
+    # title the vector drifts towards whatever the paragraph happens to discuss.
+    #
+    # bfloat16 halves the memory against float with no measurable accuracy cost
+    # at this scale. angular is cosine distance, which is what e5 was trained
+    # for. HNSW is an approximate index: it trades a small, tunable amount of
+    # recall for not comparing the query against all 3,365 vectors, which is a
+    # bad trade at 3,365 and the only possible trade at 3.3 billion.
+    field embedding type tensor<bfloat16>(x[384]) {
+        indexing: input title . ". " . input text | embed e5 | attribute | index
+        attribute {
+            distance-metric: angular
+        }
+        index {
+            hnsw {
+                max-links-per-node: 24
+                neighbors-to-explore-at-insert: 200
+            }
+        }
+    }
+
+    # ColBERT late-interaction vectors: one per token, not one per passage.
+    #
+    # The type says int8 and 16 where ColBERT is 128-dimensional, because Vespa
+    # binarises on the way in - one bit per dimension, 128 bits, 16 bytes per
+    # token. That is 32x smaller than float, and the rank profile below undoes
+    # it with unpack_bits at scoring time.
+    #
+    # paged lets these pages live on disk and be faulted in, instead of being
+    # pinned in memory like a normal attribute. They are only read for the few
+    # hundred documents that reach second-phase, so paying disk latency for them
+    # is the right trade; pinning 3,365 x 256 x 16 bytes of RAM is not.
+    #
+    # No title concatenation here: the 256-token budget is already tight for a
+    # 900-character passage, and spending any of it on a repeated title costs
+    # more than it returns.
+    field colbert type tensor<int8>(dt{}, x[16]) {
+        indexing: input text | embed colbert | attribute
+        attribute: paged
+    }
+
+    fieldset default {
+        fields: title, section, text
+    }
+
+    # =====================================================================
+    # Rank profiles
+    #
+    # Four, so the page can switch between them on the same query and show
+    # that retrieval quality is a choice with costs attached, not a property
+    # of the search engine.
+    # =====================================================================
+
+    # Shared vocabulary. Nothing inherits a scoring decision from here, only the
+    # definitions, so each profile below still states its own ranking in full.
+    rank-profile base {
+
+        inputs {
+            query(q) tensor<bfloat16>(x[384])
+        }
+
+        # BM25 over three fields with the title and section weighted up. A
+        # question that names a section heading almost always wants that
+        # section, and headings are short, so a hit there is worth more than a
+        # hit in nine hundred characters of body text.
+        function bm25_score() {
+            expression: bm25(text) + 2.0 * bm25(title) + 2.0 * bm25(section)
+        }
+
+        # closeness() is already in [0, 1]: 1 is identical, 0 is far. It is
+        # defined as 1 / (1 + distance), so it is a similarity, not a distance,
+        # and bigger is better like every other score here.
+        function vector_score() {
+            expression: closeness(field, embedding)
+        }
+    }
+
+    # ---------------------------------------------------------------------
+    # 1. Keyword only. The baseline, and the thing to beat.
+    # ---------------------------------------------------------------------
+    rank-profile keyword inherits base {
+
+        first-phase {
+            expression: bm25_score
+        }
+
+        match-features {
+            bm25_score
+            bm25(text)
+            bm25(title)
+            bm25(section)
+        }
+    }
+
+    # ---------------------------------------------------------------------
+    # 2. Vector only. Finds paraphrase, misses rare exact strings.
+    # ---------------------------------------------------------------------
+    rank-profile semantic inherits base {
+
+        first-phase {
+            expression: vector_score
+        }
+
+        match-features {
+            vector_score
+            closeness(field, embedding)
+            distance(field, embedding)
+        }
+    }
+
+    # ---------------------------------------------------------------------
+    # 3. Hybrid, fused in the global phase.
+    #
+    # Two phases. first-phase runs on the content node over every document that
+    # matched, so it has to be cheap; it is only there to decide who survives.
+    # global-phase runs once on the stateless container, after results from all
+    # content nodes have been merged, which is the only place in Vespa where a
+    # document's rank relative to the whole result set is knowable.
+    #
+    # That is exactly what RRF needs. Reciprocal rank fusion scores a document
+    # by 1/(k + rank) in each ranking it appears in, so it consumes positions
+    # rather than scores - and positions are the only thing BM25 and cosine have
+    # in common. BM25 is unbounded and corpus-dependent, cosine is in [-1, 1];
+    # adding them directly means retuning a weight whenever the corpus changes.
+    # RRF never needs that weight.
+    # ---------------------------------------------------------------------
+    rank-profile hybrid inherits base {
+
+        # Cheap and deliberately generous: this is a filter, not a verdict. The
+        # small BM25 term breaks ties among passages with near-identical cosine,
+        # which happens constantly in a single-subject corpus.
+        first-phase {
+            expression: vector_score + 0.01 * bm25_score
+        }
+
+        global-phase {
+            expression: reciprocal_rank_fusion(bm25_score, vector_score)
+            rerank-count: 200
+        }
+
+        match-features {
+            bm25_score
+            vector_score
+            bm25(text)
+            closeness(field, embedding)
+        }
+    }
+
+    # ---------------------------------------------------------------------
+    # 4. Hybrid retrieval, then ColBERT late interaction as a reranker.
+    #
+    # Also two phases, but the second one is second-phase rather than
+    # global-phase, and the difference is not stylistic. MaxSim needs
+    # attribute(colbert), and attributes live on the content nodes. The
+    # stateless container does not have them. So a rank profile that tried to
+    # compute MaxSim in global-phase would be asking the wrong machine.
+    #
+    # Late interaction means the query and the passage are compared token by
+    # token instead of as two single vectors. For each query token, find the
+    # document token it matches best; add those maxima up. A passage that
+    # answers every part of a question scores above one that answers most of it
+    # emphatically, which single-vector cosine cannot distinguish.
+    #
+    # rerank-count caps this at the top 200 per content node. It is far too
+    # expensive to run over everything that matched, which is the entire reason
+    # phased ranking exists.
+    # ---------------------------------------------------------------------
+    rank-profile colbert inherits base {
+
+        inputs {
+            query(q) tensor<bfloat16>(x[384])
+            query(qt) tensor<float>(qt{}, x[128])
+        }
+
+        first-phase {
+            expression: vector_score + 0.01 * bm25_score
+        }
+
+        # Undo the 1-bit-per-dimension packing from the field above. unpack_bits
+        # turns each int8 back into 8 floats of -1 or 1, restoring the 128
+        # dimensions MaxSim expects.
+        function unpack() {
+            expression: unpack_bits(attribute(colbert))
+        }
+
+        # MaxSim, read inside out:
+        #   sum(query(qt) * unpack(), x)   dot product per (query token,
+        #                                  document token) pair, over dimension x
+        #   reduce(..., max, dt)           for each query token, keep only its
+        #                                  best-matching document token
+        #   sum(..., qt)                   add those bests across query tokens
+        function max_sim() {
+            expression {
+                sum(
+                    reduce(
+                        sum(
+                            query(qt) * unpack(), x
+                        ),
+                        max, dt
+                    ),
+                    qt
+                )
+            }
+        }
+
+        second-phase {
+            expression: max_sim
+            rerank-count: 200
+        }
+
+        match-features {
+            max_sim
+            bm25_score
+            vector_score
+            closeness(field, embedding)
+        }
+    }
+
+    # No document-summary block on purpose. Every field above that the page
+    # renders is declared `summary` in its own indexing statement, which puts it
+    # in the implicit default summary already; the two vector fields are not,
+    # which keeps 384 dimensions and a few hundred token vectors per hit out of
+    # every response. An explicit `document-summary default` here would restate
+    # that list and then have to be kept in step with it.
+}

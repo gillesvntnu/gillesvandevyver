@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!--
+  Vespa application for the cycling corpus.
+
+  One container cluster and two content clusters, all on a single node, which is
+  what a laptop Docker run can hold. The two content clusters hold the same
+  passages in the two storage modes Vespa offers - indexed and streaming - so
+  the page can run one question through both and show what the difference costs.
+  The other interesting parts are the two embedder components and the CORS
+  filters.
+
+  The embedders matter because they are what let the browser page be a thin
+  client. The question arrives as plain text and Vespa turns it into vectors
+  itself, at query time, with the same models it used at feed time. Without them
+  the page would have to carry an embedding model, which is exactly the job the
+  in-browser version of this project does and exactly the job this version is
+  meant to hand to a server.
+
+  The CORS filters matter because without them a static site on another origin
+  cannot call this endpoint at all: the browser sends a preflight OPTIONS first
+  and refuses the real request if that preflight is not answered. These two
+  filters are built into Vespa, so no custom Java bundle is needed.
+-->
+<services version="1.0">
+
+  <container id="cycling" version="1.0">
+
+    <document-api/>
+    <search/>
+    <!-- Index-time embedding runs in the indexing document-processing chain,
+         which lives in a container. Feeding fails without this element. -->
+    <document-processing/>
+
+    <!--
+      e5-small-v2, the same model the in-browser version of this project uses,
+      so the two are comparable. e5 is asymmetric: it was trained with "query:"
+      on questions and "passage:" on documents and loses most of its accuracy
+      without them. Here Vespa applies both prefixes itself, which removes the
+      commonest way to get this wrong - prefixing at feed time and forgetting at
+      query time, which degrades quietly rather than failing.
+    -->
+    <component id="e5" type="hugging-face-embedder">
+      <transformer-model url="https://huggingface.co/intfloat/e5-small-v2/resolve/main/model.onnx"/>
+      <tokenizer-model url="https://huggingface.co/intfloat/e5-small-v2/raw/main/tokenizer.json"/>
+      <prepend>
+        <query>query:</query>
+        <document>passage:</document>
+      </prepend>
+    </component>
+
+    <!--
+      ColBERT produces one vector per token instead of one per passage, so a
+      budget has to be set for both sides. 32 query tokens is more than any
+      question typed into the box. 256 document tokens covers most of a
+      900-character passage but not all of one: anything past the limit is
+      simply not represented, which is a real limitation of this profile and is
+      written up as such on the page rather than hidden.
+    -->
+    <component id="colbert" type="colbert-embedder">
+      <transformer-model url="https://huggingface.co/colbert-ir/colbertv2.0/resolve/main/model.onnx"/>
+      <tokenizer-model url="https://huggingface.co/colbert-ir/colbertv2.0/raw/main/tokenizer.json"/>
+      <max-query-tokens>32</max-query-tokens>
+      <max-document-tokens>256</max-document-tokens>
+    </component>
+
+    <!--
+      Cross-origin access for the browser page.
+
+      allowedUrls is "*" because this is a read-only demo over a public
+      Wikipedia corpus running on a laptop. On a deployment that anyone else can
+      reach, replace the item with the exact origin that should be allowed
+      (https://gillesvandevyver.com) - a wildcard there would let any page on
+      the web spend your cluster's CPU.
+
+      The binding is http://*/search/ because that is the only endpoint the page
+      calls. Feeding and config go through other paths that no browser touches.
+
+      The bundle is jdisc-security-filters and the config name is
+      jdisc.http.filter.security.cors.cors-filter. Both are worth stating
+      precisely, because getting either wrong fails at deploy time with a
+      message about a missing component rather than about CORS.
+    -->
+    <http>
+      <filtering strict-mode="false">
+        <request-chain id="cors-request-chain">
+          <filter id="com.yahoo.jdisc.http.filter.security.cors.CorsPreflightRequestFilter"
+                  bundle="jdisc-security-filters">
+            <config name="jdisc.http.filter.security.cors.cors-filter">
+              <allowedUrls>
+                <item>*</item>
+              </allowedUrls>
+            </config>
+          </filter>
+          <binding>http://*/search/</binding>
+        </request-chain>
+
+        <response-chain id="cors-response-chain">
+          <filter id="com.yahoo.jdisc.http.filter.security.cors.CorsResponseFilter"
+                  bundle="jdisc-security-filters">
+            <config name="jdisc.http.filter.security.cors.cors-filter">
+              <allowedUrls>
+                <item>*</item>
+              </allowedUrls>
+            </config>
+          </filter>
+          <binding>http://*/search/</binding>
+        </response-chain>
+      </filtering>
+
+      <server port="8080" id="default"/>
+    </http>
+
+    <nodes>
+      <node hostalias="node1"/>
+    </nodes>
+
+  </container>
+
+  <!--
+    Indexed mode: the whole corpus, searched as one collection.
+
+    Everything is built up front - the HNSW graph over the passage vectors, the
+    BM25 posting lists, the in-memory attributes - and a query touches a small
+    part of it. This is what you want when any query may match any document.
+  -->
+  <content id="cycling-content" version="1.0">
+    <!-- One copy of each document. Fine for a demo on one node; a real cluster
+         would want at least 2 so that losing a node does not lose data. -->
+    <redundancy>1</redundancy>
+    <documents>
+      <document type="passage" mode="index"/>
+    </documents>
+    <nodes>
+      <node hostalias="node1" distribution-key="0"/>
+    </nodes>
+  </content>
+
+  <!--
+    Streaming mode: the same passages, but partitioned by article, and searched
+    one article at a time.
+
+    The two clusters hold the same text on purpose. Streaming mode is usually
+    explained with mailboxes - every query belongs to exactly one user, so there
+    is no point indexing across users - and a mailbox is hard to put on a public
+    demo page. An article is the same shape of thing: a group you always search
+    the whole of, and never across.
+
+    What changes is what gets built. No inverted index, no HNSW graph; the
+    documents in the selected group are read and matched one by one, and the
+    nearest-neighbour search over them is exact rather than approximate. That
+    costs more per query inside a group and saves nearly everything per
+    document, which is the right trade when the groups are small and numerous:
+    a million mailboxes cost a million mailboxes' worth of disk and no index at
+    all. The equivalent indexed cluster is the one above, and the page lets you
+    run the same question through both.
+
+    The separate document type is forced rather than chosen: mode is a property
+    of a document type in a content cluster, so one type cannot be both.
+  -->
+  <content id="cycling-streaming" version="1.0">
+    <redundancy>1</redundancy>
+    <documents>
+      <document type="article_passage" mode="streaming"/>
+    </documents>
+    <nodes>
+      <node hostalias="node1" distribution-key="0"/>
+    </nodes>
+  </content>
+
+</services>
