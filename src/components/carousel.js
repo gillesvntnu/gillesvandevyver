@@ -47,7 +47,7 @@ const slideData = [
   },
   {
     index: 4,
-    headline: 'Image quality',
+    headline: 'Does your heart look good?',
     button: 'Find out more',
     src: quality_pic,
     link: '#/projects/image-quality'

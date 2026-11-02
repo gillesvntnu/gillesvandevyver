@@ -12,13 +12,15 @@ import quality_pic5 from '../../../images/finding_hearts/quality_pic5.jpg';
 function ImageQuality() {
     return (
         <div className="project-page-container">
-            <h1>Image Quality</h1>
+            <h1>Does your heart look good?</h1>
             <div className="horizontal-card horizontal-card-right">
                 <div style={{gridColumn: '1 / -1', display: 'flex', justifyContent: 'center'}}>
                     <VideoPlayer src={demoVideo} type="video/mp4" ariaLabel="Regional image quality demo" />
                 </div>
+                {/* Spacer keeps the title/body + image grid pairing intact now that
+                    "Does your heart look good?" has moved up to the page title. */}
                 <div className="section-title">
-                    <h2><br/><br/>Does your heart look good?</h2>
+                    <br/><br/>
                 </div>
                 <div className="media-section">
                     <a href="https://www.sciencedirect.com/science/article/pii/S0301562924004691">
