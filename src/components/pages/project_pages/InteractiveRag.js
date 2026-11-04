@@ -185,7 +185,7 @@ const InteractiveRag = () => {
   const [docQuery, setDocQuery] = useState('');
 
   useEffect(() => {
-    document.title = 'Ask a bike question · gillesvandevyver.com';
+    document.title = 'Browser-native RAG system · gillesvandevyver.com';
   }, []);
 
   // 1. The index loads first and makes the page usable straight away in
@@ -335,7 +335,7 @@ const InteractiveRag = () => {
 
   return (
     <div className="project-page-container">
-      <h1>Ask a bike question</h1>
+      <h1>Browser-native RAG system</h1>
 
       <div className="rag-hero">
         {/* Two images, and the pairing is the point: the index above, the reason

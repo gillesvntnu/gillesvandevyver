@@ -19,10 +19,10 @@ const slideData = [
   // },
   {
     index: 0,
-    headline: 'Ask a bike question',
+    headline: 'Browser-native RAG system',
     button: 'Try it',
     src: embedding_space_pic,
-    link: '#/projects/ask-a-bike-question'
+    link: '#/projects/browser-native-rag-system'
   },
   {
     index: 1,
