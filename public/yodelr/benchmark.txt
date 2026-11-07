@@ -1,57 +1,59 @@
 Reading Sentiment140 ...
-  skipped 109 rows (empty or over 140 chars)
+  skipped 645 rows (empty or over 140 chars)
 
 Corpus
 ------
 source: sentiment140
-                   posts: 400,000.00
-                   users: 241,077.00
-         distinct_topics: 3,879.00
-   posts_with_topics_pct: 1.72
-       mentions_per_post: 0.02
-           mean_text_len: 73.14
-            span_seconds: 5,236,084.00
+                   posts: 1,599,355.00
+                   users: 659,524.00
+         distinct_topics: 13,635.00
+   posts_with_topics_pct: 2.24
+       mentions_per_post: 0.03
+           mean_text_len: 72.87
+            span_seconds: 6,869,338.00
 
-clock overhead per measurement: 56 ns (subtracted below)
+clock overhead per measurement: 47 ns (subtracted below)
 
 Writes
 ------
-add_user                      241077  mean     254 ns  median     170 ns  p95     456 ns  p99     656 ns  max    4.65 ms
-add_post                      400000  mean    1.56 us  median    1.34 us  p95    3.26 us  p99    4.52 us  max  939.81 us  ~641,256 posts/sec
+add_user                      659524  mean     293 ns  median     231 ns  p95     522 ns  p99     667 ns  max   10.10 ms
+add_post                     1599355  mean    1.65 us  median    1.45 us  p95    3.33 us  p99    4.54 us  max    5.79 ms  ~604,609 posts/sec
 
 Reads
 -----
-get_posts_for_user              3000  mean    1.38 us  median    1.21 us  p95    2.31 us  p99    4.00 us  max   17.23 us  random users
-  busiest user                  2000  mean    7.21 us  median    7.12 us  p95    7.48 us  p99    8.29 us  max   34.34 us  310 posts
-get_posts_for_topic             3000  mean    1.52 us  median    1.20 us  p95    2.85 us  p99    7.91 us  max  195.57 us  random topics
-  hottest topic                  500  mean   42.56 us  median   41.93 us  p95   43.08 us  p99   46.44 us  max  268.80 us  #fb -- 483 posts
+get_posts_for_user              3000  mean    1.54 us  median    1.34 us  p95    2.80 us  p99    4.33 us  max   13.06 us  random users
+  busiest user                  2000  mean   14.50 us  median   14.39 us  p95   14.53 us  p99   16.52 us  max  159.20 us  549 posts
+get_posts_for_topic             3000  mean    2.40 us  median    1.53 us  p95    5.14 us  p99   17.20 us  max  159.75 us  random topics
+  hottest topic                  500  mean  159.63 us  median  156.38 us  p95  169.40 us  p99  187.97 us  max  694.10 us  #followfriday -- 2100 posts
 
-get_trending_topics (1 hour)     200  mean   84.99 us  median    2.69 us  p95  550.28 us  p99  609.11 us  max  610.20 us  ~0 posts in window
-get_trending_topics (1 day)      200  mean    1.42 ms  median   18.64 us  p95    7.32 ms  p99   11.96 ms  max   12.18 ms  ~0 posts in window
-get_trending_topics (1 week)     200  mean   10.14 ms  median    7.66 ms  p95   52.19 ms  p99   56.47 ms  max   57.21 ms  ~189,480 posts in window
-get_trending_topics (whole corpus)     200  mean  114.08 ms  median  113.48 ms  p95  117.45 ms  p99  119.35 ms  max  121.75 ms  ~400,000 posts in window
+get_trending_topics (1 hour)     200  mean  239.50 us  median    4.60 us  p95    1.00 ms  p99    1.03 ms  max    1.05 ms  ~0 posts in window
+get_trending_topics (1 day)      200  mean    5.99 ms  median    1.14 ms  p95   23.62 ms  p99   23.84 ms  max   24.28 ms  ~43,054 posts in window
+get_trending_topics (1 week)     200  mean   33.52 ms  median   21.44 ms  p95  133.68 ms  p99  136.90 ms  max  139.75 ms  ~41,942 posts in window
+get_trending_topics (whole corpus)     200  mean  436.19 ms  median  441.50 ms  p95  451.15 ms  p99  468.21 ms  max  483.07 ms  ~1,599,355 posts in window
 
 Deletes
 -------
-delete_user                      300  mean   27.52 ms  median   27.45 ms  p95   29.31 ms  p99   29.68 ms  max   30.31 ms  400,000 posts in system
+delete_user                      300  mean  106.05 ms  median  106.17 ms  p95  113.22 ms  p99  118.40 ms  max  121.33 ms  1,599,355 posts in system
   The O(n) timeline rebuild dominates: it is the same amount of
   work whether the user had one post or a thousand.
 
 Memory
 ------
-     400,000 posts
-       156.8 MB held after loading
-         392 bytes per post (all three indexes plus the Post itself)
-       156.8 MB peak during loading
-       7,920 entries in the topic index
+   1,599,355 posts
+       589.1 MB held after loading
+         368 bytes per post (all three indexes plus the Post itself)
+       589.1 MB peak during loading
+      41,207 entries in the topic index
   The topic index is the biggest structure: one entry per
   (post, topic) pair, not per post.
 
 Scaling
 -------
      posts      add_post    trending/day     delete_user
-    25,000       1.11 us       268.59 us         2.26 ms
-    50,000       1.16 us       329.65 us         3.66 ms
-   100,000       1.27 us       427.59 us         6.78 ms
-   200,000       1.28 us         1.16 ms        13.05 ms
-   400,000       1.37 us         2.04 ms        26.62 ms
+    25,000       1.08 us       303.98 us         3.63 ms
+    50,000       1.13 us       551.57 us         6.79 ms
+   100,000       1.15 us         1.89 ms         6.49 ms
+   200,000       1.21 us         1.37 ms        13.39 ms
+   400,000       1.34 us         2.78 ms        26.29 ms
+   800,000       1.40 us         5.12 ms        53.91 ms
+ 1,599,355       1.56 us         5.15 ms       105.77 ms

@@ -1,13 +1,13 @@
 {
   "corpus": {
     "source": "sentiment140",
-    "posts": 400000.0,
-    "users": 241077.0,
-    "distinct_topics": 3879.0,
-    "posts_with_topics_pct": 1.72,
-    "mentions_per_post": 0.02,
-    "mean_text_len": 73.14,
-    "span_seconds": 5236084.0,
+    "posts": 1599355.0,
+    "users": 659524.0,
+    "distinct_topics": 13635.0,
+    "posts_with_topics_pct": 2.24,
+    "mentions_per_post": 0.03,
+    "mean_text_len": 72.87,
+    "span_seconds": 6869338.0,
     "datasetUrl": "https://huggingface.co/datasets/sentiment140",
     "datasetName": "Sentiment140"
   },
@@ -15,24 +15,24 @@
     {
       "label": "add_user",
       "detail": false,
-      "count": 241077,
-      "meanNs": 254.0,
-      "medianNs": 170.0,
-      "p95Ns": 456.0,
-      "p99Ns": 656.0,
-      "maxNs": 4650000.0,
+      "count": 659524,
+      "meanNs": 293.0,
+      "medianNs": 231.0,
+      "p95Ns": 522.0,
+      "p99Ns": 667.0,
+      "maxNs": 10100000.0,
       "note": ""
     },
     {
       "label": "add_post",
       "detail": false,
-      "count": 400000,
-      "meanNs": 1560.0,
-      "medianNs": 1340.0,
-      "p95Ns": 3260.0,
-      "p99Ns": 4520.0,
-      "maxNs": 939810.0,
-      "note": "~641,256 posts/sec"
+      "count": 1599355,
+      "meanNs": 1650.0,
+      "medianNs": 1450.0,
+      "p95Ns": 3330.0,
+      "p99Ns": 4540.0,
+      "maxNs": 5790000.0,
+      "note": "~604,609 posts/sec"
     }
   ],
   "reads": [
@@ -40,89 +40,89 @@
       "label": "get_posts_for_user",
       "detail": false,
       "count": 3000,
-      "meanNs": 1380.0,
-      "medianNs": 1210.0,
-      "p95Ns": 2310.0,
-      "p99Ns": 4000.0,
-      "maxNs": 17230.0,
+      "meanNs": 1540.0,
+      "medianNs": 1340.0,
+      "p95Ns": 2800.0,
+      "p99Ns": 4330.0,
+      "maxNs": 13060.0,
       "note": "random users"
     },
     {
       "label": "busiest user",
       "detail": true,
       "count": 2000,
-      "meanNs": 7210.0,
-      "medianNs": 7120.0,
-      "p95Ns": 7480.0,
-      "p99Ns": 8290.0,
-      "maxNs": 34340.0,
-      "note": "310 posts"
+      "meanNs": 14500.0,
+      "medianNs": 14390.0,
+      "p95Ns": 14530.0,
+      "p99Ns": 16520.0,
+      "maxNs": 159200.0,
+      "note": "549 posts"
     },
     {
       "label": "get_posts_for_topic",
       "detail": false,
       "count": 3000,
-      "meanNs": 1520.0,
-      "medianNs": 1200.0,
-      "p95Ns": 2850.0,
-      "p99Ns": 7910.0,
-      "maxNs": 195570.0,
+      "meanNs": 2400.0,
+      "medianNs": 1530.0,
+      "p95Ns": 5140.0,
+      "p99Ns": 17200.0,
+      "maxNs": 159750.0,
       "note": "random topics"
     },
     {
       "label": "hottest topic",
       "detail": true,
       "count": 500,
-      "meanNs": 42560.0,
-      "medianNs": 41930.0,
-      "p95Ns": 43080.0,
-      "p99Ns": 46440.0,
-      "maxNs": 268800.0,
-      "note": "#fb -- 483 posts"
+      "meanNs": 159630.0,
+      "medianNs": 156380.0,
+      "p95Ns": 169400.0,
+      "p99Ns": 187970.0,
+      "maxNs": 694100.0,
+      "note": "#followfriday -- 2100 posts"
     },
     {
       "label": "get_trending_topics (1 hour)",
       "detail": false,
       "count": 200,
-      "meanNs": 84990.0,
-      "medianNs": 2690.0,
-      "p95Ns": 550280.0,
-      "p99Ns": 609110.0,
-      "maxNs": 610200.0,
+      "meanNs": 239500.0,
+      "medianNs": 4600.0,
+      "p95Ns": 1000000.0,
+      "p99Ns": 1030000.0,
+      "maxNs": 1050000.0,
       "note": "~0 posts in window"
     },
     {
       "label": "get_trending_topics (1 day)",
       "detail": false,
       "count": 200,
-      "meanNs": 1420000.0,
-      "medianNs": 18640.0,
-      "p95Ns": 7320000.0,
-      "p99Ns": 11960000.0,
-      "maxNs": 12180000.0,
-      "note": "~0 posts in window"
+      "meanNs": 5990000.0,
+      "medianNs": 1140000.0,
+      "p95Ns": 23620000.0,
+      "p99Ns": 23840000.0,
+      "maxNs": 24280000.0,
+      "note": "~43,054 posts in window"
     },
     {
       "label": "get_trending_topics (1 week)",
       "detail": false,
       "count": 200,
-      "meanNs": 10140000.0,
-      "medianNs": 7660000.0,
-      "p95Ns": 52190000.0,
-      "p99Ns": 56470000.0,
-      "maxNs": 57210000.0,
-      "note": "~189,480 posts in window"
+      "meanNs": 33520000.000000004,
+      "medianNs": 21440000.0,
+      "p95Ns": 133680000.0,
+      "p99Ns": 136900000.0,
+      "maxNs": 139750000.0,
+      "note": "~41,942 posts in window"
     },
     {
       "label": "get_trending_topics (whole corpus)",
       "detail": false,
       "count": 200,
-      "meanNs": 114080000.0,
-      "medianNs": 113480000.0,
-      "p95Ns": 117450000.0,
-      "p99Ns": 119350000.0,
-      "maxNs": 121750000.0,
-      "note": "~400,000 posts in window"
+      "meanNs": 436190000.0,
+      "medianNs": 441500000.0,
+      "p95Ns": 451150000.0,
+      "p99Ns": 468210000.0,
+      "maxNs": 483070000.0,
+      "note": "~1,599,355 posts in window"
     }
   ],
   "deletes": [
@@ -130,55 +130,67 @@
       "label": "delete_user",
       "detail": false,
       "count": 300,
-      "meanNs": 27520000.0,
-      "medianNs": 27450000.0,
-      "p95Ns": 29310000.0,
-      "p99Ns": 29680000.0,
-      "maxNs": 30310000.0,
-      "note": "400,000 posts in system"
+      "meanNs": 106050000.0,
+      "medianNs": 106170000.0,
+      "p95Ns": 113220000.0,
+      "p99Ns": 118400000.0,
+      "maxNs": 121330000.0,
+      "note": "1,599,355 posts in system"
     }
   ],
   "memory": {
-    "posts": 400000.0,
-    "heldMb": 156.8,
-    "bytesPerPost": 392.0,
-    "peakMb": 156.8,
-    "topicIndexEntries": 7920.0
+    "posts": 1599355.0,
+    "heldMb": 589.1,
+    "bytesPerPost": 368.0,
+    "peakMb": 589.1,
+    "topicIndexEntries": 41207.0
   },
   "scaling": [
     {
       "posts": 25000,
-      "addPostNs": 1110.0,
-      "trendingDayNs": 268590.0,
-      "deleteUserNs": 2260000.0
+      "addPostNs": 1080.0,
+      "trendingDayNs": 303980.0,
+      "deleteUserNs": 3630000.0
     },
     {
       "posts": 50000,
-      "addPostNs": 1160.0,
-      "trendingDayNs": 329650.0,
-      "deleteUserNs": 3660000.0
+      "addPostNs": 1130.0,
+      "trendingDayNs": 551570.0,
+      "deleteUserNs": 6790000.0
     },
     {
       "posts": 100000,
-      "addPostNs": 1270.0,
-      "trendingDayNs": 427590.0,
-      "deleteUserNs": 6780000.0
+      "addPostNs": 1150.0,
+      "trendingDayNs": 1890000.0,
+      "deleteUserNs": 6490000.0
     },
     {
       "posts": 200000,
-      "addPostNs": 1280.0,
-      "trendingDayNs": 1160000.0,
-      "deleteUserNs": 13050000.0
+      "addPostNs": 1210.0,
+      "trendingDayNs": 1370000.0,
+      "deleteUserNs": 13390000.0
     },
     {
       "posts": 400000,
-      "addPostNs": 1370.0,
-      "trendingDayNs": 2040000.0,
-      "deleteUserNs": 26620000.0
+      "addPostNs": 1340.0,
+      "trendingDayNs": 2780000.0,
+      "deleteUserNs": 26290000.0
+    },
+    {
+      "posts": 800000,
+      "addPostNs": 1400.0,
+      "trendingDayNs": 5120000.0,
+      "deleteUserNs": 53910000.0
+    },
+    {
+      "posts": 1599355,
+      "addPostNs": 1560.0,
+      "trendingDayNs": 5150000.0,
+      "deleteUserNs": 105770000.0
     }
   ],
-  "clockOverheadNs": 56.0,
-  "skippedRows": 109,
+  "clockOverheadNs": 47.0,
+  "skippedRows": 645,
   "capturedFrom": "benchmark.txt",
-  "builtAt": "2026-11-07T18:48:21Z"
+  "builtAt": "2026-11-07T19:01:02Z"
 }

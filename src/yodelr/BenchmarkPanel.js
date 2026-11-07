@@ -74,12 +74,35 @@ const PLOT_X0 = 246;
 const PLOT_X1 = 620;
 const VALUE_X = PLOT_X1 + 14;
 const NOTE_X = PLOT_X1 + 82;
-/* Wide enough for the longest trailing note the report produces
-   ("~189,480 posts in window"), which would otherwise be clipped by the
-   viewBox rather than wrapped. */
-const CHART_W = 840;
+/* Wide enough for the longest trailing note the report produces. The notes
+   grew when the corpus did -- "#followfriday -- 2100 posts" and "~1,599,355
+   posts in window" are both longer than anything the 400k run emitted -- and
+   an SVG clips rather than wrapping, so the margin is deliberate. The whole
+   chart scales to the container width, so the only cost of a wider viewBox is
+   slightly smaller text. */
+const CHART_W = 880;
 const ROW_H = 21;
 const HEAD_H = 25;
+
+/* The trailing note, or nothing for the trending rows.
+ *
+ * benchmark.py times 200 randomly placed windows but counts the posts in only
+ * one of them — `mid = starts[0]`, the first draw — so that note is a single
+ * sample standing beside statistics gathered from two hundred. It is not a
+ * small inaccuracy either: on this corpus the median one-hour window holds no
+ * posts at all, so the count swings between zero and the full window width
+ * depending on where one random draw landed. The capture shows it plainly: the
+ * 1-week row reports fewer posts than the 1-day row, which cannot be true of
+ * any single window and is only possible because they are different draws.
+ *
+ * Every other note is solid — a user's post count, a topic's post count, the
+ * size of the whole system — so they stay. The capture keeps all of them; this
+ * drops four from the drawing only, and the JSON beside it is still complete.
+ */
+function noteFor(row) {
+  if (row.label.includes('trending')) return '';
+  return row.note.replace(' -- ', ' — ');
+}
 
 /* Exported so the two charts can be rendered and rasterised outside a browser
    when checking that nothing overlaps or falls off the edge. */
@@ -187,7 +210,7 @@ export function LatencyChart({ groups }) {
             <text x={NOTE_X} y={mid + 3.5} className="yo-chart-note">
               {/* benchmark.py writes "#fb -- 483 posts" because its output is
                   a terminal. Here an en dash is just the same note, set. */}
-              {row.note.replace(' -- ', ' — ')}
+              {noteFor(row)}
             </text>
           </g>
         );
@@ -409,9 +432,19 @@ export default function BenchmarkPanel() {
             because most of the 200 windows landed on a quiet stretch of 2009 and a few
             landed on a busy one. The cost follows how many posts fall inside the window,
             not how many exist, which is why the trending rows climb while nothing else
-            does. The post counts in grey are worth reading with that in mind: each one is
-            measured from a single sampled window rather than averaged, which is why two of
-            them say roughly nothing was in there. That is the variance, not a mistake.
+            does.
+          </p>
+        )}
+
+        {hour && (
+          <p className="yo-timing-note">
+            The quiet and busy stretches are sharper than they sound. Sentiment140 records
+            whole seconds, 2009 Twitter produced far more than one tweet per second, and
+            Yodelr requires timestamps to strictly increase — so each burst gets spread into
+            a run of exactly one post per second, while the gaps between bursts stay empty,
+            some of them for days. The timeline is therefore either saturated at 1&nbsp;Hz or
+            deserted, with little in between, and a trending window lands in one or the
+            other. That is the gap between those medians and their means.
           </p>
         )}
       </div>
