@@ -3,66 +3,13 @@
    #e5e7eb rules, #6b7280 secondary. The site is light-only, so there is no
    dark variant here either. */
 
-.yo-intro {
-    margin-top: 0.5rem;
-}
-
-.yo-intro p {
-    margin-bottom: 0.9rem;
-}
-
-.project-page-container code,
-.yo-prose code {
+.project-page-container code {
     font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
     font-size: 0.875em;
     background: #f3f4f6;
     padding: 0.08em 0.32em;
     border-radius: 0.3rem;
     word-break: normal;
-}
-
-/* ── Status bar ────────────────────────────────────── */
-.yo-statusbar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 1rem;
-    flex-wrap: wrap;
-    margin-top: 1.5rem;
-    padding: 0.7rem 1.1rem;
-    background: #f7f8fb;
-    border: 1px solid #e5e7eb;
-    border-radius: 0.75rem;
-    font-size: 0.82rem;
-    color: #4b5563;
-}
-
-.yo-status-left {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    min-width: 0;
-}
-
-.yo-dot {
-    width: 0.55rem;
-    height: 0.55rem;
-    border-radius: 50%;
-    flex-shrink: 0;
-    background: #9ca3af;
-}
-
-.yo-dot-loading {
-    background: #f59e0b;
-    animation: yo-pulse 1.3s ease-in-out infinite;
-}
-
-.yo-dot-ready { background: #10b981; }
-.yo-dot-error { background: #ef4444; }
-
-@keyframes yo-pulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.3; }
 }
 
 .yo-link-button {
@@ -81,11 +28,272 @@
 .yo-link-button:focus-visible,
 .yo-button:focus-visible,
 .yo-tab:focus-visible,
+.yo-maintab:focus-visible,
 .yo-row-button:focus-visible,
 .yo-field input:focus-visible,
 .yo-composer-input:focus-visible {
     outline: 2px solid #252947;
     outline-offset: 2px;
+}
+
+/* ── Page tabs ─────────────────────────────────────── */
+.yo-maintabs {
+    display: flex;
+    gap: 0.25rem;
+    margin-top: 1.25rem;
+    border-bottom: 1px solid #e5e7eb;
+    overflow-x: auto;
+}
+
+.yo-maintab {
+    flex: 0 0 auto;
+    background: none;
+    border: none;
+    /* The underline is a transparent border on every tab rather than one that
+       appears on the selected tab, so the label does not shift by two pixels
+       as the selection moves. */
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+    padding: 0.6rem 0.95rem;
+    font: inherit;
+    font-size: 0.92rem;
+    /* Same weight whether selected or not. Bolding the active tab would make
+       it wider and nudge the ones after it sideways on every click. */
+    font-weight: 600;
+    color: #6b7280;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.yo-maintab:hover { color: #374151; }
+
+.yo-maintab-active {
+    color: #252947;
+    border-bottom-color: #252947;
+}
+
+/* ── Corpus notes ──────────────────────────────────── */
+.yo-corpus-status,
+.yo-corpus-stats {
+    margin-top: 0.6rem;
+    padding-top: 0.6rem;
+    border-top: 1px dashed #e5e7eb;
+}
+
+.yo-corpus-stats strong {
+    font-variant-numeric: tabular-nums;
+    color: #252947;
+}
+
+/* ── Timing tab ────────────────────────────────────── */
+.yo-timing .vertical-card {
+    align-items: flex-start;
+    margin-bottom: 1.1rem;
+}
+
+.yo-timing h2 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #1a1a2e;
+    margin: 0 0 0.6rem 0;
+}
+
+.yo-timing-intro,
+.yo-timing-note {
+    font-size: 0.84rem;
+    line-height: 1.7;
+    color: #4b5563;
+    margin: 0 0 0.9rem 0;
+    max-width: 68ch;
+}
+
+.yo-timing-note {
+    margin: 0.9rem 0 0 0;
+    padding-top: 0.8rem;
+    border-top: 1px dashed #e5e7eb;
+    color: #6b7280;
+}
+
+.yo-timing-intro code,
+.yo-timing-note code {
+    font-size: 0.86em;
+    background: #f3f4f6;
+    padding: 0.05rem 0.25rem;
+    border-radius: 0.2rem;
+}
+
+/* The charts are drawn in a fixed 760-unit coordinate system and scaled to
+   whatever width they get, so the text inside them shrinks with the figure
+   rather than reflowing. On a phone that means small but still legible, which
+   is the better failure mode for something with twelve labelled rows. */
+.yo-chart {
+    display: block;
+    width: 100%;
+    height: auto;
+    overflow: visible;
+}
+
+.yo-grid {
+    stroke: #e9ebf0;
+    stroke-width: 1;
+}
+
+.yo-guide {
+    stroke: #c7cad3;
+    stroke-width: 1.5;
+    stroke-dasharray: 5 4;
+}
+
+.yo-guide-label {
+    font-size: 10px;
+    fill: #9ca3af;
+    font-style: italic;
+}
+
+.yo-axis {
+    font-size: 10px;
+    fill: #9ca3af;
+    font-variant-numeric: tabular-nums;
+}
+
+.yo-chart-head {
+    font-size: 11px;
+    font-weight: 700;
+    fill: #1a1a2e;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+.yo-chart-label {
+    font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+    font-size: 10.5px;
+    fill: #374151;
+}
+
+.yo-chart-label-detail {
+    fill: #9ca3af;
+}
+
+.yo-chart-value {
+    font-size: 10.5px;
+    fill: #252947;
+    font-variant-numeric: tabular-nums;
+}
+
+.yo-chart-note {
+    font-size: 9.5px;
+    fill: #9ca3af;
+}
+
+.yo-bar-main { fill: #a5b4d4; }
+.yo-bar-detail { fill: #d5c3b0; }
+
+.yo-bar-mean {
+    stroke: #252947;
+    stroke-width: 2;
+}
+
+.yo-legend {
+    display: flex;
+    gap: 1.1rem;
+    align-items: center;
+    margin-bottom: 0.4rem;
+    font-size: 0.74rem;
+    color: #6b7280;
+}
+
+.yo-legend-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+/* ── Scaling chart ─────────────────────────────────── */
+.yo-line {
+    fill: none;
+    stroke-width: 2;
+}
+
+.yo-line-label {
+    font-size: 10px;
+    font-weight: 600;
+}
+
+.yo-line-a { stroke: #4f7a52; }
+.yo-line-b { stroke: #b07d3a; }
+.yo-line-c { stroke: #a03c4a; }
+
+.yo-dot.yo-line-a { fill: #4f7a52; }
+.yo-dot.yo-line-b { fill: #b07d3a; }
+.yo-dot.yo-line-c { fill: #a03c4a; }
+
+text.yo-line-label.yo-line-a { fill: #4f7a52; stroke: none; }
+text.yo-line-label.yo-line-b { fill: #b07d3a; stroke: none; }
+text.yo-line-label.yo-line-c { fill: #a03c4a; stroke: none; }
+
+.yo-growth {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1.4rem;
+    margin-top: 0.6rem;
+}
+
+.yo-growth-item {
+    display: flex;
+    align-items: baseline;
+    gap: 0.4rem;
+    font-size: 0.78rem;
+    color: #6b7280;
+}
+
+.yo-growth-swatch {
+    width: 0.65rem;
+    height: 0.65rem;
+    border-radius: 0.15rem;
+    align-self: center;
+}
+
+.yo-growth-swatch.yo-line-a { background: #4f7a52; }
+.yo-growth-swatch.yo-line-b { background: #b07d3a; }
+.yo-growth-swatch.yo-line-c { background: #a03c4a; }
+
+.yo-growth-value {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #1a1a2e;
+    font-variant-numeric: tabular-nums;
+}
+
+/* ── Memory ────────────────────────────────────────── */
+.yo-memory {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    width: 100%;
+}
+
+.yo-memory-item {
+    flex: 1 1 10rem;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    padding: 0.65rem 0.75rem;
+    background: #f7f8fb;
+    border-radius: 0.5rem;
+}
+
+.yo-memory-value {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #1a1a2e;
+    font-variant-numeric: tabular-nums;
+}
+
+.yo-memory-label {
+    font-size: 0.72rem;
+    color: #6b7280;
+    line-height: 1.45;
 }
 
 /* Visible to a screen reader, not to the eye. display:none and
@@ -104,44 +312,6 @@
     clip-path: inset(50%);
     white-space: nowrap;
     border: 0;
-}
-
-/* ── Source dump ───────────────────────────────────── */
-.yo-source-panel {
-    margin-top: 0.75rem;
-    border: 1px solid #e5e7eb;
-    border-radius: 0.75rem;
-    overflow: hidden;
-}
-
-.yo-source-note {
-    margin: 0;
-    padding: 0.7rem 1.1rem;
-    font-size: 0.8rem;
-    line-height: 1.6;
-    color: #6b7280;
-    background: #fbfbfd;
-    border-bottom: 1px solid #e5e7eb;
-}
-
-.yo-source {
-    margin: 0;
-    padding: 1rem 1.1rem;
-    max-height: 26rem;
-    overflow: auto;
-    background: #1f2333;
-    color: #e5e7eb;
-    font-size: 0.74rem;
-    line-height: 1.55;
-    tab-size: 4;
-}
-
-.yo-source code {
-    background: none;
-    padding: 0;
-    color: inherit;
-    font-size: inherit;
-    white-space: pre;
 }
 
 /* ── Boot / loading ────────────────────────────────── */
@@ -580,14 +750,23 @@
     padding: 0.5rem 0.2rem;
     background: #f7f8fb;
     border-radius: 0.5rem;
+    /* Without this a grid item refuses to shrink below its content, so the
+       10-digit timestamp would push the whole row wider than the sidebar. */
+    min-width: 0;
 }
 
+/* Sized to fit the widest thing these ever hold: a 10-digit unix timestamp,
+   and "35,813" once the tweet corpus is in. Grows back for the handful of
+   digits the hand-entered scenarios produce. */
 .yo-total-value {
-    font-size: 1.05rem;
+    font-size: clamp(0.72rem, 2.1vw, 1.05rem);
     font-weight: 700;
     color: #1a1a2e;
     font-variant-numeric: tabular-nums;
     line-height: 1.2;
+    max-width: 100%;
+    overflow-wrap: anywhere;
+    text-align: center;
 }
 
 .yo-total-label {
@@ -602,6 +781,19 @@
     gap: 0.3rem;
     margin-bottom: 0.75rem;
     flex-wrap: wrap;
+}
+
+/* Only appears once a list is longer than the snapshot cap, which in practice
+   means once the tweet corpus is loaded. */
+.yo-trunc-note {
+    margin: 0 0 0.6rem 0;
+    padding: 0.4rem 0.55rem;
+    font-size: 0.72rem;
+    line-height: 1.55;
+    color: #6b7280;
+    background: #f7f8fb;
+    border-left: 2px solid #d1d5db;
+    border-radius: 0 0.3rem 0.3rem 0;
 }
 
 .yo-tab {
@@ -736,89 +928,6 @@
     word-break: break-word;
 }
 
-/* ── Call log ──────────────────────────────────────── */
-.yo-log-card {
-    align-items: stretch;
-}
-
-.yo-log-card h2 {
-    align-self: flex-start;
-}
-
-.yo-log {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    max-height: 22rem;
-    overflow-y: auto;
-}
-
-.yo-log li {
-    display: grid;
-    grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr) auto;
-    gap: 0.75rem;
-    align-items: baseline;
-    padding: 0.35rem 0.5rem;
-    border-bottom: 1px solid #f3f4f6;
-    font-size: 0.78rem;
-}
-
-.yo-log-error { background: #fef2f2; }
-
-.yo-log-call {
-    background: none;
-    padding: 0;
-    color: #1a1a2e;
-    font-size: 0.76rem;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-
-.yo-log-summary {
-    color: #6b7280;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-
-.yo-log-error .yo-log-summary { color: #991b1b; }
-
-.yo-log-ms {
-    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-    font-variant-numeric: tabular-nums;
-    color: #374151;
-    text-align: right;
-}
-
-/* ── Prose ─────────────────────────────────────────── */
-.yo-prose {
-    width: 100%;
-}
-
-.yo-prose h2 {
-    font-size: 1.35rem;
-    font-weight: 700;
-    color: #1a1a2e;
-    border-bottom: 2px solid #e5e7eb;
-    padding-bottom: 0.4rem;
-    margin: 0 0 1rem 0;
-}
-
-.yo-prose h3 {
-    font-size: 1.05rem;
-    font-weight: 600;
-    color: #374151;
-    margin: 1.4rem 0 0.4rem 0;
-}
-
-.yo-prose p {
-    font-size: 0.95rem;
-    line-height: 1.75;
-    color: #4b5563;
-    margin-bottom: 0;
-}
-
 /* ── Responsive ────────────────────────────────────── */
 @media (max-width: 1100px) {
     .yo-layout {
@@ -833,11 +942,6 @@
 }
 
 @media (max-width: 640px) {
-    .yo-statusbar {
-        font-size: 0.75rem;
-        padding: 0.6rem 0.8rem;
-    }
-
     .yo-method,
     .yo-toolbar,
     .yo-state {
@@ -862,21 +966,7 @@
 
     .yo-topic-readout { text-align: left; }
 
-    /* Three columns do not fit; stack the call and its result, keep the
-       timing on the right of the first row where it stays scannable. */
-    .yo-log li {
-        grid-template-columns: minmax(0, 1fr) auto;
-        row-gap: 0.15rem;
-    }
-
-    .yo-log-summary {
-        grid-column: 1 / -1;
-        white-space: normal;
-    }
-
     .yo-row-button { max-width: 7rem; }
-
-    .yo-source { font-size: 0.68rem; }
 }
 
 /* On a touch screen the state-panel rows are the smallest thing on the page

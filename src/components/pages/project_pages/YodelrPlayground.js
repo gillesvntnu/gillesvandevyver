@@ -2,14 +2,46 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import './CommonStyles.css';
 import './YodelrPlayground.css';
 import { loadRuntime } from '../../../yodelr/runtime';
-import { WALKTHROUGH, SAMPLE, SAMPLE_RANGE } from '../../../yodelr/sampleData';
+import { WALKTHROUGH } from '../../../yodelr/sampleData';
+import BenchmarkPanel from '../../../yodelr/BenchmarkPanel';
 
-/* The Yodelr playground.
+/* The Yodelr page.
  *
  * Every button here calls the real yodelr.py, running under Pyodide. There is
  * no JavaScript reimplementation anywhere in this file: when a call returns a
  * list, Python sorted it, and when it raises, Python raised.
+ *
+ * Three tabs, one Yodelr instance behind all of them. The tabs differ only in
+ * what gets loaded into it: nothing, or 35,813 real tweets. Switching tabs is
+ * deliberately not a reset — the state panel is always the honest answer to
+ * "what is in there right now", and silently emptying it on a tab click would
+ * make that panel a liar.
  */
+
+const TABS = [
+  ['manual', 'By hand'],
+  ['corpus', 'Real tweets'],
+  ['timing', 'Timing'],
+];
+
+/* The same six cards on both tabs — same component, same handlers, same state.
+ * Only the order changes, because the two tabs are read in opposite directions.
+ * By hand you start with an empty object, so add_user has to come first or
+ * there is nothing to query. With the tweet corpus the object arrives already
+ * full and the queries are the whole point, so the three mutators move to the
+ * bottom: they are what you reach for afterwards, to watch delete_user pay for
+ * rebuilding a 35,813-post timeline. */
+const QUERIES = ['get_posts_for_user', 'get_posts_for_topic', 'get_trending_topics'];
+const MUTATORS = ['add_user', 'add_post', 'delete_user'];
+const CARD_ORDER = {
+  manual: [...MUTATORS, ...QUERIES],
+  corpus: [...QUERIES, ...MUTATORS],
+};
+
+/** 1,234,567 rather than 1234567, for the corpus counts. */
+function thousands(n) {
+  return typeof n === 'number' ? n.toLocaleString('en-US') : '—';
+}
 
 /** Sub-millisecond calls are the normal case, so keep the small digits. */
 function formatMs(ms) {
@@ -135,10 +167,13 @@ const YodelrPlayground = () => {
   const [status, setStatus] = useState({ state: 'loading', message: 'Starting…' });
   const [info, setInfo] = useState(null);
   const [snapshot, setSnapshot] = useState(null);
-  const [log, setLog] = useState([]);
   const [busy, setBusy] = useState(false);
-  const [showSource, setShowSource] = useState(false);
+  const [tab, setTab] = useState('manual');
   const [statePane, setStatePane] = useState('topics');
+  /* What the corpus load reported back: counts and the time the replay took.
+   * null until someone asks for it, since it is a 1.9 MB download. */
+  const [corpusRun, setCorpusRun] = useState(null);
+  const [corpusStatus, setCorpusStatus] = useState(null);
   /* Loading a scenario or resetting changes the whole system at once, and the
    * only evidence is the state panel quietly redrawing. Sighted readers see
    * that; everyone else gets this line. */
@@ -163,7 +198,7 @@ const YodelrPlayground = () => {
   const setField = (key, value) => setFields((prev) => ({ ...prev, [key]: value }));
 
   useEffect(() => {
-    document.title = 'Yodelr playground · gillesvandevyver.com';
+    document.title = 'Yodelr · gillesvandevyver.com';
   }, []);
 
   useEffect(() => {
@@ -180,11 +215,11 @@ const YodelrPlayground = () => {
         runtime.reset();
         setInfo({
           provenance: runtime.provenance,
+          corpusMeta: runtime.corpusMeta,
           constants: runtime.constants,
           pythonVersion: runtime.pythonVersion,
           pyodideVersion: runtime.pyodideVersion,
           abstractMethods: runtime.abstractMethods,
-          source: runtime.source,
         });
         setSnapshot(runtime.snapshot());
         setStatus({ state: 'ready', message: '' });
@@ -200,8 +235,8 @@ const YodelrPlayground = () => {
   const topicPattern = info?.constants?.topicPattern;
   const ready = status.state === 'ready';
 
-  /* Every call goes through here: run it, record it, refresh the state panel. */
-  const run = useCallback((method, args, { label } = {}) => {
+  /* Every call goes through here: run it, then refresh the state panel. */
+  const run = useCallback((method, args) => {
     const runtime = runtimeRef.current;
     if (!runtime) return null;
 
@@ -209,19 +244,6 @@ const YodelrPlayground = () => {
     try {
       const result = runtime.call(method, args);
       setResults((prev) => ({ ...prev, [method]: result }));
-      setLog((prev) => [{
-        id: `${Date.now()}-${prev.length}`,
-        method,
-        label: label || `${method}(${args.map((a) => JSON.stringify(a)).join(', ')})`,
-        ok: result.ok,
-        ms: result.ms,
-        summary: result.ok
-          ? (Array.isArray(result.value)
-            ? `${result.value.length} item${result.value.length === 1 ? '' : 's'}`
-            : 'None')
-          : result.error,
-        errorType: result.errorType,
-      }, ...prev].slice(0, 60));
       setSnapshot(runtime.snapshot());
       return result;
     } finally {
@@ -237,68 +259,90 @@ const YodelrPlayground = () => {
 
   /* ── Bulk actions ──────────────────────────────────────────────── */
 
-  const loadBulk = useCallback((data, label, after) => {
+  /** Announce what a bulk load or a reset did, since the only other evidence
+   *  is the state panel quietly redrawing. */
+  const announceState = useCallback((runtime, prefix) => {
+    const next = runtime.snapshot();
+    setSnapshot(next);
+    setAnnouncement(
+      `${prefix}. ${next.totals.users} users, ${next.totals.posts} posts, `
+      + `${next.totals.topics} topics.`,
+    );
+    return next;
+  }, []);
+
+  const loadWalkthrough = useCallback(() => {
     const runtime = runtimeRef.current;
     if (!runtime) return;
     setBusy(true);
     try {
       runtime.reset();
-      const result = runtime.bulkAdd(data.users, data.posts);
+      runtime.bulkAdd(WALKTHROUGH.users, WALKTHROUGH.posts);
       setResults({});
-      setLog([{
-        id: `${Date.now()}-bulk`,
-        method: 'bulk',
-        label,
-        ok: result.ok,
-        ms: result.ms,
-        summary: result.ok
-          ? `${data.users.length} users, ${data.posts.length} posts`
-          : result.error,
-        errorType: result.errorType,
-      }]);
-      const next = runtime.snapshot();
-      setSnapshot(next);
+      setCorpusRun(null);
       setTsOverridden(false);
-      setAnnouncement(
-        `${label}. ${next.totals.users} users, ${next.totals.posts} posts, `
-        + `${next.totals.topics} topics.`,
-      );
-      if (after) after();
+      announceState(runtime, 'Loaded the spec example');
+      setFields((prev) => ({
+        ...prev,
+        postUser: 'john',
+        deleteUser: 'john',
+        postsUser: 'john',
+        postsTopic: 'steak',
+        trendFrom: '1',
+        trendTo: '3',
+      }));
     } finally {
       setBusy(false);
     }
-  }, []);
+  }, [announceState]);
 
-  const loadWalkthrough = () => loadBulk(WALKTHROUGH, 'Load example (spec walkthrough)', () => {
-    setFields((prev) => ({
-      ...prev,
-      postUser: 'john',
-      deleteUser: 'john',
-      postsUser: 'john',
-      postsTopic: 'steak',
-      trendFrom: '1',
-      trendTo: '3',
-    }));
-  });
+  /* The tweet corpus. Async because the file has to arrive first; everything
+   * after that is one blocking call into Python. */
+  const loadCorpus = useCallback(async () => {
+    const runtime = runtimeRef.current;
+    if (!runtime) return;
+    setBusy(true);
+    setCorpusStatus('Downloading the tweet corpus…');
+    try {
+      runtime.reset();
+      const result = await runtime.loadCorpus(setCorpusStatus);
+      setResults({});
+      setTsOverridden(false);
+      if (!result.ok) {
+        setCorpusStatus(`${result.errorType}: ${result.error}`);
+        return;
+      }
+      setCorpusRun(result);
+      setCorpusStatus(null);
+      const next = announceState(runtime, 'Loaded the tweet corpus');
+      const busiest = next.users[0]?.name ?? '';
+      const hottest = next.topics[0]?.name ?? '';
+      setFields((prev) => ({
+        ...prev,
+        postUser: busiest,
+        deleteUser: busiest,
+        postsUser: busiest,
+        postsTopic: hottest,
+        // One day out of the 79 the corpus spans. A window that covers
+        // everything would make trending look like a plain frequency count;
+        // the point is that it answers for a slice without touching the rest.
+        trendFrom: String(info?.corpusMeta?.firstTimestamp ?? 1),
+        trendTo: String((info?.corpusMeta?.firstTimestamp ?? 1) + 86400),
+      }));
+    } catch (err) {
+      setCorpusStatus(err.message);
+    } finally {
+      setBusy(false);
+    }
+  }, [announceState, info]);
 
-  const loadSample = () => loadBulk(SAMPLE, 'Load sample data', () => {
-    setFields((prev) => ({
-      ...prev,
-      postUser: 'ada',
-      deleteUser: 'bjorn',
-      postsUser: 'ada',
-      postsTopic: 'sourdough',
-      trendFrom: String(SAMPLE_RANGE.from),
-      trendTo: String(SAMPLE_RANGE.to),
-    }));
-  });
-
-  const reset = () => {
+  const reset = useCallback(() => {
     const runtime = runtimeRef.current;
     if (!runtime) return;
     runtime.reset();
     setResults({});
-    setLog([]);
+    setCorpusRun(null);
+    setCorpusStatus(null);
     setSnapshot(runtime.snapshot());
     setTsOverridden(false);
     setAnnouncement('Reset. No users, no posts, no topics.');
@@ -306,7 +350,7 @@ const YodelrPlayground = () => {
       addUser: '', postUser: '', postText: '', postTs: '1', deleteUser: '',
       postsUser: '', postsTopic: '', trendFrom: '1', trendTo: '3',
     });
-  };
+  }, []);
 
   /* ── Derived bits for the composer ─────────────────────────────── */
 
@@ -341,14 +385,353 @@ const YodelrPlayground = () => {
 
   const userNames = snapshot?.users.map((u) => u.name) ?? [];
 
+  /* How many rows the open pane would have if nothing were capped. Compared
+     against snapshot.shown to decide whether the truncation note applies to
+     this pane in particular. */
+  const paneTotal = snapshot
+    ? (statePane === 'topics'
+      ? snapshot.totals.topics
+      : statePane === 'users'
+        ? snapshot.totals.users
+        : snapshot.totals.posts)
+    : 0;
+
+  /* The six cards, built once and handed to whichever tab is open. Both
+     tabs get the same card, the same handler and the same state; the only
+     thing that differs is the order, which CARD_ORDER decides. */
+  const methodCards = {
+    add_user: (
+      <MethodCard
+        key="add_user"
+        name="add-user"
+        signature="add_user(user_name)"
+        note="Registers a name. Raises if it is already taken."
+        result={results.add_user}
+        busy={busy}
+        onSubmit={() => {
+          run('add_user', [fields.addUser]);
+          setField('addUser', '');
+        }}
+      >
+        <div className="yo-field">
+          <label htmlFor="yo-add-user">User name</label>
+          <input
+            id="yo-add-user"
+            type="text"
+            value={fields.addUser}
+            onChange={(e) => setField('addUser', e.target.value)}
+            placeholder="john"
+            autoComplete="off"
+          />
+        </div>
+        <button type="submit" className="yo-button" disabled={busy || !fields.addUser}>
+          Add user
+        </button>
+      </MethodCard>
+    ),
+
+    /* add_post gets the most room: it is where the character limit,
+       the topic parser and the timestamp rule all show up. */
+    add_post: (
+      <MethodCard
+        key="add_post"
+        name="add-post"
+        signature="add_post(user_name, post_text, timestamp)"
+        note="Raises on an unregistered user, on text over the limit, and on a timestamp that does not strictly increase."
+        result={results.add_post}
+        busy={busy}
+        onSubmit={() => {
+          const ts = Number(fields.postTs);
+          const result = run('add_post', [
+            fields.postUser,
+            fields.postText,
+            Number.isFinite(ts) ? ts : fields.postTs,
+          ]);
+          if (result?.ok) {
+            setField('postText', '');
+            setTsOverridden(false);
+          }
+        }}
+      >
+        <div className="yo-field-row">
+          <div className="yo-field">
+            <label htmlFor="yo-post-user">User name</label>
+            <input
+              id="yo-post-user"
+              type="text"
+              list="yo-user-list"
+              value={fields.postUser}
+              onChange={(e) => setField('postUser', e.target.value)}
+              placeholder="john"
+              autoComplete="off"
+            />
+          </div>
+          <div className="yo-field yo-field-narrow">
+            <label htmlFor="yo-post-ts">Timestamp</label>
+            <input
+              id="yo-post-ts"
+              type="number"
+              value={fields.postTs}
+              onChange={(e) => { setField('postTs', e.target.value); setTsOverridden(true); }}
+              aria-describedby="yo-ts-help"
+            />
+          </div>
+        </div>
+        <p className="yo-help" id="yo-ts-help">
+          {tsOverridden
+            ? <>Overridden. Next free value is <code>{nextTimestamp}</code> — anything at or below{' '}
+              <code>{snapshot?.lastTimestamp ?? '—'}</code> will be rejected.</>
+            : <>Defaults to the last timestamp plus one. Edit it to try the monotonicity rule.</>}
+        </p>
+
+        <div className="yo-field">
+          <label htmlFor="yo-post-text">Post text</label>
+          {/* The highlighted copy sits behind a transparent textarea.
+              Both use identical metrics so the runs line up with the
+              real characters as they are typed. */}
+          <div className="yo-composer">
+            <div className="yo-composer-backdrop" aria-hidden="true">
+              {runs.map((run_, i) => (
+                run_.topic
+                  ? <mark key={i} className="yo-topic-mark">{run_.text}</mark>
+                  : <span key={i}>{run_.text}</span>
+              ))}
+              {'\n'}
+            </div>
+            <textarea
+              id="yo-post-text"
+              className={`yo-composer-input${overLimit ? ' yo-over' : ''}`}
+              value={fields.postText}
+              rows={3}
+              onChange={(e) => setField('postText', e.target.value)}
+              placeholder="eating #steak for dinner"
+              aria-describedby="yo-post-counter yo-topic-readout"
+              spellCheck="false"
+            />
+          </div>
+        </div>
+
+        <div className="yo-composer-meta">
+          <span
+            id="yo-post-counter"
+            className={`yo-counter${overLimit ? ' yo-counter-over' : ''}`}
+          >
+            {postLength} / {maxLength}
+            {overLimit && <> · {postLength - maxLength} over, Python will reject this</>}
+          </span>
+          <span className="yo-topic-readout" id="yo-topic-readout">
+            {parsedTopics.length === 0
+              ? 'no topics'
+              : (
+                <>
+                  topics:{' '}
+                  {/* The commas are for the ear, not the eye: this element is
+                      the textarea's aria-describedby, and without a separator
+                      a screen reader runs the chips together into one word. */}
+                  {parsedTopics.map((t, i) => (
+                    <React.Fragment key={t}>
+                      {i > 0 && <span className="yo-chip-sep">, </span>}
+                      <code className="yo-topic-chip">{t}</code>
+                    </React.Fragment>
+                  ))}
+                </>
+              )}
+          </span>
+        </div>
+
+        {truncatedTopic && (
+          <p className="yo-note-inline">
+            <code>#{truncatedTopic.topic}</code> stops at{' '}
+            <code>{truncatedTopic.stoppedAt}</code>. A topic is <code>#</code> followed
+            by one or more of <code>[0-9a-zA-Z_]</code>, and that set has no accented
+            letters in it — so <code>#café</code> yields the topic{' '}
+            <code>caf</code>, not <code>café</code>.
+          </p>
+        )}
+
+        <div className="yo-inline-actions">
+          <button type="submit" className="yo-button" disabled={busy || !fields.postUser}>
+            Add post
+          </button>
+          <button
+            type="button"
+            className="yo-link-button"
+            onClick={() => setField('postText', 'first #café and then #a_1 #b-c')}
+          >
+            Try the accent case
+          </button>
+          <button
+            type="button"
+            className="yo-link-button"
+            onClick={() => setField('postText', 'x'.repeat(maxLength + 1))}
+          >
+            Try {maxLength + 1} characters
+          </button>
+        </div>
+      </MethodCard>
+    ),
+
+    delete_user: (
+      <MethodCard
+        key="delete_user"
+        name="delete-user"
+        signature="delete_user(user_name)"
+        note="Removes the user and every post they wrote, from all three indexes. The expensive one: the timeline is rebuilt."
+        result={results.delete_user}
+        busy={busy}
+        onSubmit={() => run('delete_user', [fields.deleteUser])}
+      >
+        <div className="yo-field">
+          <label htmlFor="yo-delete-user">User name</label>
+          <input
+            id="yo-delete-user"
+            type="text"
+            list="yo-user-list"
+            value={fields.deleteUser}
+            onChange={(e) => setField('deleteUser', e.target.value)}
+            placeholder="john"
+            autoComplete="off"
+          />
+        </div>
+        <button type="submit" className="yo-button" disabled={busy || !fields.deleteUser}>
+          Delete user
+        </button>
+      </MethodCard>
+    ),
+
+    get_posts_for_user: (
+      <MethodCard
+        key="get_posts_for_user"
+        name="posts-for-user"
+        signature="get_posts_for_user(user_name)"
+        note="That user's posts, newest first. Raises on an unknown user."
+        result={results.get_posts_for_user}
+        emptyNote="Registered, but has not posted."
+        busy={busy}
+        onSubmit={() => run('get_posts_for_user', [fields.postsUser])}
+      >
+        <div className="yo-field">
+          <label htmlFor="yo-posts-user">User name</label>
+          <input
+            id="yo-posts-user"
+            type="text"
+            list="yo-user-list"
+            value={fields.postsUser}
+            onChange={(e) => setField('postsUser', e.target.value)}
+            placeholder="john"
+            autoComplete="off"
+          />
+        </div>
+        <button type="submit" className="yo-button" disabled={busy || !fields.postsUser}>
+          Get posts
+        </button>
+      </MethodCard>
+    ),
+
+    get_posts_for_topic: (
+      <MethodCard
+        key="get_posts_for_topic"
+        name="posts-for-topic"
+        signature="get_posts_for_topic(topic)"
+        note="Posts mentioning a topic, newest first. An unknown topic is an empty list, not an error — topics are never registered."
+        result={results.get_posts_for_topic}
+        emptyNote="No post mentions that topic. Note this is not an error."
+        busy={busy}
+        onSubmit={() => run('get_posts_for_topic', [fields.postsTopic])}
+      >
+        <div className="yo-field">
+          <label htmlFor="yo-posts-topic">Topic (without the #)</label>
+          <input
+            id="yo-posts-topic"
+            type="text"
+            list="yo-topic-list"
+            value={fields.postsTopic}
+            onChange={(e) => setField('postsTopic', e.target.value)}
+            placeholder="steak"
+            autoComplete="off"
+          />
+        </div>
+        <button type="submit" className="yo-button" disabled={busy || !fields.postsTopic}>
+          Get posts
+        </button>
+      </MethodCard>
+    ),
+
+    get_trending_topics: (
+      <MethodCard
+        key="get_trending_topics"
+        name="trending"
+        signature="get_trending_topics(from_timestamp, to_timestamp)"
+        note="Topics in an inclusive window, most mentions first, ties broken alphabetically. Raises if the window runs backwards."
+        result={results.get_trending_topics}
+        emptyNote="No posts in that window."
+        busy={busy}
+        onSubmit={() => run('get_trending_topics', [
+          Number(fields.trendFrom), Number(fields.trendTo),
+        ])}
+      >
+        <div className="yo-field-row">
+          <div className="yo-field yo-field-narrow">
+            <label htmlFor="yo-trend-from">From timestamp</label>
+            <input
+              id="yo-trend-from"
+              type="number"
+              value={fields.trendFrom}
+              onChange={(e) => setField('trendFrom', e.target.value)}
+            />
+          </div>
+          <div className="yo-field yo-field-narrow">
+            <label htmlFor="yo-trend-to">To timestamp</label>
+            <input
+              id="yo-trend-to"
+              type="number"
+              value={fields.trendTo}
+              onChange={(e) => setField('trendTo', e.target.value)}
+            />
+          </div>
+        </div>
+        <div className="yo-inline-actions">
+          <button type="submit" className="yo-button" disabled={busy}>
+            Get trending topics
+          </button>
+          {snapshot?.totals.posts > 0 && (
+            <button
+              type="button"
+              className="yo-link-button"
+              onClick={() => {
+                // From the snapshot's own extent fields, not off the
+                // timeline list: that is only the last 200 rows once
+                // the tweet corpus is loaded.
+                setField('trendFrom', String(snapshot.firstTimestamp));
+                setField('trendTo', String(snapshot.latestTimestamp));
+              }}
+            >
+              Widen to everything
+            </button>
+          )}
+          <button
+            type="button"
+            className="yo-link-button"
+            onClick={() => {
+              setField('trendFrom', '5');
+              setField('trendTo', '4');
+            }}
+          >
+            Try a backwards window
+          </button>
+        </div>
+      </MethodCard>
+    ),
+  };
+
   /* ── Loading and failure ───────────────────────────────────────── */
 
   if (status.state === 'error') {
     return (
       <div className="project-page-container">
-        <h1>Yodelr playground</h1>
+        <h1>Yodelr</h1>
         <div className="vertical-card yo-boot yo-boot-error">
-          <h2>The playground could not start</h2>
+          <h2>The page could not start</h2>
           <p>{status.message}</p>
           <p className="yo-boot-note">
             The page runs the Python implementation itself rather than a copy of it, so it
@@ -365,7 +748,7 @@ const YodelrPlayground = () => {
 
   return (
     <div className="project-page-container">
-      <h1>Yodelr playground</h1>
+      <h1>Yodelr</h1>
 
       {/* Off-screen but not display:none, which would take it out of the
           accessibility tree along with the viewport. Present from first render
@@ -374,63 +757,27 @@ const YodelrPlayground = () => {
         {announcement}
       </p>
 
-      <div className="yo-intro">
-        <p>
-          Yodelr is a micro-blogging service: users register, post up to 140 characters,
-          tag posts with <code>#topics</code>, and ask what was trending between two points
-          in time. It was a coding challenge, and the interesting part is not the feature
-          list but the data structures underneath — each query has to come back in sorted
-          order without sorting anything at call time.
-        </p>
-        <p>
-          This page is the implementation I submitted, running. Not a port of it, not a
-          description of it: the actual <code>yodelr.py</code> is downloaded into your
-          browser and executed by a real CPython compiled to WebAssembly. Every list below
-          came out of Python, and every error message is one Python raised.
-        </p>
-      </div>
-
-      {/* ── Status bar ───────────────────────────────────────────── */}
-      <div className="yo-statusbar">
-        <span className="yo-status-left">
-          <span className={`yo-dot yo-dot-${status.state}`} />
-          {ready
-            ? (
-              <span>
-                CPython {info.pythonVersion} on Pyodide {info.pyodideVersion} ·{' '}
-                <code>yodelr.py</code> {info.provenance?.lines} lines
-                {info.provenance?.sha256 && (
-                  <> · sha256 <code>{info.provenance.sha256.slice(0, 12)}</code></>
-                )}
-              </span>
-            )
-            : <span>{status.message}</span>}
-        </span>
-        {ready && (
+      {/* The tab strip is up immediately, not after boot. Timing needs no
+          Python, so making it unreachable for the ten seconds the interpreter
+          takes to arrive would be gating it on something it does not use. */}
+      <div className="yo-maintabs" role="tablist" aria-label="Yodelr">
+        {TABS.map(([key, label]) => (
           <button
+            key={key}
             type="button"
-            className="yo-link-button"
-            onClick={() => setShowSource((v) => !v)}
-            aria-expanded={showSource}
+            role="tab"
+            id={`yo-tab-${key}`}
+            aria-selected={tab === key}
+            aria-controls={`yo-panel-${key}`}
+            className={`yo-maintab${tab === key ? ' yo-maintab-active' : ''}`}
+            onClick={() => setTab(key)}
           >
-            {showSource ? 'Hide the source' : 'Show the source that is running'}
+            {label}
           </button>
-        )}
+        ))}
       </div>
 
-      {showSource && ready && (
-        <div className="yo-source-panel">
-          <p className="yo-source-note">
-            Byte-for-byte what is executing, fetched from <code>/yodelr/yodelr.py</code>. It is
-            copied out of the challenge repository by a script at build time
-            (<code>npm run yodelr:sync</code>) and never edited here, so this page cannot
-            drift away from the submission.
-          </p>
-          <pre className="yo-source"><code>{info.source}</code></pre>
-        </div>
-      )}
-
-      {!ready && (
+      {!ready && tab !== 'timing' && (
         <div className="vertical-card yo-boot" role="status" aria-live="polite">
           <div className="yo-spinner" aria-hidden="true" />
           <h2>Starting Python in your browser</h2>
@@ -447,31 +794,79 @@ const YodelrPlayground = () => {
         </div>
       )}
 
-      {ready && (
-        <>
-          {/* ── Scenario buttons ───────────────────────────────── */}
+      {/* Not gated on `ready`: this tab shows recorded measurements and needs
+          no Python at all, so there is no reason to make it wait for a 10 MB
+          interpreter to finish downloading. */}
+      {tab === 'timing' && <BenchmarkPanel />}
+
+      {ready && tab !== 'timing' && (
+        <div
+          role="tabpanel"
+          id={`yo-panel-${tab}`}
+          aria-labelledby={`yo-tab-${tab}`}
+        >
+          {/* ── What is loaded ─────────────────────────────────── */}
           <div className="yo-toolbar">
             <div className="yo-toolbar-buttons">
-              <button type="button" className="yo-button" onClick={loadWalkthrough} disabled={busy}>
-                Load example
-              </button>
-              <button type="button" className="yo-button" onClick={loadSample} disabled={busy}>
-                Load sample data
-              </button>
+              {tab === 'manual'
+                ? (
+                  <button type="button" className="yo-button" onClick={loadWalkthrough} disabled={busy}>
+                    Load the spec example
+                  </button>
+                )
+                : (
+                  <button type="button" className="yo-button" onClick={loadCorpus} disabled={busy}>
+                    {corpusRun ? 'Load it again' : 'Load the tweet corpus'}
+                  </button>
+                )}
               <button type="button" className="yo-button yo-button-quiet" onClick={reset} disabled={busy}>
                 Reset
               </button>
             </div>
-            <p className="yo-toolbar-note">
-              <strong>Load example</strong> is the walkthrough from the spec: john posts three
-              times, and <code>get_trending_topics(1, 3)</code> should return
-              {' '}<code>["steak", "chilling"]</code>.{' '}
-              <strong>Load sample data</strong> is {SAMPLE.posts.length} posts from{' '}
-              {SAMPLE.users.length} users with a deliberately lopsided topic distribution —
-              good for watching trending change shape as you move the window, and for
-              seeing what <code>delete_user</code> costs. Try deleting <code>bjorn</code>,
-              who is almost single-handedly responsible for <code>#sourdough</code>.
-            </p>
+
+            {tab === 'manual' && (
+              <p className="yo-toolbar-note">
+                Start empty and type, or load the walkthrough from the spec: john posts three
+                times, and <code>get_trending_topics(1, 3)</code> returns{' '}
+                <code>["steak", "chilling"]</code>.
+              </p>
+            )}
+
+            {tab === 'corpus' && (
+              <p className="yo-toolbar-note">
+                {thousands(info?.corpusMeta?.posts)} real tweets from{' '}
+                {thousands(info?.corpusMeta?.users)} authors, replayed through{' '}
+                <code>yodelr.py</code>. They are the{' '}
+                <a href={info?.corpusMeta?.datasetUrl} target="_blank" rel="noreferrer">
+                  Sentiment140
+                </a>{' '}
+                dump from 2009 — the year the limit really was 140 characters — filtered down
+                to the posts that carry a <code>#hashtag</code>, because only 2.2% of them do
+                and a straight slice would leave the topic index with nothing to do. Text and
+                author are the dump's own, and the order is its own timestamps; the only edit
+                is that tweets landing on the same second are nudged one second apart, because
+                Yodelr requires timestamps to strictly increase. About{' '}
+                {Math.round((info?.corpusMeta?.bytesGzipped ?? 0) / 1e5) / 10}&nbsp;MB to
+                download.
+              </p>
+            )}
+
+            {tab === 'corpus' && corpusStatus && (
+              <p className="yo-toolbar-note yo-corpus-status" role="status">
+                {corpusStatus}
+              </p>
+            )}
+
+            {tab === 'corpus' && corpusRun && (
+              <p className="yo-toolbar-note yo-corpus-stats">
+                Replayed {thousands(corpusRun.posts)} posts in{' '}
+                <strong>{formatMs(corpusRun.addPostMs)}</strong>, which is{' '}
+                {corpusRun.perPostUs.toFixed(1)}&nbsp;µs per <code>add_post</code>. Registering
+                the {thousands(corpusRun.users)} users took {formatMs(corpusRun.addUserMs)};
+                unzipping and parsing the file, which is not Yodelr's work, took{' '}
+                {formatMs(corpusRun.parseMs)}.
+              </p>
+            )}
           </div>
 
           <div className="yo-layout">
@@ -479,307 +874,7 @@ const YodelrPlayground = () => {
             <div className="yo-methods">
               <h2>The API</h2>
 
-              <MethodCard
-                name="add-user"
-                signature="add_user(user_name)"
-                note="Registers a name. Raises if it is already taken."
-                result={results.add_user}
-                busy={busy}
-                onSubmit={() => {
-                  run('add_user', [fields.addUser]);
-                  setField('addUser', '');
-                }}
-              >
-                <div className="yo-field">
-                  <label htmlFor="yo-add-user">User name</label>
-                  <input
-                    id="yo-add-user"
-                    type="text"
-                    value={fields.addUser}
-                    onChange={(e) => setField('addUser', e.target.value)}
-                    placeholder="john"
-                    autoComplete="off"
-                  />
-                </div>
-                <button type="submit" className="yo-button" disabled={busy || !fields.addUser}>
-                  Add user
-                </button>
-              </MethodCard>
-
-              {/* add_post gets the most room: it is where the character limit,
-                  the topic parser and the timestamp rule all show up. */}
-              <MethodCard
-                name="add-post"
-                signature="add_post(user_name, post_text, timestamp)"
-                note="Raises on an unregistered user, on text over the limit, and on a timestamp that does not strictly increase."
-                result={results.add_post}
-                busy={busy}
-                onSubmit={() => {
-                  const ts = Number(fields.postTs);
-                  const result = run('add_post', [
-                    fields.postUser,
-                    fields.postText,
-                    Number.isFinite(ts) ? ts : fields.postTs,
-                  ]);
-                  if (result?.ok) {
-                    setField('postText', '');
-                    setTsOverridden(false);
-                  }
-                }}
-              >
-                <div className="yo-field-row">
-                  <div className="yo-field">
-                    <label htmlFor="yo-post-user">User name</label>
-                    <input
-                      id="yo-post-user"
-                      type="text"
-                      list="yo-user-list"
-                      value={fields.postUser}
-                      onChange={(e) => setField('postUser', e.target.value)}
-                      placeholder="john"
-                      autoComplete="off"
-                    />
-                  </div>
-                  <div className="yo-field yo-field-narrow">
-                    <label htmlFor="yo-post-ts">Timestamp</label>
-                    <input
-                      id="yo-post-ts"
-                      type="number"
-                      value={fields.postTs}
-                      onChange={(e) => { setField('postTs', e.target.value); setTsOverridden(true); }}
-                      aria-describedby="yo-ts-help"
-                    />
-                  </div>
-                </div>
-                <p className="yo-help" id="yo-ts-help">
-                  {tsOverridden
-                    ? <>Overridden. Next free value is <code>{nextTimestamp}</code> — anything at or below{' '}
-                      <code>{snapshot?.lastTimestamp ?? '—'}</code> will be rejected.</>
-                    : <>Defaults to the last timestamp plus one. Edit it to try the monotonicity rule.</>}
-                </p>
-
-                <div className="yo-field">
-                  <label htmlFor="yo-post-text">Post text</label>
-                  {/* The highlighted copy sits behind a transparent textarea.
-                      Both use identical metrics so the runs line up with the
-                      real characters as they are typed. */}
-                  <div className="yo-composer">
-                    <div className="yo-composer-backdrop" aria-hidden="true">
-                      {runs.map((run_, i) => (
-                        run_.topic
-                          ? <mark key={i} className="yo-topic-mark">{run_.text}</mark>
-                          : <span key={i}>{run_.text}</span>
-                      ))}
-                      {'\n'}
-                    </div>
-                    <textarea
-                      id="yo-post-text"
-                      className={`yo-composer-input${overLimit ? ' yo-over' : ''}`}
-                      value={fields.postText}
-                      rows={3}
-                      onChange={(e) => setField('postText', e.target.value)}
-                      placeholder="eating #steak for dinner"
-                      aria-describedby="yo-post-counter yo-topic-readout"
-                      spellCheck="false"
-                    />
-                  </div>
-                </div>
-
-                <div className="yo-composer-meta">
-                  <span
-                    id="yo-post-counter"
-                    className={`yo-counter${overLimit ? ' yo-counter-over' : ''}`}
-                  >
-                    {postLength} / {maxLength}
-                    {overLimit && <> · {postLength - maxLength} over, Python will reject this</>}
-                  </span>
-                  <span className="yo-topic-readout" id="yo-topic-readout">
-                    {parsedTopics.length === 0
-                      ? 'no topics'
-                      : (
-                        <>
-                          topics:{' '}
-                          {/* The commas are for the ear, not the eye: this element is
-                              the textarea's aria-describedby, and without a separator
-                              a screen reader runs the chips together into one word. */}
-                          {parsedTopics.map((t, i) => (
-                            <React.Fragment key={t}>
-                              {i > 0 && <span className="yo-chip-sep">, </span>}
-                              <code className="yo-topic-chip">{t}</code>
-                            </React.Fragment>
-                          ))}
-                        </>
-                      )}
-                  </span>
-                </div>
-
-                {truncatedTopic && (
-                  <p className="yo-note-inline">
-                    <code>#{truncatedTopic.topic}</code> stops at{' '}
-                    <code>{truncatedTopic.stoppedAt}</code>. A topic is <code>#</code> followed
-                    by one or more of <code>[0-9a-zA-Z_]</code>, and that set has no accented
-                    letters in it — so <code>#café</code> yields the topic{' '}
-                    <code>caf</code>, not <code>café</code>.
-                  </p>
-                )}
-
-                <div className="yo-inline-actions">
-                  <button type="submit" className="yo-button" disabled={busy || !fields.postUser}>
-                    Add post
-                  </button>
-                  <button
-                    type="button"
-                    className="yo-link-button"
-                    onClick={() => setField('postText', 'first #café and then #a_1 #b-c')}
-                  >
-                    Try the accent case
-                  </button>
-                  <button
-                    type="button"
-                    className="yo-link-button"
-                    onClick={() => setField('postText', 'x'.repeat(maxLength + 1))}
-                  >
-                    Try {maxLength + 1} characters
-                  </button>
-                </div>
-              </MethodCard>
-
-              <MethodCard
-                name="delete-user"
-                signature="delete_user(user_name)"
-                note="Removes the user and every post they wrote, from all three indexes. The expensive one: the timeline is rebuilt."
-                result={results.delete_user}
-                busy={busy}
-                onSubmit={() => run('delete_user', [fields.deleteUser])}
-              >
-                <div className="yo-field">
-                  <label htmlFor="yo-delete-user">User name</label>
-                  <input
-                    id="yo-delete-user"
-                    type="text"
-                    list="yo-user-list"
-                    value={fields.deleteUser}
-                    onChange={(e) => setField('deleteUser', e.target.value)}
-                    placeholder="john"
-                    autoComplete="off"
-                  />
-                </div>
-                <button type="submit" className="yo-button" disabled={busy || !fields.deleteUser}>
-                  Delete user
-                </button>
-              </MethodCard>
-
-              <MethodCard
-                name="posts-for-user"
-                signature="get_posts_for_user(user_name)"
-                note="That user's posts, newest first. Raises on an unknown user."
-                result={results.get_posts_for_user}
-                emptyNote="Registered, but has not posted."
-                busy={busy}
-                onSubmit={() => run('get_posts_for_user', [fields.postsUser])}
-              >
-                <div className="yo-field">
-                  <label htmlFor="yo-posts-user">User name</label>
-                  <input
-                    id="yo-posts-user"
-                    type="text"
-                    list="yo-user-list"
-                    value={fields.postsUser}
-                    onChange={(e) => setField('postsUser', e.target.value)}
-                    placeholder="john"
-                    autoComplete="off"
-                  />
-                </div>
-                <button type="submit" className="yo-button" disabled={busy || !fields.postsUser}>
-                  Get posts
-                </button>
-              </MethodCard>
-
-              <MethodCard
-                name="posts-for-topic"
-                signature="get_posts_for_topic(topic)"
-                note="Posts mentioning a topic, newest first. An unknown topic is an empty list, not an error — topics are never registered."
-                result={results.get_posts_for_topic}
-                emptyNote="No post mentions that topic. Note this is not an error."
-                busy={busy}
-                onSubmit={() => run('get_posts_for_topic', [fields.postsTopic])}
-              >
-                <div className="yo-field">
-                  <label htmlFor="yo-posts-topic">Topic (without the #)</label>
-                  <input
-                    id="yo-posts-topic"
-                    type="text"
-                    list="yo-topic-list"
-                    value={fields.postsTopic}
-                    onChange={(e) => setField('postsTopic', e.target.value)}
-                    placeholder="steak"
-                    autoComplete="off"
-                  />
-                </div>
-                <button type="submit" className="yo-button" disabled={busy || !fields.postsTopic}>
-                  Get posts
-                </button>
-              </MethodCard>
-
-              <MethodCard
-                name="trending"
-                signature="get_trending_topics(from_timestamp, to_timestamp)"
-                note="Topics in an inclusive window, most mentions first, ties broken alphabetically. Raises if the window runs backwards."
-                result={results.get_trending_topics}
-                emptyNote="No posts in that window."
-                busy={busy}
-                onSubmit={() => run('get_trending_topics', [
-                  Number(fields.trendFrom), Number(fields.trendTo),
-                ])}
-              >
-                <div className="yo-field-row">
-                  <div className="yo-field yo-field-narrow">
-                    <label htmlFor="yo-trend-from">From timestamp</label>
-                    <input
-                      id="yo-trend-from"
-                      type="number"
-                      value={fields.trendFrom}
-                      onChange={(e) => setField('trendFrom', e.target.value)}
-                    />
-                  </div>
-                  <div className="yo-field yo-field-narrow">
-                    <label htmlFor="yo-trend-to">To timestamp</label>
-                    <input
-                      id="yo-trend-to"
-                      type="number"
-                      value={fields.trendTo}
-                      onChange={(e) => setField('trendTo', e.target.value)}
-                    />
-                  </div>
-                </div>
-                <div className="yo-inline-actions">
-                  <button type="submit" className="yo-button" disabled={busy}>
-                    Get trending topics
-                  </button>
-                  {snapshot?.totals.posts > 0 && (
-                    <button
-                      type="button"
-                      className="yo-link-button"
-                      onClick={() => {
-                        setField('trendFrom', String(snapshot.timeline[0].ts));
-                        setField('trendTo', String(snapshot.timeline[snapshot.timeline.length - 1].ts));
-                      }}
-                    >
-                      Widen to everything
-                    </button>
-                  )}
-                  <button
-                    type="button"
-                    className="yo-link-button"
-                    onClick={() => {
-                      setField('trendFrom', '5');
-                      setField('trendTo', '4');
-                    }}
-                  >
-                    Try a backwards window
-                  </button>
-                </div>
-              </MethodCard>
+              {CARD_ORDER[tab].map((key) => methodCards[key])}
             </div>
 
             {/* ── State panel ──────────────────────────────────── */}
@@ -791,17 +886,20 @@ const YodelrPlayground = () => {
                 which is how each query returns already in the right order.
               </p>
 
+              {/* The totals are always the true totals, read off the live object.
+                  Only the lists below them are capped — see the note after the
+                  tab strip. */}
               <div className="yo-totals">
                 <div className="yo-total">
-                  <span className="yo-total-value">{snapshot?.totals.users ?? 0}</span>
+                  <span className="yo-total-value">{thousands(snapshot?.totals.users ?? 0)}</span>
                   <span className="yo-total-label">users</span>
                 </div>
                 <div className="yo-total">
-                  <span className="yo-total-value">{snapshot?.totals.posts ?? 0}</span>
+                  <span className="yo-total-value">{thousands(snapshot?.totals.posts ?? 0)}</span>
                   <span className="yo-total-label">posts</span>
                 </div>
                 <div className="yo-total">
-                  <span className="yo-total-value">{snapshot?.totals.topics ?? 0}</span>
+                  <span className="yo-total-value">{thousands(snapshot?.totals.topics ?? 0)}</span>
                   <span className="yo-total-label">topics</span>
                 </div>
                 <div className="yo-total">
@@ -827,6 +925,21 @@ const YodelrPlayground = () => {
                   </button>
                 ))}
               </div>
+
+              {/* With the tweet corpus loaded there are 25k users and 13k topics.
+                  Rendering those as DOM nodes would cost far more than the calls
+                  being measured, so the snapshot is capped. Say so rather than
+                  letting the panel look complete. The cap applies per list, so
+                  the note is worked out per pane: whether topics are cut says
+                  nothing about whether users are. */}
+              {snapshot?.truncated && paneTotal > snapshot.shown && (
+                <p className="yo-trunc-note">
+                  Showing {statePane === 'timeline' ? 'the latest' : 'the busiest'}{' '}
+                  {thousands(snapshot.shown)} of {thousands(paneTotal)}{' '}
+                  {statePane === 'timeline' ? 'posts' : statePane}. The object holds
+                  all of them — only this list is cut, so the page stays quick.
+                </p>
+              )}
 
               <div className="yo-state-body">
                 {snapshot?.totals.posts === 0 && snapshot?.totals.users === 0 && (
@@ -930,97 +1043,7 @@ const YodelrPlayground = () => {
             {(snapshot?.topics ?? []).map((t) => <option key={t.name} value={t.name} />)}
           </datalist>
 
-          {/* ── Call log ─────────────────────────────────────── */}
-          <div className="vertical-card yo-log-card">
-            <h2>Call log</h2>
-            <p className="yo-state-note">
-              Timed inside Python with <code>perf_counter()</code> around the method call
-              alone, so the numbers are the implementation rather than the browser talking
-              to it. Watch <code>delete_user</code> against the others once the sample data
-              is loaded: it is the only operation that depends on the total number of posts,
-              because it rebuilds the timeline.
-            </p>
-            {log.length === 0
-              ? <p className="yo-empty-note">Nothing called yet.</p>
-              : (
-                <ol className="yo-log">
-                  {log.map((entry) => (
-                    <li key={entry.id} className={entry.ok ? 'yo-log-ok' : 'yo-log-error'}>
-                      <code className="yo-log-call">{entry.label}</code>
-                      <span className="yo-log-summary">
-                        {entry.ok ? entry.summary : `${entry.errorType}: ${entry.summary}`}
-                      </span>
-                      <span className="yo-log-ms">{formatMs(entry.ms)}</span>
-                    </li>
-                  ))}
-                </ol>
-              )}
-          </div>
-
-          {/* ── Prose ────────────────────────────────────────── */}
-          <div className="vertical-card">
-            <div className="yo-prose">
-              <h2>How this page works</h2>
-
-              <h3>Is this really the submitted code?</h3>
-              <p>
-                Yes, and the setup is arranged so that it cannot quietly stop being true. A
-                build script copies <code>yodelr.py</code> out of the challenge repository
-                into this site's static assets and records its SHA-256; nothing in this
-                repository contains a second copy of the logic to fall out of step. The hash
-                in the status bar is of the file your browser just executed, and
-                &ldquo;{showSource ? 'Hide' : 'Show'} the source&rdquo; prints the file
-                itself. The implementation is untouched — the challenge forbids altering the
-                provided interface, so the page wraps it from the outside, exactly as the
-                unit tests do.
-              </p>
-
-              <h3>How does Python run in a browser?</h3>
-              <p>
-                Pyodide is CPython compiled to WebAssembly. The page downloads the
-                interpreter, writes <code>yodelr.py</code> to its virtual filesystem and
-                imports it. Yodelr needs nothing outside the standard library — the
-                challenge requires that — so there are no packages to install, and the whole
-                thing is a static file download with no backend anywhere.
-              </p>
-
-              <h3>Why does the timing matter?</h3>
-              <p>
-                Because the challenge is really about complexity. Every read here answers
-                from an index that is already in the right order: a user's posts and a
-                topic's posts are stored newest-last and walked backwards, and trending
-                binary-searches the timeline for the window bounds rather than scanning it.
-                Nothing sorts a whole dataset at call time. The one deliberate exception is{' '}
-                <code>delete_user</code>, which rebuilds the timeline and so costs time
-                proportional to every post in the system, not just the deleted user's. That
-                was a trade: deletes are rare, trending is not, and the alternative — leaving
-                dead posts in place and skipping them while reading — makes the common case
-                slowly degrade.
-              </p>
-
-              <h3>Why does <code>#café</code> give <code>caf</code>?</h3>
-              <p>
-                The spec defines a topic as <code>#</code> followed by one or more characters
-                from <code>[0-9a-zA-Z_]</code>, and that is what the implementation matches.
-                It would have been shorter to write <code>\w</code>, but <code>\w</code> also
-                matches accented and non-Latin letters, which would quietly accept more than
-                the spec allows. So the parser stops at the <code>é</code> and the topic is{' '}
-                <code>caf</code>. It looks like a bug and is the opposite of one, which is
-                why the composer above shows you where the match ended rather than hiding it.
-              </p>
-
-              <h3>What is not here</h3>
-              <p>
-                The benchmark. The repository also runs this implementation over a corpus of
-                1.6 million real tweets to check it behaves on data it did not choose for
-                itself; that needs a dataset far too large to ship to a browser, so it stays
-                a thing you run locally. This page is for poking at the semantics by hand —
-                especially the edges, which is why every error above is surfaced rather than
-                swallowed.
-              </p>
-            </div>
-          </div>
-        </>
+        </div>
       )}
     </div>
   );
