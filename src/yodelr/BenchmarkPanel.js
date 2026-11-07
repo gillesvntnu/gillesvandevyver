@@ -57,7 +57,7 @@ function formatNs(ns) {
  * The span is the point, either way: the fastest operation and the slowest are
  * six decades apart, which no linear axis can show at once — add_user would be
  * a bar a third of a pixel wide. */
-function decadesFor(values) {
+export function decadesFor(values) {
   const usable = values.filter((v) => typeof v === 'number' && v > 0);
   /* Round the bottom down to a decade so the first gridline is a labelled
      one, but stop the top at the data itself rather than at the next decade.
@@ -84,16 +84,27 @@ const CHART_W = 700;
 const ROW_H = 21;
 const HEAD_H = 25;
 
-/* Exported so the chart can be rendered and rasterised outside a browser when
-   checking that nothing overlaps or falls off the edge. */
-export function LatencyChart({ groups }) {
-  /* Every drawn quantity, so nothing can fall outside the axis: the bars run
-     median to p99 and the tick is the mean, and all three have to fit. */
+/* Every drawn quantity, so nothing can fall outside the axis: the bars run
+   median to p99 and the tick is the mean, and all three have to fit.
+   Exported because the caller drawing more than one chart has to derive a
+   shared axis from all of them, and deriving it from a different set of
+   numbers than the chart draws is how an axis ends up too short. */
+export function drawnValues(groups) {
   const all = [];
   groups.forEach(([, rows]) => rows.forEach((r) => {
     all.push(r.medianNs, r.meanNs, r.p99Ns);
   }));
-  const { lo, hi, ticks } = decadesFor(all);
+  return all;
+}
+
+/* Exported so the chart can be rendered and rasterised outside a browser when
+   checking that nothing overlaps or falls off the edge.
+
+   `domain` is optional. Given one, the chart draws on it instead of fitting
+   the axis to its own rows -- which is what two charts meant to be compared
+   need, and what a chart standing alone does not want. */
+export function LatencyChart({ groups, domain }) {
+  const { lo, hi, ticks } = domain || decadesFor(drawnValues(groups));
   const span = Math.log10(hi) - Math.log10(lo);
   const xOf = (ns) => {
     const clamped = Math.min(Math.max(ns, lo), hi);
@@ -206,21 +217,22 @@ function label(row) {
 }
 const prep = (rows) => rows.map((r) => ({ ...r, display: label(r) }));
 
+/* One capture, in the shape the chart wants. */
+const groupsFor = (data) => [
+  ['Writes', prep(data.writes)],
+  ['Reads', prep(data.reads)],
+  ['Deletes', prep(data.deletes)],
+];
+
 /* One capture, drawn. Both cards are the same component because they are the
    same measurement of two objects; if they diverged into two bodies of JSX,
    a change to one chart would silently stop applying to the other. */
-function TimingCard({ title, intro, data }) {
+function TimingCard({ title, intro, groups, domain }) {
   return (
     <div className="vertical-card">
       <h2>{title}</h2>
       <p className="yo-timing-intro">{intro}</p>
-      <LatencyChart
-        groups={[
-          ['Writes', prep(data.writes)],
-          ['Reads', prep(data.reads)],
-          ['Deletes', prep(data.deletes)],
-        ]}
-      />
+      <LatencyChart groups={groups} domain={domain} />
     </div>
   );
 }
@@ -259,6 +271,19 @@ export default function BenchmarkPanel() {
     );
   }
 
+  const groups = { v1: groupsFor(data.v1), v2: groupsFor(data.v2) };
+  /* One axis for both cards. Left to themselves the two charts each fit the
+     axis to their own slowest call -- about 600 ms for v1, about 150 ms for
+     v2 -- so the same duration would sit at two different places on the page
+     and the eye would compare bars drawn to two different scales. The whole
+     point of the second card is the comparison, so the domain is derived from
+     both captures at once. It costs v2 the right-hand stretch of its plot,
+     which is exactly the right picture: that empty space is the work it no
+     longer does. */
+  const domain = decadesFor(
+    drawnValues(groups.v1).concat(drawnValues(groups.v2)),
+  );
+
   const c = data.v1.corpus;
   const n = (value) => Math.round(value).toLocaleString('en-US');
   const dataset = c.datasetUrl
@@ -268,8 +293,9 @@ export default function BenchmarkPanel() {
   return (
     <div className="yo-timing" role="tabpanel" id="yo-panel-timing" aria-labelledby="yo-tab-timing">
       <TimingCard
-        title="Timing"
-        data={data.v1}
+        title="Original timing"
+        groups={groups.v1}
+        domain={domain}
         intro={(
           <>
             The timings below come from {n(c.posts)} real tweets, {n(c.users)} users
@@ -278,15 +304,10 @@ export default function BenchmarkPanel() {
         )}
       />
       <TimingCard
-        title="Timing v2"
-        data={data.v2}
-        intro={(
-          <>
-            The same calls, against a revision that keeps a second timeline of
-            only the posts carrying a topic and counts those into hourly
-            buckets. Same tweets, same machine.
-          </>
-        )}
+        title="Timing with hourly buckets"
+        groups={groups.v2}
+        domain={domain}
+        intro={<>Adding hourly buckets instead of one big list</>}
       />
     </div>
   );
