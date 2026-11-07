@@ -31,20 +31,44 @@ function formatNs(ns) {
   return `${(ns / 1e9).toFixed(2)} s`;
 }
 
+/* Axis ticks, so short beats exact. The sweep's sizes are round numbers until
+   the last one, which is however many posts the corpus happened to have
+   (1,587,224 → "1.59M"), so trim the trailing zeros rather than printing
+   either "1.587224M" or a misleading "2M". */
 function compact(n) {
-  if (n >= 1e6) return `${n / 1e6}M`;
-  if (n >= 1e3) return `${n / 1e3}k`;
+  const trim = (v) => String(Number(v.toFixed(2)));
+  if (n >= 1e6) return `${trim(n / 1e6)}M`;
+  if (n >= 1e3) return `${trim(n / 1e3)}k`;
   return String(n);
 }
 
 /* ── Latency ─────────────────────────────────────────────────────────── */
 
-/* 100 ns to 200 ms. The span is the point: the fastest operation and the
- * slowest are six decades apart, which no linear axis can show at once —
- * add_user would be a bar a third of a pixel wide. */
-const LO = 1e2;
-const HI = 2e8;
-const DECADES = [1e2, 1e3, 1e4, 1e5, 1e6, 1e7, 1e8];
+/* The axis spans whatever the data spans, rounded out to whole decades. It
+ * used to be hardcoded at 100 ns–200 ms, which was right for the 400k capture
+ * and quietly wrong for anything slower: xOf() clamps, so a 450 ms call would
+ * have been drawn pinned to the right edge and read as 200 ms. A chart that
+ * silently relabels its own data is worse than one that looks cramped, so the
+ * range is derived instead. Rerun benchmark.py on a bigger corpus and the axis
+ * grows a decade rather than lying.
+ *
+ * The span is the point, either way: the fastest operation and the slowest are
+ * six decades apart, which no linear axis can show at once — add_user would be
+ * a bar a third of a pixel wide. */
+function decadesFor(values) {
+  const usable = values.filter((v) => typeof v === 'number' && v > 0);
+  /* Round the bottom down to a decade so the first gridline is a labelled
+     one, but stop the top at the data itself rather than at the next decade.
+     Rounding both ends out is tidier arithmetic and a worse chart: a slowest
+     call of 119 ms would push the axis to a full second and spend a sixth of
+     the width on emptiness. A little headroom keeps the longest bar off the
+     edge. */
+  const lo = Math.pow(10, Math.floor(Math.log10(Math.min(...usable))));
+  const hi = Math.max(...usable) * 1.08;
+  const ticks = [];
+  for (let d = lo; d <= hi; d *= 10) ticks.push(d);
+  return { lo, hi, ticks };
+}
 
 const PLOT_X0 = 246;
 const PLOT_X1 = 620;
@@ -57,15 +81,22 @@ const CHART_W = 840;
 const ROW_H = 21;
 const HEAD_H = 25;
 
-function xOf(ns) {
-  const clamped = Math.min(Math.max(ns, LO), HI);
-  const t = (Math.log10(clamped) - Math.log10(LO)) / (Math.log10(HI) - Math.log10(LO));
-  return PLOT_X0 + t * (PLOT_X1 - PLOT_X0);
-}
-
 /* Exported so the two charts can be rendered and rasterised outside a browser
    when checking that nothing overlaps or falls off the edge. */
 export function LatencyChart({ groups }) {
+  /* Every drawn quantity, so nothing can fall outside the axis: the bars run
+     median to p99 and the tick is the mean, and all three have to fit. */
+  const all = [];
+  groups.forEach(([, rows]) => rows.forEach((r) => {
+    all.push(r.medianNs, r.meanNs, r.p99Ns);
+  }));
+  const { lo, hi, ticks } = decadesFor(all);
+  const span = Math.log10(hi) - Math.log10(lo);
+  const xOf = (ns) => {
+    const clamped = Math.min(Math.max(ns, lo), hi);
+    return PLOT_X0 + ((Math.log10(clamped) - Math.log10(lo)) / span) * (PLOT_X1 - PLOT_X0);
+  };
+
   /* Lay the rows out first so the SVG height is known before anything is
      drawn, rather than guessed and then clipped. */
   const laid = [];
@@ -86,10 +117,10 @@ export function LatencyChart({ groups }) {
       className="yo-chart"
       viewBox={`0 0 ${CHART_W} ${height}`}
       role="img"
-      aria-label="How long one call takes, on a logarithmic axis from 100 nanoseconds to 200 milliseconds. Writes and ordinary reads land in microseconds; delete_user and whole-corpus trending land in tens of milliseconds."
+      aria-label={`How long one call takes, on a logarithmic axis from ${formatNs(lo)} to ${formatNs(hi)}. Writes and ordinary reads land in microseconds; delete_user and whole-corpus trending land in tens of milliseconds.`}
     >
       {/* Decade gridlines, drawn once behind everything. */}
-      {DECADES.map((d) => (
+      {ticks.map((d) => (
         <g key={d}>
           <line
             x1={xOf(d)} x2={xOf(d)} y1={26} y2={height - 4}
@@ -177,14 +208,17 @@ const S_X0 = 64;
 const S_X1 = 700;
 const S_Y0 = 28;
 const S_Y1 = 236;
-const S_DECADES = [1e3, 1e4, 1e5, 1e6, 1e7, 1e8];
-
 export function ScalingChart({ rows }) {
   const xs = rows.map((r) => r.posts);
   const lx0 = Math.log10(Math.min(...xs));
   const lx1 = Math.log10(Math.max(...xs));
-  const ly0 = Math.log10(1e3);
-  const ly1 = Math.log10(1e8);
+
+  /* Same reason as the latency axis: this was pinned at 1 µs–100 ms, and py()
+     does not clamp, so a slower delete_user on a bigger corpus would simply
+     have been plotted above the top of the box. */
+  const sDec = decadesFor(rows.flatMap((r) => SERIES.map(([key]) => r[key])));
+  const ly0 = Math.log10(sDec.lo);
+  const ly1 = Math.log10(sDec.hi);
 
   const px = (posts) => S_X0 + ((Math.log10(posts) - lx0) / (lx1 - lx0)) * (S_X1 - S_X0);
   const py = (ns) => S_Y1 - ((Math.log10(ns) - ly0) / (ly1 - ly0)) * (S_Y1 - S_Y0);
@@ -193,6 +227,18 @@ export function ScalingChart({ rows }) {
      exponent, so "costs twice as much when the data doubles" is literally a
      45-degree line. Drawing one lets you read each series against O(n) by
      eye instead of doing arithmetic on the table. */
+  /* Derived, not written out. The growth multiples are shown below the chart
+     too, computed from these same rows; a hand-typed description here would be
+     the one summary that quietly failed to update when the corpus changed —
+     and the one nobody sighted would ever notice. */
+  const label = 'Cost per call against dataset size, both axes logarithmic. Over a '
+    + `${Math.round(Math.max(...xs) / Math.min(...xs))}-fold increase in posts, `
+    + SERIES.map(([key, name]) => {
+      const g = rows[rows.length - 1][key] / rows[0][key];
+      return `${name.split(',')[0]} grows ${g.toFixed(1)} times`;
+    }).join(', ')
+    + '. The dashed line is linear growth, for reference.';
+
   const first = rows[0];
   const guide = [
     [px(first.posts), py(first.deleteUserNs)],
@@ -205,11 +251,11 @@ export function ScalingChart({ rows }) {
       className="yo-chart"
       viewBox={`0 0 ${CHART_W} 286`}
       role="img"
-      aria-label="Cost per call against dataset size, both axes logarithmic. Over a sixteen-fold increase in posts, add_post grows 1.2 times, the one-day trending window 7.6 times, and delete_user 11.8 times — the last tracking the dashed linear reference."
+      aria-label={label}
     >
       <text x={0} y={12} className="yo-axis">time per call</text>
 
-      {S_DECADES.map((d) => (
+      {sDec.ticks.map((d) => (
         <g key={d}>
           <line x1={S_X0} x2={S_X1} y1={py(d)} y2={py(d)} className="yo-grid" />
           <text x={S_X0 - 8} y={py(d) + 3.5} className="yo-axis" textAnchor="end">
@@ -321,18 +367,15 @@ export default function BenchmarkPanel() {
   return (
     <div className="yo-timing" role="tabpanel" id="yo-panel-timing" aria-labelledby="yo-tab-timing">
       <div className="vertical-card">
-        <h2>How long each call takes</h2>
+        <h2>Timing</h2>
         <p className="yo-timing-intro">
-          These are the only numbers on this page that your browser did not just produce.
-          They come from <code>benchmark.py</code> in the challenge repo, run natively on{' '}
-          {c.posts.toLocaleString('en-US')} real tweets — {Math.round(c.users).toLocaleString('en-US')}{' '}
-          users and {Math.round(c.distinct_topics).toLocaleString('en-US')} topics. It has to be
-          native: resolving a {formatNs(data.writes[0].medianNs)} call means subtracting the
-          clock's own {data.clockOverheadNs} ns cost and pausing the garbage collector, and
-          WebAssembly gives you neither. The{' '}
-          <a href={CAPTURE_URL} target="_blank" rel="noreferrer">raw output of that run</a>{' '}
-          is committed beside the page; every number below is parsed from it rather than
-          typed in.
+          The timings below come from {Math.round(c.posts).toLocaleString('en-US')} real
+          tweets, {Math.round(c.users).toLocaleString('en-US')} users and{' '}
+          {Math.round(c.distinct_topics).toLocaleString('en-US')} topics. It is the{' '}
+          {c.datasetUrl
+            ? <a href={c.datasetUrl} target="_blank" rel="noreferrer">{c.datasetName || 'Sentiment140'}</a>
+            : (c.datasetName || 'Sentiment140')}{' '}
+          dataset.
         </p>
 
         <div className="yo-legend">
@@ -435,6 +478,16 @@ export default function BenchmarkPanel() {
           hashtag at all.
         </p>
       </div>
+
+      {/* The one line the intro cannot drop. Everything else on this page is
+          live and self-evidently so; these numbers are not, and a reader has
+          no way to tell unless told. The link is also what makes them
+          checkable, which is the only reason to trust them. */}
+      <p className="yo-timing-source">
+        Measured natively by <code>benchmark.py</code>, not in your browser —{' '}
+        <a href={CAPTURE_URL} target="_blank" rel="noreferrer">the raw output</a> is
+        committed beside this page and every number above is parsed from it.
+      </p>
     </div>
   );
 }

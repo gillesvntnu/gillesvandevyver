@@ -7,7 +7,9 @@
     "posts_with_topics_pct": 1.72,
     "mentions_per_post": 0.02,
     "mean_text_len": 73.14,
-    "span_seconds": 5236084.0
+    "span_seconds": 5236084.0,
+    "datasetUrl": "https://huggingface.co/datasets/sentiment140",
+    "datasetName": "Sentiment140"
   },
   "writes": [
     {
@@ -178,5 +180,5 @@
   "clockOverheadNs": 56.0,
   "skippedRows": 109,
   "capturedFrom": "benchmark.txt",
-  "builtAt": "2026-11-07T18:18:33Z"
+  "builtAt": "2026-11-07T18:48:21Z"
 }

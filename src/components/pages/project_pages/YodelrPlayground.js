@@ -11,32 +11,31 @@ import BenchmarkPanel from '../../../yodelr/BenchmarkPanel';
  * no JavaScript reimplementation anywhere in this file: when a call returns a
  * list, Python sorted it, and when it raises, Python raised.
  *
- * Three tabs, one Yodelr instance behind all of them. The tabs differ only in
- * what gets loaded into it: nothing, or 35,813 real tweets. Switching tabs is
- * deliberately not a reset — the state panel is always the honest answer to
- * "what is in there right now", and silently emptying it on a tab click would
- * make that panel a liar.
+ * Two tabs. Playground is the live object; Timing is a recorded measurement
+ * that no browser could reproduce. Typing a post by hand and replaying 35,813
+ * real tweets were once separate tabs, but they were never separate code —
+ * same six cards, same handlers, same instance, differing only in what had
+ * been loaded. That is a button, not a tab, so they are one tab now and the
+ * two load buttons sit side by side.
+ *
+ * Loading is deliberately not a reset either. The state panel is always the
+ * honest answer to "what is in there right now", and silently emptying it
+ * would make that panel a liar.
  */
 
 const TABS = [
-  ['manual', 'By hand'],
-  ['corpus', 'Real tweets'],
+  ['play', 'Playground'],
   ['timing', 'Timing'],
 ];
 
-/* The same six cards on both tabs — same component, same handlers, same state.
- * Only the order changes, because the two tabs are read in opposite directions.
- * By hand you start with an empty object, so add_user has to come first or
- * there is nothing to query. With the tweet corpus the object arrives already
- * full and the queries are the whole point, so the three mutators move to the
- * bottom: they are what you reach for afterwards, to watch delete_user pay for
- * rebuilding a 35,813-post timeline. */
+/* Mutators first, then queries. An empty object is where every visitor starts,
+ * and on an empty object a query has nothing to answer — add_user has to come
+ * first or the top of the page is three cards that all return nothing. Anyone
+ * who would rather begin with 35,813 tweets already full in the object has the
+ * corpus button above, which is one click and scrolls past nothing. */
 const QUERIES = ['get_posts_for_user', 'get_posts_for_topic', 'get_trending_topics'];
 const MUTATORS = ['add_user', 'add_post', 'delete_user'];
-const CARD_ORDER = {
-  manual: [...MUTATORS, ...QUERIES],
-  corpus: [...QUERIES, ...MUTATORS],
-};
+const CARD_ORDER = [...MUTATORS, ...QUERIES];
 
 /** 1,234,567 rather than 1234567, for the corpus counts. */
 function thousands(n) {
@@ -168,7 +167,7 @@ const YodelrPlayground = () => {
   const [info, setInfo] = useState(null);
   const [snapshot, setSnapshot] = useState(null);
   const [busy, setBusy] = useState(false);
-  const [tab, setTab] = useState('manual');
+  const [tab, setTab] = useState('play');
   const [statePane, setStatePane] = useState('topics');
   /* What the corpus load reported back: counts and the time the replay took.
    * null until someone asks for it, since it is a 1.9 MB download. */
@@ -396,9 +395,8 @@ const YodelrPlayground = () => {
         : snapshot.totals.posts)
     : 0;
 
-  /* The six cards, built once and handed to whichever tab is open. Both
-     tabs get the same card, the same handler and the same state; the only
-     thing that differs is the order, which CARD_ORDER decides. */
+  /* The six cards, keyed so CARD_ORDER decides the order in one place rather
+     than the order being wherever the JSX happens to sit. */
   const methodCards = {
     add_user: (
       <MethodCard
@@ -777,7 +775,7 @@ const YodelrPlayground = () => {
         ))}
       </div>
 
-      {!ready && tab !== 'timing' && (
+      {!ready && tab === 'play' && (
         <div className="vertical-card yo-boot" role="status" aria-live="polite">
           <div className="yo-spinner" aria-hidden="true" />
           <h2>Starting Python in your browser</h2>
@@ -799,40 +797,57 @@ const YodelrPlayground = () => {
           interpreter to finish downloading. */}
       {tab === 'timing' && <BenchmarkPanel />}
 
-      {ready && tab !== 'timing' && (
+      {ready && tab === 'play' && (
         <div
           role="tabpanel"
-          id={`yo-panel-${tab}`}
-          aria-labelledby={`yo-tab-${tab}`}
+          id="yo-panel-play"
+          aria-labelledby="yo-tab-play"
         >
           {/* ── What is loaded ─────────────────────────────────── */}
           <div className="yo-toolbar">
+            {/* Two ways to fill the same object, so two buttons rather than
+                two tabs. Neither is required: the cards below work on an
+                empty instance, which is the third way. */}
             <div className="yo-toolbar-buttons">
-              {tab === 'manual'
-                ? (
-                  <button type="button" className="yo-button" onClick={loadWalkthrough} disabled={busy}>
-                    Load the spec example
-                  </button>
-                )
-                : (
-                  <button type="button" className="yo-button" onClick={loadCorpus} disabled={busy}>
-                    {corpusRun ? 'Load it again' : 'Load the tweet corpus'}
-                  </button>
-                )}
+              <button type="button" className="yo-button" onClick={loadWalkthrough} disabled={busy}>
+                Load the spec example
+              </button>
+              {/* The count comes off corpus.json, never typed here — rebuild
+                  the corpus with a different --limit and this label follows.
+                  If the metadata fetch failed the label drops the number
+                  rather than printing an em dash where a count should be. */}
+              <button type="button" className="yo-button" onClick={loadCorpus} disabled={busy}>
+                {corpusRun
+                  ? 'Load the tweets again'
+                  : typeof info?.corpusMeta?.posts === 'number'
+                    ? `Load ${thousands(info.corpusMeta.posts)} real tweets`
+                    : 'Load the tweet corpus'}
+              </button>
               <button type="button" className="yo-button yo-button-quiet" onClick={reset} disabled={busy}>
                 Reset
               </button>
             </div>
 
-            {tab === 'manual' && (
-              <p className="yo-toolbar-note">
-                Start empty and type, or load the walkthrough from the spec: john posts three
-                times, and <code>get_trending_topics(1, 3)</code> returns{' '}
-                <code>["steak", "chilling"]</code>.
+            <p className="yo-toolbar-note">
+              Start empty and type, or load the walkthrough from the spec — john posts three
+              times and <code>get_trending_topics(1, 3)</code> returns{' '}
+              <code>["steak", "chilling"]</code> — or replay{' '}
+              {Math.round(info?.corpusMeta?.spanDays ?? 0)} days of real Twitter through it,
+              which is about{' '}
+              {Math.round((info?.corpusMeta?.bytesGzipped ?? 0) / 1e5) / 10}&nbsp;MB to
+              download.
+            </p>
+
+            {corpusStatus && (
+              <p className="yo-toolbar-note yo-corpus-status" role="status">
+                {corpusStatus}
               </p>
             )}
 
-            {tab === 'corpus' && (
+            {/* Provenance, held back until there is something to have
+                provenance for. Before the load it is a paragraph about data
+                that is not in the object yet. */}
+            {corpusRun && (
               <p className="yo-toolbar-note">
                 {thousands(info?.corpusMeta?.posts)} real tweets from{' '}
                 {thousands(info?.corpusMeta?.users)} authors, replayed through{' '}
@@ -845,19 +860,11 @@ const YodelrPlayground = () => {
                 and a straight slice would leave the topic index with nothing to do. Text and
                 author are the dump's own, and the order is its own timestamps; the only edit
                 is that tweets landing on the same second are nudged one second apart, because
-                Yodelr requires timestamps to strictly increase. About{' '}
-                {Math.round((info?.corpusMeta?.bytesGzipped ?? 0) / 1e5) / 10}&nbsp;MB to
-                download.
+                Yodelr requires timestamps to strictly increase.
               </p>
             )}
 
-            {tab === 'corpus' && corpusStatus && (
-              <p className="yo-toolbar-note yo-corpus-status" role="status">
-                {corpusStatus}
-              </p>
-            )}
-
-            {tab === 'corpus' && corpusRun && (
+            {corpusRun && (
               <p className="yo-toolbar-note yo-corpus-stats">
                 Replayed {thousands(corpusRun.posts)} posts in{' '}
                 <strong>{formatMs(corpusRun.addPostMs)}</strong>, which is{' '}
@@ -874,7 +881,7 @@ const YodelrPlayground = () => {
             <div className="yo-methods">
               <h2>The API</h2>
 
-              {CARD_ORDER[tab].map((key) => methodCards[key])}
+              {CARD_ORDER.map((key) => methodCards[key])}
             </div>
 
             {/* ── State panel ──────────────────────────────────── */}
@@ -887,8 +894,8 @@ const YodelrPlayground = () => {
               </p>
 
               {/* The totals are always the true totals, read off the live object.
-                  Only the lists below them are capped — see the note after the
-                  tab strip. */}
+                  Only the lists below them are capped — see the truncation note
+                  under whichever of the three is open. */}
               <div className="yo-totals">
                 <div className="yo-total">
                   <span className="yo-total-value">{thousands(snapshot?.totals.users ?? 0)}</span>

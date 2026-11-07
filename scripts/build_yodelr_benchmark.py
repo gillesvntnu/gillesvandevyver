@@ -179,12 +179,17 @@ def run_benchmark(src_repo, limit):
     if not script.exists():
         sys.exit("build_yodelr_benchmark: no benchmark.py at {}".format(script))
     print("running benchmark.py --limit {} (this takes minutes)".format(limit))
+    # Merged, not captured separately. benchmark.py writes its corpus-loading
+    # lines to stderr -- including "skipped N rows", which is where skippedRows
+    # is parsed from -- so taking stdout alone would produce a capture missing
+    # fields that the hand-made one has, and nothing would complain.
     done = subprocess.run(
         [sys.executable, "benchmark.py", "--limit", str(limit)],
-        cwd=str(harness), capture_output=True, text=True,
+        cwd=str(harness), stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+        text=True,
     )
     if done.returncode != 0:
-        sys.stderr.write(done.stderr)
+        sys.stderr.write(done.stdout)
         sys.exit("build_yodelr_benchmark: benchmark.py failed")
     return done.stdout
 
@@ -216,6 +221,18 @@ def main():
         if not data[key]:
             sys.exit("build_yodelr_benchmark: parsed no rows for '{}' -- has "
                      "benchmark.py's output format changed?".format(key))
+
+    # The capture names its source ("sentiment140") but carries no link, and
+    # the page wants one. Rather than type the URL a second time, lift it off
+    # corpus.json, which the corpus builder already wrote from the dataset it
+    # actually downloaded. One source, so the two tabs cannot disagree about
+    # where the tweets came from.
+    meta_path = OUT_DIR / "corpus.json"
+    if meta_path.exists():
+        meta = json.loads(meta_path.read_text(encoding="utf-8"))
+        if meta.get("datasetUrl"):
+            data["corpus"]["datasetUrl"] = meta["datasetUrl"]
+            data["corpus"]["datasetName"] = meta.get("dataset", "")
 
     data["capturedFrom"] = CAPTURE.name
     data["builtAt"] = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")

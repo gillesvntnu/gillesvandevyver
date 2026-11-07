@@ -339,8 +339,8 @@ async function boot(onProgress) {
   const [source, provenanceText, corpusMetaText] = await Promise.all([
     fetchText(SRC_URL, 'yodelr.py'),
     fetchText(PROVENANCE_URL, 'the yodelr.py provenance record').catch(() => '{}'),
-    // Half a kilobyte of counts, so the tweet tab can describe the corpus
-    // before anyone decides to download the 1.9 MB of it.
+    // Half a kilobyte of counts, so the load button can say how many tweets
+    // and how many megabytes before anyone commits to the 1.9 MB of them.
     fetchText(CORPUS_META_URL, 'the corpus description').catch(() => '{}'),
   ]);
 
