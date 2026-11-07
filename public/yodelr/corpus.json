@@ -1,6 +1,6 @@
 {
   "dataset": "Sentiment140",
-  "datasetUrl": "https://huggingface.co/datasets/sentiment140",
+  "datasetUrl": "https://www.kaggle.com/datasets/kazanova/sentiment140",
   "filter": "posts containing a #hashtag",
   "scannedRows": 1600000,
   "posts": 35813,
@@ -13,5 +13,5 @@
   "meanTextLength": 89.0,
   "bytesGzipped": 1874368,
   "sha256": "b40a919ff64f56a5dddcfb363b8aa0aec86ebfdbc5fcba4b76615c270fd39445",
-  "builtAt": "2026-11-07T17:37:13Z"
+  "builtAt": "2026-11-07T19:23:59Z"
 }

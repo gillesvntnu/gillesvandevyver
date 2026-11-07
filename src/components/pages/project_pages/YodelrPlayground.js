@@ -2,7 +2,6 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import './CommonStyles.css';
 import './YodelrPlayground.css';
 import { loadRuntime } from '../../../yodelr/runtime';
-import { WALKTHROUGH } from '../../../yodelr/sampleData';
 import BenchmarkPanel from '../../../yodelr/BenchmarkPanel';
 
 /* The Yodelr page.
@@ -12,11 +11,17 @@ import BenchmarkPanel from '../../../yodelr/BenchmarkPanel';
  * list, Python sorted it, and when it raises, Python raised.
  *
  * Two tabs. Playground is the live object; Timing is a recorded measurement
- * that no browser could reproduce. Typing a post by hand and replaying 35,813
- * real tweets were once separate tabs, but they were never separate code —
+ * that no browser could reproduce. Typing a post by hand and replaying the
+ * tweet corpus were once separate tabs, but they were never separate code —
  * same six cards, same handlers, same instance, differing only in what had
- * been loaded. That is a button, not a tab, so they are one tab now and the
- * two load buttons sit side by side.
+ * been loaded. That is a button, not a tab, so they are one tab now.
+ *
+ * The page deliberately explains very little. The six signatures name their
+ * own arguments, and every rule the prose used to state — the character
+ * limit, the unregistered user, the window that runs backwards — is reachable
+ * by pressing a button and reading what Python sends back. Describing those
+ * rules in text on a page that can demonstrate them is the one thing this
+ * page has no excuse for.
  *
  * Loading is deliberately not a reset either. The state panel is always the
  * honest answer to "what is in there right now", and silently emptying it
@@ -31,8 +36,8 @@ const TABS = [
 /* Mutators first, then queries. An empty object is where every visitor starts,
  * and on an empty object a query has nothing to answer — add_user has to come
  * first or the top of the page is three cards that all return nothing. Anyone
- * who would rather begin with 35,813 tweets already full in the object has the
- * corpus button above, which is one click and scrolls past nothing. */
+ * who would rather begin with the object already full has the dataset button
+ * above, which is one click and scrolls past nothing. */
 const QUERIES = ['get_posts_for_user', 'get_posts_for_topic', 'get_trending_topics'];
 const MUTATORS = ['add_user', 'add_post', 'delete_user'];
 const CARD_ORDER = [...MUTATORS, ...QUERIES];
@@ -134,14 +139,18 @@ function CallResult({ result, emptyNote }) {
   );
 }
 
-/** One API method: signature, note, its own controls, its own last result. */
-function MethodCard({ name, signature, note, children, result, emptyNote, onSubmit, busy }) {
+/** One API method: signature, its own controls, its own last result.
+ *
+ * Each card used to carry a sentence of prose describing what the method does
+ * and what it raises. It is gone: the signature names the arguments, and the
+ * rules it described are all reachable by pressing the button and reading what
+ * comes back, which is the point of a page that runs the real thing. */
+function MethodCard({ name, signature, children, result, emptyNote, onSubmit, busy }) {
   return (
     <section className="yo-method" aria-labelledby={`method-${name}`}>
       <h3 className="yo-method-head" id={`method-${name}`}>
         <code>{signature}</code>
       </h3>
-      <p className="yo-method-note">{note}</p>
       <form
         className="yo-method-form"
         onSubmit={(event) => { event.preventDefault(); onSubmit(); }}
@@ -169,9 +178,6 @@ const YodelrPlayground = () => {
   const [busy, setBusy] = useState(false);
   const [tab, setTab] = useState('play');
   const [statePane, setStatePane] = useState('topics');
-  /* What the corpus load reported back: counts and the time the replay took.
-   * null until someone asks for it, since it is a 1.9 MB download. */
-  const [corpusRun, setCorpusRun] = useState(null);
   const [corpusStatus, setCorpusStatus] = useState(null);
   /* Loading a scenario or resetting changes the whole system at once, and the
    * only evidence is the state panel quietly redrawing. Sighted readers see
@@ -270,31 +276,6 @@ const YodelrPlayground = () => {
     return next;
   }, []);
 
-  const loadWalkthrough = useCallback(() => {
-    const runtime = runtimeRef.current;
-    if (!runtime) return;
-    setBusy(true);
-    try {
-      runtime.reset();
-      runtime.bulkAdd(WALKTHROUGH.users, WALKTHROUGH.posts);
-      setResults({});
-      setCorpusRun(null);
-      setTsOverridden(false);
-      announceState(runtime, 'Loaded the spec example');
-      setFields((prev) => ({
-        ...prev,
-        postUser: 'john',
-        deleteUser: 'john',
-        postsUser: 'john',
-        postsTopic: 'steak',
-        trendFrom: '1',
-        trendTo: '3',
-      }));
-    } finally {
-      setBusy(false);
-    }
-  }, [announceState]);
-
   /* The tweet corpus. Async because the file has to arrive first; everything
    * after that is one blocking call into Python. */
   const loadCorpus = useCallback(async () => {
@@ -311,7 +292,6 @@ const YodelrPlayground = () => {
         setCorpusStatus(`${result.errorType}: ${result.error}`);
         return;
       }
-      setCorpusRun(result);
       setCorpusStatus(null);
       const next = announceState(runtime, 'Loaded the tweet corpus');
       const busiest = next.users[0]?.name ?? '';
@@ -340,7 +320,6 @@ const YodelrPlayground = () => {
     if (!runtime) return;
     runtime.reset();
     setResults({});
-    setCorpusRun(null);
     setCorpusStatus(null);
     setSnapshot(runtime.snapshot());
     setTsOverridden(false);
@@ -403,7 +382,6 @@ const YodelrPlayground = () => {
         key="add_user"
         name="add-user"
         signature="add_user(user_name)"
-        note="Registers a name. Raises if it is already taken."
         result={results.add_user}
         busy={busy}
         onSubmit={() => {
@@ -435,7 +413,6 @@ const YodelrPlayground = () => {
         key="add_post"
         name="add-post"
         signature="add_post(user_name, post_text, timestamp)"
-        note="Raises on an unregistered user, on text over the limit, and on a timestamp that does not strictly increase."
         result={results.add_post}
         busy={busy}
         onSubmit={() => {
@@ -574,7 +551,6 @@ const YodelrPlayground = () => {
         key="delete_user"
         name="delete-user"
         signature="delete_user(user_name)"
-        note="Removes the user and every post they wrote, from all three indexes. The expensive one: the timeline is rebuilt."
         result={results.delete_user}
         busy={busy}
         onSubmit={() => run('delete_user', [fields.deleteUser])}
@@ -602,7 +578,6 @@ const YodelrPlayground = () => {
         key="get_posts_for_user"
         name="posts-for-user"
         signature="get_posts_for_user(user_name)"
-        note="That user's posts, newest first. Raises on an unknown user."
         result={results.get_posts_for_user}
         emptyNote="Registered, but has not posted."
         busy={busy}
@@ -631,7 +606,6 @@ const YodelrPlayground = () => {
         key="get_posts_for_topic"
         name="posts-for-topic"
         signature="get_posts_for_topic(topic)"
-        note="Posts mentioning a topic, newest first. An unknown topic is an empty list, not an error — topics are never registered."
         result={results.get_posts_for_topic}
         emptyNote="No post mentions that topic. Note this is not an error."
         busy={busy}
@@ -660,7 +634,6 @@ const YodelrPlayground = () => {
         key="get_trending_topics"
         name="trending"
         signature="get_trending_topics(from_timestamp, to_timestamp)"
-        note="Topics in an inclusive window, most mentions first, ties broken alphabetically. Raises if the window runs backwards."
         result={results.get_trending_topics}
         emptyNote="No posts in that window."
         busy={busy}
@@ -688,36 +661,14 @@ const YodelrPlayground = () => {
             />
           </div>
         </div>
-        <div className="yo-inline-actions">
-          <button type="submit" className="yo-button" disabled={busy}>
-            Get trending topics
-          </button>
-          {snapshot?.totals.posts > 0 && (
-            <button
-              type="button"
-              className="yo-link-button"
-              onClick={() => {
-                // From the snapshot's own extent fields, not off the
-                // timeline list: that is only the last 200 rows once
-                // the tweet corpus is loaded.
-                setField('trendFrom', String(snapshot.firstTimestamp));
-                setField('trendTo', String(snapshot.latestTimestamp));
-              }}
-            >
-              Widen to everything
-            </button>
-          )}
-          <button
-            type="button"
-            className="yo-link-button"
-            onClick={() => {
-              setField('trendFrom', '5');
-              setField('trendTo', '4');
-            }}
-          >
-            Try a backwards window
-          </button>
-        </div>
+        {/* Two shortcuts used to sit beside this button, one filling the
+            window with the object's full extent and one inverting it to
+            trip the backwards-window check. Both only typed into the two
+            fields above, which anyone can do, so the card is now the same
+            shape as the other five: arguments, then call. */}
+        <button type="submit" className="yo-button" disabled={busy}>
+          Get trending topics
+        </button>
       </MethodCard>
     ),
   };
@@ -776,19 +727,15 @@ const YodelrPlayground = () => {
       </div>
 
       {!ready && tab === 'play' && (
-        <div className="vertical-card yo-boot" role="status" aria-live="polite">
+        /* Just the spinner. The progress text is gone from the screen but not
+           from the accessibility tree: a spinner is `aria-hidden`, so a screen
+           reader would otherwise be told nothing at all for the ten seconds
+           the interpreter takes to arrive. */
+        <div className="vertical-card yo-boot">
           <div className="yo-spinner" aria-hidden="true" />
-          <h2>Starting Python in your browser</h2>
-          <p>{status.message}</p>
-          <p className="yo-boot-note">
-            This takes a few seconds the first time. A whole CPython interpreter
-            (about 10&nbsp;MB of WebAssembly) has to arrive and start up before the first
-            call can run. After that every call is instant, and the browser caches the
-            runtime for next time.
-          </p>
-          <div className="yo-skeleton" aria-hidden="true">
-            <span /><span /><span />
-          </div>
+          <span className="yo-visually-hidden" role="status" aria-live="polite">
+            {status.message}
+          </span>
         </div>
       )}
 
@@ -805,73 +752,22 @@ const YodelrPlayground = () => {
         >
           {/* ── What is loaded ─────────────────────────────────── */}
           <div className="yo-toolbar">
-            {/* Two ways to fill the same object, so two buttons rather than
-                two tabs. Neither is required: the cards below work on an
-                empty instance, which is the third way. */}
             <div className="yo-toolbar-buttons">
-              <button type="button" className="yo-button" onClick={loadWalkthrough} disabled={busy}>
-                Load the spec example
-              </button>
-              {/* The count comes off corpus.json, never typed here — rebuild
-                  the corpus with a different --limit and this label follows.
-                  If the metadata fetch failed the label drops the number
-                  rather than printing an em dash where a count should be. */}
               <button type="button" className="yo-button" onClick={loadCorpus} disabled={busy}>
-                {corpusRun
-                  ? 'Load the tweets again'
-                  : typeof info?.corpusMeta?.posts === 'number'
-                    ? `Load ${thousands(info.corpusMeta.posts)} real tweets`
-                    : 'Load the tweet corpus'}
+                Load public twitter dataset
               </button>
               <button type="button" className="yo-button yo-button-quiet" onClick={reset} disabled={busy}>
                 Reset
               </button>
             </div>
 
-            <p className="yo-toolbar-note">
-              Start empty and type, or load the walkthrough from the spec — john posts three
-              times and <code>get_trending_topics(1, 3)</code> returns{' '}
-              <code>["steak", "chilling"]</code> — or replay{' '}
-              {Math.round(info?.corpusMeta?.spanDays ?? 0)} days of real Twitter through it,
-              which is about{' '}
-              {Math.round((info?.corpusMeta?.bytesGzipped ?? 0) / 1e5) / 10}&nbsp;MB to
-              download.
-            </p>
-
+            {/* The one line kept: the load takes a couple of seconds and
+                fetches ~1.9 MB, and a button that appears to do nothing is
+                worse than a word of explanation. It clears itself when the
+                replay finishes. */}
             {corpusStatus && (
               <p className="yo-toolbar-note yo-corpus-status" role="status">
                 {corpusStatus}
-              </p>
-            )}
-
-            {/* Provenance, held back until there is something to have
-                provenance for. Before the load it is a paragraph about data
-                that is not in the object yet. */}
-            {corpusRun && (
-              <p className="yo-toolbar-note">
-                {thousands(info?.corpusMeta?.posts)} real tweets from{' '}
-                {thousands(info?.corpusMeta?.users)} authors, replayed through{' '}
-                <code>yodelr.py</code>. They are the{' '}
-                <a href={info?.corpusMeta?.datasetUrl} target="_blank" rel="noreferrer">
-                  Sentiment140
-                </a>{' '}
-                dump from 2009 — the year the limit really was 140 characters — filtered down
-                to the posts that carry a <code>#hashtag</code>, because only 2.2% of them do
-                and a straight slice would leave the topic index with nothing to do. Text and
-                author are the dump's own, and the order is its own timestamps; the only edit
-                is that tweets landing on the same second are nudged one second apart, because
-                Yodelr requires timestamps to strictly increase.
-              </p>
-            )}
-
-            {corpusRun && (
-              <p className="yo-toolbar-note yo-corpus-stats">
-                Replayed {thousands(corpusRun.posts)} posts in{' '}
-                <strong>{formatMs(corpusRun.addPostMs)}</strong>, which is{' '}
-                {corpusRun.perPostUs.toFixed(1)}&nbsp;µs per <code>add_post</code>. Registering
-                the {thousands(corpusRun.users)} users took {formatMs(corpusRun.addUserMs)};
-                unzipping and parsing the file, which is not Yodelr's work, took{' '}
-                {formatMs(corpusRun.parseMs)}.
               </p>
             )}
           </div>
@@ -887,15 +783,16 @@ const YodelrPlayground = () => {
             {/* ── State panel ──────────────────────────────────── */}
             <aside className="yo-state" aria-label="Current state of the system">
               <h2>State</h2>
-              <p className="yo-state-note">
-                Read straight out of the live object after every call. These are the
-                implementation's three indexes: a post is filed in all of them at once,
-                which is how each query returns already in the right order.
-              </p>
 
               {/* The totals are always the true totals, read off the live object.
                   Only the lists below them are capped — see the truncation note
-                  under whichever of the three is open. */}
+                  under whichever of the three is open.
+
+                  Three totals for three indexes. There was a fourth, `last ts`,
+                  showing the newest timestamp in the object; it is gone because
+                  it was the only tile that did not correspond to anything in the
+                  panel below it, and the timeline list shows the same timestamps
+                  with their posts attached. */}
               <div className="yo-totals">
                 <div className="yo-total">
                   <span className="yo-total-value">{thousands(snapshot?.totals.users ?? 0)}</span>
@@ -908,10 +805,6 @@ const YodelrPlayground = () => {
                 <div className="yo-total">
                   <span className="yo-total-value">{thousands(snapshot?.totals.topics ?? 0)}</span>
                   <span className="yo-total-label">topics</span>
-                </div>
-                <div className="yo-total">
-                  <span className="yo-total-value">{snapshot?.lastTimestamp ?? '—'}</span>
-                  <span className="yo-total-label">last ts</span>
                 </div>
               </div>
 
@@ -941,17 +834,16 @@ const YodelrPlayground = () => {
                   nothing about whether users are. */}
               {snapshot?.truncated && paneTotal > snapshot.shown && (
                 <p className="yo-trunc-note">
-                  Showing {statePane === 'timeline' ? 'the latest' : 'the busiest'}{' '}
+                  Showing {statePane === 'timeline' ? 'the latest' : 'the most common'}{' '}
                   {thousands(snapshot.shown)} of {thousands(paneTotal)}{' '}
-                  {statePane === 'timeline' ? 'posts' : statePane}. The object holds
-                  all of them — only this list is cut, so the page stays quick.
+                  {statePane === 'timeline' ? 'posts' : statePane}.
                 </p>
               )}
 
               <div className="yo-state-body">
                 {snapshot?.totals.posts === 0 && snapshot?.totals.users === 0 && (
                   <p className="yo-empty-note">
-                    Empty. Add a user, or load one of the scenarios above.
+                    Empty. Add a user, or load the dataset above.
                   </p>
                 )}
 

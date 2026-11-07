@@ -73,16 +73,10 @@
 }
 
 /* ── Corpus notes ──────────────────────────────────── */
-.yo-corpus-status,
-.yo-corpus-stats {
+.yo-corpus-status {
     margin-top: 0.6rem;
     padding-top: 0.6rem;
     border-top: 1px dashed #e5e7eb;
-}
-
-.yo-corpus-stats strong {
-    font-variant-numeric: tabular-nums;
-    color: #252947;
 }
 
 /* ── Timing tab ────────────────────────────────────── */
@@ -98,8 +92,7 @@
     margin: 0 0 0.6rem 0;
 }
 
-.yo-timing-intro,
-.yo-timing-note {
+.yo-timing-intro {
     font-size: 0.84rem;
     line-height: 1.7;
     color: #4b5563;
@@ -107,26 +100,7 @@
     max-width: 68ch;
 }
 
-.yo-timing-note {
-    margin: 0.9rem 0 0 0;
-    padding-top: 0.8rem;
-    border-top: 1px dashed #e5e7eb;
-    color: #6b7280;
-}
-
-/* Sits outside the cards, so it reads as a footnote to the whole tab rather
-   than as a remark about the memory numbers it happens to follow. */
-.yo-timing-source {
-    font-size: 0.78rem;
-    line-height: 1.6;
-    color: #9097a3;
-    margin: 0.2rem 0.2rem 0 0.2rem;
-    max-width: 68ch;
-}
-
-.yo-timing-intro code,
-.yo-timing-source code,
-.yo-timing-note code {
+.yo-timing-intro code {
     font-size: 0.86em;
     background: #f3f4f6;
     padding: 0.05rem 0.25rem;
@@ -147,18 +121,6 @@
 .yo-grid {
     stroke: #e9ebf0;
     stroke-width: 1;
-}
-
-.yo-guide {
-    stroke: #c7cad3;
-    stroke-width: 1.5;
-    stroke-dasharray: 5 4;
-}
-
-.yo-guide-label {
-    font-size: 10px;
-    fill: #9ca3af;
-    font-style: italic;
 }
 
 .yo-axis {
@@ -191,120 +153,12 @@
     font-variant-numeric: tabular-nums;
 }
 
-.yo-chart-note {
-    font-size: 9.5px;
-    fill: #9ca3af;
-}
-
 .yo-bar-main { fill: #a5b4d4; }
 .yo-bar-detail { fill: #d5c3b0; }
 
 .yo-bar-mean {
     stroke: #252947;
     stroke-width: 2;
-}
-
-.yo-legend {
-    display: flex;
-    gap: 1.1rem;
-    align-items: center;
-    margin-bottom: 0.4rem;
-    font-size: 0.74rem;
-    color: #6b7280;
-}
-
-.yo-legend-item {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.35rem;
-}
-
-/* ── Scaling chart ─────────────────────────────────── */
-.yo-line {
-    fill: none;
-    stroke-width: 2;
-}
-
-.yo-line-label {
-    font-size: 10px;
-    font-weight: 600;
-}
-
-.yo-line-a { stroke: #4f7a52; }
-.yo-line-b { stroke: #b07d3a; }
-.yo-line-c { stroke: #a03c4a; }
-
-.yo-dot.yo-line-a { fill: #4f7a52; }
-.yo-dot.yo-line-b { fill: #b07d3a; }
-.yo-dot.yo-line-c { fill: #a03c4a; }
-
-text.yo-line-label.yo-line-a { fill: #4f7a52; stroke: none; }
-text.yo-line-label.yo-line-b { fill: #b07d3a; stroke: none; }
-text.yo-line-label.yo-line-c { fill: #a03c4a; stroke: none; }
-
-.yo-growth {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem 1.4rem;
-    margin-top: 0.6rem;
-}
-
-.yo-growth-item {
-    display: flex;
-    align-items: baseline;
-    gap: 0.4rem;
-    font-size: 0.78rem;
-    color: #6b7280;
-}
-
-.yo-growth-swatch {
-    width: 0.65rem;
-    height: 0.65rem;
-    border-radius: 0.15rem;
-    align-self: center;
-}
-
-.yo-growth-swatch.yo-line-a { background: #4f7a52; }
-.yo-growth-swatch.yo-line-b { background: #b07d3a; }
-.yo-growth-swatch.yo-line-c { background: #a03c4a; }
-
-.yo-growth-value {
-    font-size: 0.95rem;
-    font-weight: 700;
-    color: #1a1a2e;
-    font-variant-numeric: tabular-nums;
-}
-
-/* ── Memory ────────────────────────────────────────── */
-.yo-memory {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-    width: 100%;
-}
-
-.yo-memory-item {
-    flex: 1 1 10rem;
-    min-width: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 0.15rem;
-    padding: 0.65rem 0.75rem;
-    background: #f7f8fb;
-    border-radius: 0.5rem;
-}
-
-.yo-memory-value {
-    font-size: 1.15rem;
-    font-weight: 700;
-    color: #1a1a2e;
-    font-variant-numeric: tabular-nums;
-}
-
-.yo-memory-label {
-    font-size: 0.72rem;
-    color: #6b7280;
-    line-height: 1.45;
 }
 
 /* Visible to a screen reader, not to the eye. display:none and
@@ -361,36 +215,8 @@ text.yo-line-label.yo-line-c { fill: #a03c4a; stroke: none; }
 
 @keyframes yo-spin { to { transform: rotate(360deg); } }
 
-/* A hint of the shape that is coming, so the wait does not look like a
-   broken page. Purely decorative, hidden from assistive tech. */
-.yo-skeleton {
-    display: flex;
-    flex-direction: column;
-    gap: 0.6rem;
-    max-width: 26rem;
-    margin: 1.75rem auto 0 auto;
-}
-
-.yo-skeleton span {
-    height: 0.7rem;
-    border-radius: 0.35rem;
-    background: linear-gradient(90deg, #eef0f4 25%, #e2e5ec 37%, #eef0f4 63%);
-    background-size: 400% 100%;
-    animation: yo-shimmer 1.4s ease-in-out infinite;
-}
-
-.yo-skeleton span:nth-child(2) { width: 82%; }
-.yo-skeleton span:nth-child(3) { width: 60%; }
-
-@keyframes yo-shimmer {
-    0% { background-position: 100% 50%; }
-    100% { background-position: 0 50%; }
-}
-
 @media (prefers-reduced-motion: reduce) {
-    .yo-spinner,
-    .yo-skeleton span,
-    .yo-dot-loading { animation: none; }
+    .yo-spinner { animation: none; }
 }
 
 /* ── Toolbar ───────────────────────────────────────── */
@@ -482,13 +308,6 @@ text.yo-line-label.yo-line-c { fill: #a03c4a; stroke: none; }
     font-weight: 600;
     color: #1a1a2e;
     word-break: break-word;
-}
-
-.yo-method-note {
-    font-size: 0.8rem;
-    line-height: 1.6;
-    color: #6b7280;
-    margin: 0 0 0.85rem 0;
 }
 
 .yo-method-form {
@@ -740,16 +559,11 @@ text.yo-line-label.yo-line-c { fill: #a03c4a; stroke: none; }
     padding: 1rem 1.15rem;
 }
 
-.yo-state-note {
-    font-size: 0.78rem;
-    line-height: 1.6;
-    color: #6b7280;
-    margin: 0 0 0.85rem 0;
-}
-
+/* Three columns for three indexes. Was four, while a `last ts` tile sat
+   alongside them; leaving it at four would have left a quarter-width gap. */
 .yo-totals {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(3, 1fr);
     gap: 0.4rem;
     margin-bottom: 0.9rem;
 }

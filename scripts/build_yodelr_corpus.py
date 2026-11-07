@@ -179,7 +179,10 @@ def main():
     packed = data_path.stat().st_size
     meta = {
         "dataset": "Sentiment140",
-        "datasetUrl": "https://huggingface.co/datasets/sentiment140",
+        # Kaggle rather than the Hugging Face mirror: this is where the dump
+        # is published, and it is the page fetch_data.py points at, so a
+        # reader following the link lands on the file the numbers came from.
+        "datasetUrl": "https://www.kaggle.com/datasets/kazanova/sentiment140",
         "filter": "posts containing a #hashtag",
         "scannedRows": scanned,
         "posts": len(records),

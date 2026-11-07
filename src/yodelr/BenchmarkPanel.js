@@ -1,26 +1,29 @@
-/* The Timing tab.
+/* The Timing tab: one chart, one sentence saying where the data came from.
  *
- * Everything else on this page is live: you press a button, Python runs, you
- * see what it returned. This tab is the one exception, and it says so, because
- * the numbers it shows cannot be produced in a browser tab. benchmark.py runs
- * for minutes, holds 157 MB, disables the garbage collector to keep the tail
- * clean, and resolves a 254 ns add_user — none of which Pyodide can do, and
- * the last one not even natively without subtracting the clock's own cost.
+ * Everything else on this page is live — you press a button, Python runs, you
+ * see what it returned. This tab is the one exception, because the numbers it
+ * shows cannot be produced in a browser tab. benchmark.py runs for minutes,
+ * holds 589 MB, disables the garbage collector to keep the tail clean, and
+ * resolves a 293 ns add_user — none of which Pyodide can do, and the last one
+ * not even natively without subtracting the clock's own cost. So they were
+ * measured once on a laptop and shipped.
  *
- * So they were measured once on a laptop and shipped. The raw stdout of that
- * run is committed next to the JSON and linked below, so every number here can
- * be checked against the thing it was parsed from.
+ * public/yodelr/benchmark.txt is that run's verbatim stdout, committed beside
+ * the JSON, and every number drawn here was parsed out of it by
+ * scripts/build_yodelr_benchmark.py rather than typed. The JSON is a superset
+ * of what the chart uses: it also carries the scaling sweep and the memory
+ * figures, which this tab used to draw and no longer does. They stay in the
+ * capture and in the parser because they are measurements, and losing them to
+ * a layout decision would be the wrong trade.
  *
- * Both charts are hand-drawn SVG rather than a charting library. Two reasons:
- * the bundle is already large enough, and both axes here need to be
- * logarithmic over five decades, which is exactly the case where a library's
- * defaults fight you.
+ * The chart is hand-drawn SVG rather than a charting library. Two reasons: the
+ * bundle is already large enough, and the axis needs to be logarithmic over six
+ * decades, which is exactly the case where a library's defaults fight you.
  */
 
 import React, { useEffect, useState } from 'react';
 
 const BENCHMARK_URL = `${process.env.PUBLIC_URL}/yodelr/benchmark.json`;
-const CAPTURE_URL = `${process.env.PUBLIC_URL}/yodelr/benchmark.txt`;
 
 /* Same three-way split benchmark.py's own _unit() uses, so a number here reads
  * identically to the same number in the committed capture. */
@@ -29,17 +32,6 @@ function formatNs(ns) {
   if (ns < 1e6) return `${(ns / 1e3).toFixed(2)} µs`;
   if (ns < 1e9) return `${(ns / 1e6).toFixed(2)} ms`;
   return `${(ns / 1e9).toFixed(2)} s`;
-}
-
-/* Axis ticks, so short beats exact. The sweep's sizes are round numbers until
-   the last one, which is however many posts the corpus happened to have
-   (1,587,224 → "1.59M"), so trim the trailing zeros rather than printing
-   either "1.587224M" or a misleading "2M". */
-function compact(n) {
-  const trim = (v) => String(Number(v.toFixed(2)));
-  if (n >= 1e6) return `${trim(n / 1e6)}M`;
-  if (n >= 1e3) return `${trim(n / 1e3)}k`;
-  return String(n);
 }
 
 /* ── Latency ─────────────────────────────────────────────────────────── */
@@ -73,39 +65,17 @@ function decadesFor(values) {
 const PLOT_X0 = 246;
 const PLOT_X1 = 620;
 const VALUE_X = PLOT_X1 + 14;
-const NOTE_X = PLOT_X1 + 82;
-/* Wide enough for the longest trailing note the report produces. The notes
-   grew when the corpus did -- "#followfriday -- 2100 posts" and "~1,599,355
-   posts in window" are both longer than anything the 400k run emitted -- and
-   an SVG clips rather than wrapping, so the margin is deliberate. The whole
-   chart scales to the container width, so the only cost of a wider viewBox is
-   slightly smaller text. */
-const CHART_W = 880;
+/* Just past the median column. There used to be a third column out here for
+   the report's trailing notes ("#followfriday -- 2100 posts"), and the viewBox
+   was 880 to hold the longest of them. With that column gone the extra 180
+   units would be blank margin, and because the chart scales to its container,
+   blank margin is paid for in smaller text everywhere else. */
+const CHART_W = 700;
 const ROW_H = 21;
 const HEAD_H = 25;
 
-/* The trailing note, or nothing for the trending rows.
- *
- * benchmark.py times 200 randomly placed windows but counts the posts in only
- * one of them — `mid = starts[0]`, the first draw — so that note is a single
- * sample standing beside statistics gathered from two hundred. It is not a
- * small inaccuracy either: on this corpus the median one-hour window holds no
- * posts at all, so the count swings between zero and the full window width
- * depending on where one random draw landed. The capture shows it plainly: the
- * 1-week row reports fewer posts than the 1-day row, which cannot be true of
- * any single window and is only possible because they are different draws.
- *
- * Every other note is solid — a user's post count, a topic's post count, the
- * size of the whole system — so they stay. The capture keeps all of them; this
- * drops four from the drawing only, and the JSON beside it is still complete.
- */
-function noteFor(row) {
-  if (row.label.includes('trending')) return '';
-  return row.note.replace(' -- ', ' — ');
-}
-
-/* Exported so the two charts can be rendered and rasterised outside a browser
-   when checking that nothing overlaps or falls off the edge. */
+/* Exported so the chart can be rendered and rasterised outside a browser when
+   checking that nothing overlaps or falls off the edge. */
 export function LatencyChart({ groups }) {
   /* Every drawn quantity, so nothing can fall outside the axis: the bars run
      median to p99 and the tick is the mean, and all three have to fit. */
@@ -207,123 +177,9 @@ export function LatencyChart({ groups }) {
             <text x={VALUE_X} y={mid + 3.5} className="yo-chart-value">
               {formatNs(row.medianNs)}
             </text>
-            <text x={NOTE_X} y={mid + 3.5} className="yo-chart-note">
-              {/* benchmark.py writes "#fb -- 483 posts" because its output is
-                  a terminal. Here an en dash is just the same note, set. */}
-              {noteFor(row)}
-            </text>
           </g>
         );
       })}
-    </svg>
-  );
-}
-
-/* ── Scaling ─────────────────────────────────────────────────────────── */
-
-const SERIES = [
-  ['addPostNs', 'add_post', 'yo-line-a'],
-  ['trendingDayNs', 'get_trending_topics, 1-day window', 'yo-line-b'],
-  ['deleteUserNs', 'delete_user', 'yo-line-c'],
-];
-
-const S_X0 = 64;
-const S_X1 = 700;
-const S_Y0 = 28;
-const S_Y1 = 236;
-export function ScalingChart({ rows }) {
-  const xs = rows.map((r) => r.posts);
-  const lx0 = Math.log10(Math.min(...xs));
-  const lx1 = Math.log10(Math.max(...xs));
-
-  /* Same reason as the latency axis: this was pinned at 1 µs–100 ms, and py()
-     does not clamp, so a slower delete_user on a bigger corpus would simply
-     have been plotted above the top of the box. */
-  const sDec = decadesFor(rows.flatMap((r) => SERIES.map(([key]) => r[key])));
-  const ly0 = Math.log10(sDec.lo);
-  const ly1 = Math.log10(sDec.hi);
-
-  const px = (posts) => S_X0 + ((Math.log10(posts) - lx0) / (lx1 - lx0)) * (S_X1 - S_X0);
-  const py = (ns) => S_Y1 - ((Math.log10(ns) - ly0) / (ly1 - ly0)) * (S_Y1 - S_Y0);
-
-  /* On log-log axes a straight line is a power law and its slope is the
-     exponent, so "costs twice as much when the data doubles" is literally a
-     45-degree line. Drawing one lets you read each series against O(n) by
-     eye instead of doing arithmetic on the table. */
-  /* Derived, not written out. The growth multiples are shown below the chart
-     too, computed from these same rows; a hand-typed description here would be
-     the one summary that quietly failed to update when the corpus changed —
-     and the one nobody sighted would ever notice. */
-  const label = 'Cost per call against dataset size, both axes logarithmic. Over a '
-    + `${Math.round(Math.max(...xs) / Math.min(...xs))}-fold increase in posts, `
-    + SERIES.map(([key, name]) => {
-      const g = rows[rows.length - 1][key] / rows[0][key];
-      return `${name.split(',')[0]} grows ${g.toFixed(1)} times`;
-    }).join(', ')
-    + '. The dashed line is linear growth, for reference.';
-
-  const first = rows[0];
-  const guide = [
-    [px(first.posts), py(first.deleteUserNs)],
-    [px(rows[rows.length - 1].posts),
-      py(first.deleteUserNs * (rows[rows.length - 1].posts / first.posts))],
-  ];
-
-  return (
-    <svg
-      className="yo-chart"
-      viewBox={`0 0 ${CHART_W} 286`}
-      role="img"
-      aria-label={label}
-    >
-      <text x={0} y={12} className="yo-axis">time per call</text>
-
-      {sDec.ticks.map((d) => (
-        <g key={d}>
-          <line x1={S_X0} x2={S_X1} y1={py(d)} y2={py(d)} className="yo-grid" />
-          <text x={S_X0 - 8} y={py(d) + 3.5} className="yo-axis" textAnchor="end">
-            {formatNs(d).replace('.00', '')}
-          </text>
-        </g>
-      ))}
-
-      {rows.map((r) => (
-        <text key={r.posts} x={px(r.posts)} y={S_Y1 + 18} className="yo-axis" textAnchor="middle">
-          {compact(r.posts)}
-        </text>
-      ))}
-      <text x={(S_X0 + S_X1) / 2} y={S_Y1 + 36} className="yo-axis" textAnchor="middle">
-        posts in the system
-      </text>
-
-      <line
-        x1={guide[0][0]} y1={guide[0][1]} x2={guide[1][0]} y2={guide[1][1]}
-        className="yo-guide"
-      />
-      <text x={guide[1][0] - 6} y={guide[1][1] - 8} className="yo-guide-label" textAnchor="end">
-        linear — O(n)
-      </text>
-
-      {SERIES.map(([key, label, cls]) => (
-        <g key={key}>
-          <polyline
-            className={`yo-line ${cls}`}
-            points={rows.map((r) => `${px(r.posts)},${py(r[key])}`).join(' ')}
-          />
-          {rows.map((r) => (
-            <circle key={r.posts} cx={px(r.posts)} cy={py(r[key])} r={3} className={`yo-dot ${cls}`}>
-              <title>{`${label} at ${r.posts.toLocaleString('en-US')} posts: ${formatNs(r[key])}`}</title>
-            </circle>
-          ))}
-          <text
-            x={S_X1 + 8}
-            y={py(rows[rows.length - 1][key]) + 3.5}
-            className={`yo-line-label ${cls}`}
-          >
-            {key === 'trendingDayNs' ? 'trending/day' : label}
-          </text>
-        </g>
-      ))}
     </svg>
   );
 }
@@ -373,19 +229,7 @@ export default function BenchmarkPanel() {
   };
   const prep = (rows) => rows.map((r) => ({ ...r, display: label(r) }));
 
-  const growth = (key) => {
-    const a = data.scaling[0];
-    const b = data.scaling[data.scaling.length - 1];
-    return (b[key] / a[key]).toFixed(1);
-  };
-  const sizeGrowth = Math.round(
-    data.scaling[data.scaling.length - 1].posts / data.scaling[0].posts,
-  );
-
   const c = data.corpus;
-  /* By label, not by index: the parser preserves benchmark.py's own order, and
-     adding a row there should not silently repoint the sentence below. */
-  const hour = data.reads.find((r) => r.label.includes('1 hour'));
 
   return (
     <div className="yo-timing" role="tabpanel" id="yo-panel-timing" aria-labelledby="yo-tab-timing">
@@ -394,27 +238,12 @@ export default function BenchmarkPanel() {
         <p className="yo-timing-intro">
           The timings below come from {Math.round(c.posts).toLocaleString('en-US')} real
           tweets, {Math.round(c.users).toLocaleString('en-US')} users and{' '}
-          {Math.round(c.distinct_topics).toLocaleString('en-US')} topics. It is the{' '}
+          {Math.round(c.distinct_topics).toLocaleString('en-US')} topics. It is the public{' '}
           {c.datasetUrl
             ? <a href={c.datasetUrl} target="_blank" rel="noreferrer">{c.datasetName || 'Sentiment140'}</a>
             : (c.datasetName || 'Sentiment140')}{' '}
           dataset.
         </p>
-
-        <div className="yo-legend">
-          <span className="yo-legend-item">
-            <svg width="26" height="11" aria-hidden="true">
-              <rect x="0" y="1" width="26" height="9" rx="2" className="yo-bar-main" />
-            </svg>
-            median to p99
-          </span>
-          <span className="yo-legend-item">
-            <svg width="10" height="15" aria-hidden="true">
-              <line x1="5" y1="0" x2="5" y2="15" className="yo-bar-mean" />
-            </svg>
-            mean
-          </span>
-        </div>
 
         <LatencyChart
           groups={[
@@ -423,104 +252,7 @@ export default function BenchmarkPanel() {
             ['Deletes', prep(data.deletes)],
           ]}
         />
-
-        {hour && (
-          <p className="yo-timing-note">
-            Read the gap between the tick and the bar. For a one-hour trending window the
-            median call takes {formatNs(hour.medianNs)} and the mean takes{' '}
-            {formatNs(hour.meanNs)} — {Math.round(hour.meanNs / hour.medianNs)} times more —
-            because most of the 200 windows landed on a quiet stretch of 2009 and a few
-            landed on a busy one. The cost follows how many posts fall inside the window,
-            not how many exist, which is why the trending rows climb while nothing else
-            does.
-          </p>
-        )}
-
-        {hour && (
-          <p className="yo-timing-note">
-            The quiet and busy stretches are sharper than they sound. Sentiment140 records
-            whole seconds, 2009 Twitter produced far more than one tweet per second, and
-            Yodelr requires timestamps to strictly increase — so each burst gets spread into
-            a run of exactly one post per second, while the gaps between bursts stay empty,
-            some of them for days. The timeline is therefore either saturated at 1&nbsp;Hz or
-            deserted, with little in between, and a trending window lands in one or the
-            other. That is the gap between those medians and their means.
-          </p>
-        )}
       </div>
-
-      <div className="vertical-card">
-        <h2>What happens as the data grows</h2>
-        <p className="yo-timing-intro">
-          The same three measurements repeated at growing sizes. This is the part that
-          actually checks the complexity table in <code>yodelr.py</code>, because a single
-          measurement can only tell you that something is fast today.
-        </p>
-
-        <ScalingChart rows={data.scaling} />
-
-        <div className="yo-growth">
-          {SERIES.map(([key, name, cls]) => (
-            <div className="yo-growth-item" key={key}>
-              <span className={`yo-growth-swatch ${cls}`} aria-hidden="true" />
-              <span className="yo-growth-value">×{growth(key)}</span>
-              <span className="yo-growth-label">
-                <code>{name.split(',')[0]}</code>
-                {name.includes(',') && <>, 1-day window</>}
-              </span>
-            </div>
-          ))}
-        </div>
-
-        <p className="yo-timing-note">
-          Over a {sizeGrowth}× increase in posts, <code>add_post</code> got{' '}
-          {growth('addPostNs')}× slower and <code>delete_user</code> got{' '}
-          {growth('deleteUserNs')}× slower. That is the trade the implementation makes on
-          purpose: three indexes kept in sorted order so that every read is already in the
-          order it needs to be, paid for by a timeline rebuild on delete that costs the same
-          whether the user wrote one post or a thousand. Trending sits in between at{' '}
-          {growth('trendingDayNs')}× — the window is still a fixed day, but a day of a
-          denser feed holds more posts to scan.
-        </p>
-      </div>
-
-      <div className="vertical-card">
-        <h2>What it costs to hold</h2>
-        <div className="yo-memory">
-          <div className="yo-memory-item">
-            <span className="yo-memory-value">{data.memory.bytesPerPost.toFixed(0)}</span>
-            <span className="yo-memory-label">bytes per post, all three indexes</span>
-          </div>
-          <div className="yo-memory-item">
-            <span className="yo-memory-value">{data.memory.heldMb.toFixed(1)} MB</span>
-            <span className="yo-memory-label">
-              for {Math.round(data.memory.posts).toLocaleString('en-US')} posts
-            </span>
-          </div>
-          <div className="yo-memory-item">
-            <span className="yo-memory-value">
-              {Math.round(data.memory.topicIndexEntries).toLocaleString('en-US')}
-            </span>
-            <span className="yo-memory-label">entries in the topic index</span>
-          </div>
-        </div>
-        <p className="yo-timing-note">
-          The topic index holds one entry per (post, topic) pair rather than per post, so it
-          grows with how heavily people tag rather than with how much they write. On this
-          corpus that is cheap — only {c.posts_with_topics_pct}% of 2009 tweets carry a
-          hashtag at all.
-        </p>
-      </div>
-
-      {/* The one line the intro cannot drop. Everything else on this page is
-          live and self-evidently so; these numbers are not, and a reader has
-          no way to tell unless told. The link is also what makes them
-          checkable, which is the only reason to trust them. */}
-      <p className="yo-timing-source">
-        Measured natively by <code>benchmark.py</code>, not in your browser —{' '}
-        <a href={CAPTURE_URL} target="_blank" rel="noreferrer">the raw output</a> is
-        committed beside this page and every number above is parsed from it.
-      </p>
     </div>
   );
 }

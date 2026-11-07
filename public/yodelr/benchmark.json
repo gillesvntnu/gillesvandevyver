@@ -8,7 +8,7 @@
     "mentions_per_post": 0.03,
     "mean_text_len": 72.87,
     "span_seconds": 6869338.0,
-    "datasetUrl": "https://huggingface.co/datasets/sentiment140",
+    "datasetUrl": "https://www.kaggle.com/datasets/kazanova/sentiment140",
     "datasetName": "Sentiment140"
   },
   "writes": [
@@ -192,5 +192,5 @@
   "clockOverheadNs": 47.0,
   "skippedRows": 645,
   "capturedFrom": "benchmark.txt",
-  "builtAt": "2026-11-07T19:01:02Z"
+  "builtAt": "2026-11-07T19:23:59Z"
 }

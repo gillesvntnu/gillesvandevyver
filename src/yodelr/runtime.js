@@ -106,32 +106,6 @@ class Bridge:
         elapsed = (time.perf_counter() - start) * 1000.0
         return json.dumps({"ok": True, "ms": elapsed, "value": value})
 
-    def bulk_add(self, payload_json):
-        """Load many users and posts, timing the adds and nothing else."""
-        payload = json.loads(payload_json)
-
-        start = time.perf_counter()
-        try:
-            for name in payload["users"]:
-                self.y.add_user(name)
-            for user, text, ts in payload["posts"]:
-                self.y.add_post(user, text, ts)
-        except Exception as err:          # noqa: BLE001
-            elapsed = (time.perf_counter() - start) * 1000.0
-            return json.dumps({
-                "ok": False,
-                "ms": elapsed,
-                "errorType": type(err).__name__,
-                "error": str(err),
-            })
-        elapsed = (time.perf_counter() - start) * 1000.0
-        return json.dumps({
-            "ok": True,
-            "ms": elapsed,
-            "value": None,
-            "count": len(payload["posts"]) + len(payload["users"]),
-        })
-
     def load_corpus(self, path):
         """Replay a gzipped TSV corpus of real tweets through the implementation.
 
@@ -371,9 +345,6 @@ async function boot(onProgress) {
     /** Call one of the six API methods. Resolves with the error, never rejects. */
     call(method, args) {
       return JSON.parse(bridge.call(method, JSON.stringify(args)));
-    },
-    bulkAdd(users, posts) {
-      return JSON.parse(bridge.bulk_add(JSON.stringify({ users, posts })));
     },
     /** Replay the real-tweet corpus. Downloads it the first time. */
     async loadCorpus(onProgress) {
