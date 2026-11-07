@@ -1,4 +1,4 @@
-/* The Timing tab: two charts, one sentence each saying where the data came from.
+/* The Timing tab: three charts, one sentence each saying where the data came from.
  *
  * Everything else on this page is live — you press a button, Python runs, you
  * see what it returned. This tab is the one exception, because the numbers it
@@ -20,19 +20,33 @@
  * bundle is already large enough, and the axis needs to be logarithmic over six
  * decades, which is exactly the case where a library's defaults fight you.
  *
- * Two captures, because there are two implementations, and the second card is
- * only meaningful if the pair is comparable. Both were therefore measured on
- * the same machine in the same sitting: a 30% faster laptop would swamp a
- * genuine difference, and the reader has no way to tell the two apart by
- * looking. Each chart scales its own axis, so the same bar length in the two
- * cards does not mean the same duration -- the axis labels are what to read.
+ * Three captures, because there are three implementations, and the lower cards
+ * are only meaningful if all three are comparable. They were therefore
+ * measured on the same machine in the same sitting: a 30% faster laptop would
+ * swamp a genuine difference, and the reader has no way to tell the two apart
+ * by looking. For the same reason the C++ numbers come from a port of
+ * benchmark.py rather than a benchmark written fresh -- same corpus, same
+ * random draws, same percentile arithmetic, so the difference between the
+ * cards is the implementation and not the measurement.
+ *
+ * All three charts share one axis, derived from every value any of them draws.
+ * That is the whole point: a bar of a given length means the same duration on
+ * every card, so the comparison can be made by eye instead of by reading
+ * three sets of labels. It leaves the faster cards with empty space on the
+ * right, which is the honest picture -- that space is work they do not do.
  */
 
 import React, { useEffect, useState } from 'react';
 
+/* Three captures, one per card. All three were produced by the same harness
+ * -- the C++ one is a port of benchmark.py that prints the same format -- and
+ * all three were measured on the same machine in the same sitting, which is
+ * the only reason the cards can be read against each other at all. */
+const BENCHMARK_KEYS = ['v1', 'v2', 'cpp'];
 const BENCHMARK_URLS = {
   v1: `${process.env.PUBLIC_URL}/yodelr/benchmark.json`,
   v2: `${process.env.PUBLIC_URL}/yodelr/benchmark_v2.json`,
+  cpp: `${process.env.PUBLIC_URL}/yodelr/benchmark_cpp.json`,
 };
 
 /* Same three-way split benchmark.py's own _unit() uses, so a number here reads
@@ -244,12 +258,20 @@ export default function BenchmarkPanel() {
   useEffect(() => {
     let cancelled = false;
     Promise.all(
-      ['v1', 'v2'].map((key) => fetch(BENCHMARK_URLS[key]).then((r) => {
+      BENCHMARK_KEYS.map((key) => fetch(BENCHMARK_URLS[key]).then((r) => {
         if (!r.ok) throw new Error(`${key}: ${r.status} ${r.statusText}`);
         return r.json();
       })),
     )
-      .then(([v1, v2]) => { if (!cancelled) setData({ v1, v2 }); })
+      /* Zipped back onto the keys rather than destructured positionally: the
+         list is the single place a capture is named, so adding a fourth one
+         means editing BENCHMARK_KEYS and nothing else. */
+      .then((loaded) => {
+        if (cancelled) return;
+        const next = {};
+        BENCHMARK_KEYS.forEach((key, i) => { next[key] = loaded[i]; });
+        setData(next);
+      })
       .catch((err) => { if (!cancelled) setError(err.message); });
     return () => { cancelled = true; };
   }, []);
@@ -271,17 +293,18 @@ export default function BenchmarkPanel() {
     );
   }
 
-  const groups = { v1: groupsFor(data.v1), v2: groupsFor(data.v2) };
-  /* One axis for both cards. Left to themselves the two charts each fit the
-     axis to their own slowest call -- about 600 ms for v1, about 150 ms for
-     v2 -- so the same duration would sit at two different places on the page
-     and the eye would compare bars drawn to two different scales. The whole
-     point of the second card is the comparison, so the domain is derived from
-     both captures at once. It costs v2 the right-hand stretch of its plot,
-     which is exactly the right picture: that empty space is the work it no
-     longer does. */
+  const groups = {};
+  BENCHMARK_KEYS.forEach((key) => { groups[key] = groupsFor(data[key]); });
+  /* One axis for all three cards. Left to themselves each chart fits the axis
+     to its own slowest call -- about 600 ms for v1, about 150 ms for v2, less
+     again for the C++ port -- so the same duration would sit at three
+     different places on the page and the eye would compare bars drawn to
+     three different scales. The whole point of the lower cards is the
+     comparison, so the domain is derived from every capture at once. It costs
+     the faster two the right-hand stretch of their plots, which is exactly
+     the right picture: that empty space is the work they no longer do. */
   const domain = decadesFor(
-    drawnValues(groups.v1).concat(drawnValues(groups.v2)),
+    BENCHMARK_KEYS.reduce((all, key) => all.concat(drawnValues(groups[key])), []),
   );
 
   const c = data.v1.corpus;
@@ -308,6 +331,19 @@ export default function BenchmarkPanel() {
         groups={groups.v2}
         domain={domain}
         intro={<>Adding hourly buckets instead of one big list</>}
+      />
+      <TimingCard
+        title="Timing in C++"
+        groups={groups.cpp}
+        domain={domain}
+        intro={(
+          <>
+            The same algorithm as the card above, written in C++ rather than
+            Python. Same tweets, same machine, same random windows — the
+            benchmark is a port of the Python one, so only the language
+            changed. The playground on the other tabs still runs the Python.
+          </>
+        )}
       />
     </div>
   );

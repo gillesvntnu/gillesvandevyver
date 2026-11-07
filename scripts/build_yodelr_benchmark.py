@@ -16,24 +16,32 @@ benchmark.txt is committed as the receipt. Every number the page shows can
 be found in it by eye, and the page links to it. If the two ever disagree,
 the text wins and this parser is wrong.
 
-    python3 scripts/build_yodelr_benchmark.py                 # re-parse the capture
-    python3 scripts/build_yodelr_benchmark.py --run           # re-measure, then parse
-    python3 scripts/build_yodelr_benchmark.py --run --impl v2 # the same, for v2
+    python3 scripts/build_yodelr_benchmark.py                  # re-parse the capture
+    python3 scripts/build_yodelr_benchmark.py --run            # re-measure, then parse
+    python3 scripts/build_yodelr_benchmark.py --run --impl v2  # the same, for v2
+    python3 scripts/build_yodelr_benchmark.py --run --impl cpp # the same, for C++
 
 --run needs the challenge repo and the downloaded dataset; the default path
 needs neither, so the site builds anywhere.
 
-There are two implementations and so two captures, written and parsed by this
-one script rather than by a copy of it with the filenames changed. v1 keeps
-the unsuffixed names it already had. The capture says which implementation it
-came from, and the run refuses to parse a capture whose marker disagrees with
---impl -- otherwise the one mistake nobody would notice is a v1 run quietly
-being written into benchmark_v2.json, and the page would report a 68x speedup
-of v1 over itself.
+There are three implementations and so three captures, written and parsed by
+this one script rather than by a copy of it with the filenames changed. v1
+keeps the unsuffixed names it already had. The capture says which
+implementation it came from, and the run refuses to parse a capture whose
+marker disagrees with --impl -- otherwise the one mistake nobody would notice
+is a v1 run quietly being written into benchmark_v2.json, and the page would
+report a 68x speedup of v1 over itself.
+
+cpp is measured by a different program -- cpp/benchmark, a port of
+benchmark.py -- but deliberately not by a different parser. The port prints
+the same format strings, so the capture it produces reads here exactly like a
+Python one, and the three cards on the page are built by one piece of code
+rather than three that have to be kept in agreement.
 
 Outputs:
     public/yodelr/benchmark.json      parsed rows, all times in nanoseconds
     public/yodelr/benchmark_v2.json   the same, for yodelr_v2.py
+    public/yodelr/benchmark_cpp.json  the same, for the C++ port
 """
 
 import argparse
@@ -61,6 +69,7 @@ def paths_for(impl):
 
 DEFAULT_SRC_REPO = REPO_ROOT.parent / "yodelr-coding-challenge"
 HARNESS_REL = "yodelr_twitter_test/yodelr_twitter_test"
+CPP_REL = "yodelr_twitter_test/cpp"
 
 # benchmark.py prints every duration through its _unit() helper, which picks
 # one of three suffixes by magnitude. Parse all three back to nanoseconds so
@@ -203,8 +212,55 @@ def parse(text):
     return out
 
 
+def run_cpp_benchmark(src_repo, limit):
+    """Re-measure with the C++ harness, building it first.
+
+    cpp/benchmark.cpp is a port of benchmark.py: same corpus, same random
+    draws, same statistics, same output format. So the only thing that changes
+    here is which process produces the text -- everything downstream, the
+    parser included, is shared. That is the point. A second parser for a
+    second harness is a second thing to keep in step, and the one that is
+    wrong is always the one nobody looked at.
+
+    `make` rather than a g++ command line, so the compiler flags live in one
+    place next to the code they build, and so the generated entity table gets
+    regenerated if it is missing.
+    """
+    cpp_dir = src_repo / CPP_REL
+    source = cpp_dir / "benchmark.cpp"
+    if not source.exists():
+        sys.exit("build_yodelr_benchmark: no benchmark.cpp at {}".format(source))
+
+    print("building the C++ benchmark")
+    built = subprocess.run(["make", "benchmark"], cwd=str(cpp_dir),
+                           stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+                           text=True)
+    if built.returncode != 0:
+        sys.stderr.write(built.stdout)
+        sys.exit("build_yodelr_benchmark: make failed")
+
+    # Run from the harness directory, not from cpp/, because the binary looks
+    # for the dataset at the same relative path benchmark.py does. Measuring a
+    # different file than the Python runs measured would be the one difference
+    # that invalidates the whole comparison.
+    harness = src_repo / HARNESS_REL
+    print("running cpp/benchmark --limit {} (this takes minutes)".format(limit))
+    done = subprocess.run(
+        [str((cpp_dir / "benchmark").resolve()), "--limit", str(limit)],
+        cwd=str(harness), stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+        text=True,
+    )
+    if done.returncode != 0:
+        sys.stderr.write(done.stdout)
+        sys.exit("build_yodelr_benchmark: cpp/benchmark failed")
+    return done.stdout
+
+
 def run_benchmark(src_repo, limit, impl):
     """Re-measure. Only used with --run; the committed capture is the default."""
+    if impl == "cpp":
+        return run_cpp_benchmark(src_repo, limit)
+
     harness = src_repo / HARNESS_REL
     script = harness / "benchmark.py"
     if not script.exists():
@@ -234,7 +290,7 @@ def main():
                     help="posts to measure, when --run is given")
     ap.add_argument("--src", type=Path, default=DEFAULT_SRC_REPO,
                     help="path to the yodelr challenge repo")
-    ap.add_argument("--impl", choices=("v1", "v2"), default="v1",
+    ap.add_argument("--impl", choices=("v1", "v2", "cpp"), default="v1",
                     help="which implementation's capture to build (default: v1)")
     args = ap.parse_args()
 
