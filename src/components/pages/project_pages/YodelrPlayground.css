@@ -1,0 +1,901 @@
+/* YodelrPlayground.css: the in-browser Yodelr demo.
+   Palette follows CommonStyles.css: #252947 accent, #374151 body text,
+   #e5e7eb rules, #6b7280 secondary. The site is light-only, so there is no
+   dark variant here either. */
+
+.yo-intro {
+    margin-top: 0.5rem;
+}
+
+.yo-intro p {
+    margin-bottom: 0.9rem;
+}
+
+.project-page-container code,
+.yo-prose code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.875em;
+    background: #f3f4f6;
+    padding: 0.08em 0.32em;
+    border-radius: 0.3rem;
+    word-break: normal;
+}
+
+/* ── Status bar ────────────────────────────────────── */
+.yo-statusbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-top: 1.5rem;
+    padding: 0.7rem 1.1rem;
+    background: #f7f8fb;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.75rem;
+    font-size: 0.82rem;
+    color: #4b5563;
+}
+
+.yo-status-left {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-width: 0;
+}
+
+.yo-dot {
+    width: 0.55rem;
+    height: 0.55rem;
+    border-radius: 50%;
+    flex-shrink: 0;
+    background: #9ca3af;
+}
+
+.yo-dot-loading {
+    background: #f59e0b;
+    animation: yo-pulse 1.3s ease-in-out infinite;
+}
+
+.yo-dot-ready { background: #10b981; }
+.yo-dot-error { background: #ef4444; }
+
+@keyframes yo-pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+}
+
+.yo-link-button {
+    background: none;
+    border: none;
+    padding: 0;
+    font: inherit;
+    font-size: 0.82rem;
+    color: #252947;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.yo-link-button:hover { color: #4f5486; }
+
+.yo-link-button:focus-visible,
+.yo-button:focus-visible,
+.yo-tab:focus-visible,
+.yo-row-button:focus-visible,
+.yo-field input:focus-visible,
+.yo-composer-input:focus-visible {
+    outline: 2px solid #252947;
+    outline-offset: 2px;
+}
+
+/* Visible to a screen reader, not to the eye. display:none and
+   visibility:hidden both remove the element from the accessibility tree, so
+   clip it instead. A sibling of this rule exists in carousel.scss; this page
+   keeps its own so it does not depend on another component's stylesheet
+   having been loaded. */
+.yo-visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    clip-path: inset(50%);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* ── Source dump ───────────────────────────────────── */
+.yo-source-panel {
+    margin-top: 0.75rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.75rem;
+    overflow: hidden;
+}
+
+.yo-source-note {
+    margin: 0;
+    padding: 0.7rem 1.1rem;
+    font-size: 0.8rem;
+    line-height: 1.6;
+    color: #6b7280;
+    background: #fbfbfd;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.yo-source {
+    margin: 0;
+    padding: 1rem 1.1rem;
+    max-height: 26rem;
+    overflow: auto;
+    background: #1f2333;
+    color: #e5e7eb;
+    font-size: 0.74rem;
+    line-height: 1.55;
+    tab-size: 4;
+}
+
+.yo-source code {
+    background: none;
+    padding: 0;
+    color: inherit;
+    font-size: inherit;
+    white-space: pre;
+}
+
+/* ── Boot / loading ────────────────────────────────── */
+.yo-boot {
+    text-align: center;
+    padding: 2.5rem 1.5rem;
+}
+
+.yo-boot h2 {
+    border-bottom: none;
+    margin-bottom: 0.4rem;
+}
+
+.yo-boot p {
+    max-width: 34rem;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.yo-boot-note {
+    font-size: 0.85rem;
+    color: #6b7280;
+}
+
+.yo-boot-error h2 { color: #991b1b; }
+
+.yo-spinner {
+    width: 2.2rem;
+    height: 2.2rem;
+    margin: 0 auto 1rem auto;
+    border: 3px solid #e5e7eb;
+    border-top-color: #252947;
+    border-radius: 50%;
+    animation: yo-spin 0.85s linear infinite;
+}
+
+@keyframes yo-spin { to { transform: rotate(360deg); } }
+
+/* A hint of the shape that is coming, so the wait does not look like a
+   broken page. Purely decorative, hidden from assistive tech. */
+.yo-skeleton {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    max-width: 26rem;
+    margin: 1.75rem auto 0 auto;
+}
+
+.yo-skeleton span {
+    height: 0.7rem;
+    border-radius: 0.35rem;
+    background: linear-gradient(90deg, #eef0f4 25%, #e2e5ec 37%, #eef0f4 63%);
+    background-size: 400% 100%;
+    animation: yo-shimmer 1.4s ease-in-out infinite;
+}
+
+.yo-skeleton span:nth-child(2) { width: 82%; }
+.yo-skeleton span:nth-child(3) { width: 60%; }
+
+@keyframes yo-shimmer {
+    0% { background-position: 100% 50%; }
+    100% { background-position: 0 50%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .yo-spinner,
+    .yo-skeleton span,
+    .yo-dot-loading { animation: none; }
+}
+
+/* ── Toolbar ───────────────────────────────────────── */
+.yo-toolbar {
+    margin-top: 1.5rem;
+    padding: 1rem 1.15rem;
+    border: 1px solid #ddd;
+    border-radius: 2vh;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.yo-toolbar-buttons {
+    display: flex;
+    gap: 0.6rem;
+    flex-wrap: wrap;
+}
+
+.yo-toolbar-note {
+    font-size: 0.82rem;
+    line-height: 1.65;
+    color: #6b7280;
+    margin: 0.85rem 0 0 0;
+}
+
+.yo-button {
+    font: inherit;
+    font-size: 0.86rem;
+    font-weight: 600;
+    padding: 0.5rem 1rem;
+    border: 1px solid #252947;
+    border-radius: 0.55rem;
+    background: #252947;
+    color: #fff;
+    cursor: pointer;
+    transition: background 0.15s ease;
+}
+
+.yo-button:hover:not(:disabled) { background: #363b63; }
+
+.yo-button:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+.yo-button-quiet {
+    background: #fff;
+    color: #252947;
+}
+
+.yo-button-quiet:hover:not(:disabled) { background: #f3f4f6; }
+
+/* ── Layout ────────────────────────────────────────── */
+.yo-layout {
+    display: grid;
+    grid-template-columns: 1fr 21rem;
+    gap: 1.5rem;
+    align-items: start;
+    margin-top: 1.5rem;
+}
+
+.yo-methods h2,
+.yo-state h2 {
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: #1a1a2e;
+    border-bottom: 2px solid #e5e7eb;
+    padding-bottom: 0.4rem;
+    margin: 0 0 1rem 0;
+}
+
+/* ── One method ────────────────────────────────────── */
+.yo-method {
+    border: 1px solid #ddd;
+    border-radius: 2vh;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 1rem 1.15rem;
+    margin-bottom: 1.1rem;
+}
+
+.yo-method-head {
+    margin: 0 0 0.3rem 0;
+    font-size: 0.95rem;
+}
+
+.yo-method-head code {
+    background: none;
+    padding: 0;
+    font-size: 0.92rem;
+    font-weight: 600;
+    color: #1a1a2e;
+    word-break: break-word;
+}
+
+.yo-method-note {
+    font-size: 0.8rem;
+    line-height: 1.6;
+    color: #6b7280;
+    margin: 0 0 0.85rem 0;
+}
+
+.yo-method-form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.7rem;
+    align-items: flex-start;
+}
+
+.yo-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    width: 100%;
+}
+
+.yo-field label {
+    font-size: 0.76rem;
+    font-weight: 600;
+    color: #4b5563;
+    letter-spacing: 0.01em;
+}
+
+.yo-field input {
+    font: inherit;
+    font-size: 0.88rem;
+    padding: 0.45rem 0.6rem;
+    border: 1px solid #d1d5db;
+    border-radius: 0.5rem;
+    background: #fff;
+    color: #111827;
+    width: 100%;
+}
+
+.yo-field input:focus { border-color: #252947; }
+
+.yo-field-row {
+    display: flex;
+    gap: 0.7rem;
+    width: 100%;
+    flex-wrap: wrap;
+}
+
+.yo-field-narrow {
+    flex: 1 1 8rem;
+    width: auto;
+    min-width: 7rem;
+}
+
+.yo-field-row .yo-field { flex: 1 1 10rem; }
+
+.yo-help {
+    font-size: 0.76rem;
+    line-height: 1.55;
+    color: #6b7280;
+    margin: -0.25rem 0 0 0;
+}
+
+.yo-inline-actions {
+    display: flex;
+    gap: 0.9rem;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+/* ── Composer with topic highlighting ──────────────── */
+/* The backdrop sits in normal flow and so decides the height; the textarea is
+   absolutely positioned on top of it. Because both wrap identically, the
+   highlight rectangles stay behind the right characters and neither element
+   ever needs to scroll. */
+.yo-composer {
+    position: relative;
+    width: 100%;
+}
+
+.yo-composer-backdrop,
+.yo-composer-input {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    letter-spacing: 0;
+    padding: 0.5rem 0.6rem;
+    border: 1px solid transparent;
+    border-radius: 0.5rem;
+    white-space: pre-wrap;
+    overflow-wrap: break-word;
+    word-break: break-word;
+}
+
+.yo-composer-backdrop {
+    min-height: 4.8rem;
+    color: transparent;
+    /* Highlights only; the readable text is the textarea's own, so selection
+       and the caret behave normally. */
+}
+
+.yo-composer-input {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    resize: none;
+    overflow: hidden;
+    background: transparent;
+    color: #111827;
+    border-color: #d1d5db;
+}
+
+.yo-composer-input:focus { border-color: #252947; }
+
+.yo-composer-input.yo-over { border-color: #dc2626; }
+
+.yo-topic-mark {
+    background: rgba(37, 41, 71, 0.14);
+    color: transparent;
+    border-radius: 0.25rem;
+    padding: 0;
+}
+
+/* In the timeline the marks are the readable text, so they get a colour. */
+.yo-timeline-text .yo-topic-mark {
+    color: #252947;
+    font-weight: 600;
+    background: rgba(37, 41, 71, 0.1);
+}
+
+.yo-composer-meta {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    width: 100%;
+    font-size: 0.76rem;
+    color: #6b7280;
+}
+
+.yo-counter {
+    font-variant-numeric: tabular-nums;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+.yo-counter-over {
+    color: #dc2626;
+    font-weight: 600;
+}
+
+.yo-topic-readout {
+    text-align: right;
+}
+
+.yo-topic-chip {
+    background: rgba(37, 41, 71, 0.1);
+    color: #252947;
+    font-weight: 600;
+    margin-left: 0.25rem;
+}
+
+/* The commas separating the chips are there so the readout reads as a list
+   rather than one run-together word. The margin above already separates them
+   for a sighted reader, so take the comma out of the picture but leave it in
+   the accessibility tree, where display:none or visibility:hidden would not. */
+.yo-chip-sep {
+    font-size: 0;
+}
+
+.yo-note-inline {
+    font-size: 0.78rem;
+    line-height: 1.6;
+    color: #4b5563;
+    background: #fff8ed;
+    border-left: 3px solid #f59e0b;
+    padding: 0.5rem 0.7rem;
+    border-radius: 0 0.4rem 0.4rem 0;
+    margin: 0;
+    width: 100%;
+}
+
+/* ── Results ───────────────────────────────────────── */
+.yo-result {
+    margin-top: 0.9rem;
+    padding: 0.65rem 0.8rem;
+    border-radius: 0.55rem;
+    font-size: 0.82rem;
+    border: 1px solid #e5e7eb;
+    background: #fbfbfd;
+}
+
+.yo-result-error {
+    background: #fef2f2;
+    border-color: #fecaca;
+}
+
+.yo-result-label {
+    font-size: 0.74rem;
+    font-weight: 600;
+    color: #4b5563;
+    text-transform: lowercase;
+    letter-spacing: 0.02em;
+}
+
+.yo-result-error .yo-result-label { color: #991b1b; }
+
+.yo-timing {
+    font-weight: 400;
+    color: #6b7280;
+    font-variant-numeric: tabular-nums;
+}
+
+.yo-error-message {
+    margin: 0.35rem 0 0 0;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.8rem;
+    line-height: 1.55;
+    color: #7f1d1d;
+    word-break: break-word;
+}
+
+.yo-result-list {
+    margin: 0.45rem 0 0 0;
+    padding-left: 1.3rem;
+    max-height: 15rem;
+    overflow-y: auto;
+}
+
+.yo-result-list li {
+    font-size: 0.82rem;
+    line-height: 1.55;
+    color: #374151;
+    margin-bottom: 0.2rem;
+    word-break: break-word;
+}
+
+.yo-empty-note {
+    margin: 0.35rem 0 0 0;
+    font-size: 0.8rem;
+    color: #6b7280;
+    font-style: italic;
+}
+
+/* ── State panel ───────────────────────────────────── */
+.yo-state {
+    position: sticky;
+    top: 1rem;
+    border: 1px solid #ddd;
+    border-radius: 2vh;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 1rem 1.15rem;
+}
+
+.yo-state-note {
+    font-size: 0.78rem;
+    line-height: 1.6;
+    color: #6b7280;
+    margin: 0 0 0.85rem 0;
+}
+
+.yo-totals {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.4rem;
+    margin-bottom: 0.9rem;
+}
+
+.yo-total {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0.5rem 0.2rem;
+    background: #f7f8fb;
+    border-radius: 0.5rem;
+}
+
+.yo-total-value {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #1a1a2e;
+    font-variant-numeric: tabular-nums;
+    line-height: 1.2;
+}
+
+.yo-total-label {
+    font-size: 0.66rem;
+    color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.yo-tabs {
+    display: flex;
+    gap: 0.3rem;
+    margin-bottom: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.yo-tab {
+    font: inherit;
+    font-size: 0.72rem;
+    padding: 0.3rem 0.5rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.45rem;
+    background: #fff;
+    color: #6b7280;
+    cursor: pointer;
+}
+
+.yo-tab code {
+    background: none;
+    padding: 0;
+    font-size: inherit;
+    color: inherit;
+}
+
+.yo-tab-active {
+    background: #252947;
+    border-color: #252947;
+    color: #fff;
+}
+
+.yo-state-body {
+    max-height: 28rem;
+    overflow-y: auto;
+}
+
+.yo-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.yo-list li {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.3rem 0;
+    border-bottom: 1px solid #f3f4f6;
+    font-size: 0.8rem;
+}
+
+.yo-row-button {
+    font: inherit;
+    font-size: 0.8rem;
+    background: none;
+    border: none;
+    padding: 0;
+    color: #252947;
+    cursor: pointer;
+    text-align: left;
+    flex: 0 0 auto;
+    max-width: 9rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.yo-row-button:hover { text-decoration: underline; }
+
+.yo-row-button code {
+    background: none;
+    padding: 0;
+    color: inherit;
+    font-size: 0.78rem;
+}
+
+.yo-bar-wrap {
+    flex: 1 1 auto;
+    min-width: 1.5rem;
+    height: 0.4rem;
+    background: #f3f4f6;
+    border-radius: 0.2rem;
+    overflow: hidden;
+}
+
+.yo-bar {
+    display: block;
+    height: 100%;
+    background: #252947;
+    border-radius: 0.2rem;
+}
+
+.yo-count {
+    flex: 0 0 auto;
+    font-size: 0.72rem;
+    color: #6b7280;
+    font-variant-numeric: tabular-nums;
+    margin-left: auto;
+}
+
+.yo-timeline {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.yo-timeline li {
+    padding: 0.4rem 0;
+    border-bottom: 1px solid #f3f4f6;
+}
+
+.yo-timeline-head {
+    display: flex;
+    gap: 0.45rem;
+    align-items: baseline;
+    margin-bottom: 0.1rem;
+}
+
+.yo-ts {
+    font-size: 0.68rem;
+    color: #6b7280;
+    background: #f3f4f6;
+    padding: 0.05em 0.3em;
+}
+
+.yo-timeline-user {
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: #374151;
+}
+
+.yo-timeline-text {
+    display: block;
+    font-size: 0.78rem;
+    line-height: 1.5;
+    color: #4b5563;
+    word-break: break-word;
+}
+
+/* ── Call log ──────────────────────────────────────── */
+.yo-log-card {
+    align-items: stretch;
+}
+
+.yo-log-card h2 {
+    align-self: flex-start;
+}
+
+.yo-log {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    max-height: 22rem;
+    overflow-y: auto;
+}
+
+.yo-log li {
+    display: grid;
+    grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr) auto;
+    gap: 0.75rem;
+    align-items: baseline;
+    padding: 0.35rem 0.5rem;
+    border-bottom: 1px solid #f3f4f6;
+    font-size: 0.78rem;
+}
+
+.yo-log-error { background: #fef2f2; }
+
+.yo-log-call {
+    background: none;
+    padding: 0;
+    color: #1a1a2e;
+    font-size: 0.76rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.yo-log-summary {
+    color: #6b7280;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.yo-log-error .yo-log-summary { color: #991b1b; }
+
+.yo-log-ms {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-variant-numeric: tabular-nums;
+    color: #374151;
+    text-align: right;
+}
+
+/* ── Prose ─────────────────────────────────────────── */
+.yo-prose {
+    width: 100%;
+}
+
+.yo-prose h2 {
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: #1a1a2e;
+    border-bottom: 2px solid #e5e7eb;
+    padding-bottom: 0.4rem;
+    margin: 0 0 1rem 0;
+}
+
+.yo-prose h3 {
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: #374151;
+    margin: 1.4rem 0 0.4rem 0;
+}
+
+.yo-prose p {
+    font-size: 0.95rem;
+    line-height: 1.75;
+    color: #4b5563;
+    margin-bottom: 0;
+}
+
+/* ── Responsive ────────────────────────────────────── */
+@media (max-width: 1100px) {
+    .yo-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .yo-state {
+        position: static;
+    }
+
+    .yo-state-body { max-height: 22rem; }
+}
+
+@media (max-width: 640px) {
+    .yo-statusbar {
+        font-size: 0.75rem;
+        padding: 0.6rem 0.8rem;
+    }
+
+    .yo-method,
+    .yo-toolbar,
+    .yo-state {
+        padding: 0.85rem 0.9rem;
+        border-radius: 1rem;
+    }
+
+    .yo-toolbar-buttons .yo-button {
+        flex: 1 1 auto;
+    }
+
+    .yo-field-row { flex-direction: column; }
+
+    .yo-field-narrow { width: 100%; }
+
+    .yo-totals { grid-template-columns: repeat(2, 1fr); }
+
+    .yo-composer-meta {
+        flex-direction: column;
+        gap: 0.2rem;
+    }
+
+    .yo-topic-readout { text-align: left; }
+
+    /* Three columns do not fit; stack the call and its result, keep the
+       timing on the right of the first row where it stays scannable. */
+    .yo-log li {
+        grid-template-columns: minmax(0, 1fr) auto;
+        row-gap: 0.15rem;
+    }
+
+    .yo-log-summary {
+        grid-column: 1 / -1;
+        white-space: normal;
+    }
+
+    .yo-row-button { max-width: 7rem; }
+
+    .yo-source { font-size: 0.68rem; }
+}
+
+/* On a touch screen the state-panel rows are the smallest thing on the page
+   and they are buttons, so give them a finger-sized target. Keyed off the
+   pointer rather than the width: a narrow window on a laptop has a mouse and
+   does not need the extra height, and a tablet is wide and does. */
+@media (pointer: coarse) {
+    .yo-list li,
+    .yo-timeline li {
+        padding: 0.45rem 0;
+    }
+
+    .yo-row-button {
+        min-height: 2.25rem;
+        display: flex;
+        align-items: center;
+    }
+
+    .yo-tab {
+        min-height: 2.25rem;
+    }
+}

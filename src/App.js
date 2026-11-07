@@ -13,6 +13,7 @@ import ImprovingClinicalMeasurements from "./components/pages/project_pages/Impr
 import GenerativeAI from "./components/pages/project_pages/GenerativeAI";
 import AgenticAI from "./components/pages/project_pages/AgenticAI";
 import InteractiveRag from "./components/pages/project_pages/InteractiveRag";
+import YodelrPlayground from "./components/pages/project_pages/YodelrPlayground";
 import PdfViewer from './components/viewers/PDFViewer';
 import JSXViewer from './components/viewers/JSXViewer';
 
@@ -49,6 +50,7 @@ function App() {
                 a redirect would only add a bounce. */}
             <Route path='/projects/ask-a-bike-question' element={<InteractiveRag />} />
             <Route path='/projects/ask-my-research' element={<InteractiveRag />} />
+            <Route path='/projects/yodelr' element={<YodelrPlayground />} />
             <Route path="/recommendation-pdf" element={<PdfViewer />} />
             <Route path="/recommendation" element={
               <JSXViewer/>

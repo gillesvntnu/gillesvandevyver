@@ -31,14 +31,16 @@
     "start": "react-scripts start",
     "predeploy": "npm run build",
     "deploy": "gh-pages -d build",
-    "build": "react-scripts build",
+    "build": "npm run yodelr:check && react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "generate-sitemap": "node generate-sitemap.js",
     "rag:fetch": "python3 scripts/fetch_wikipedia_cycling.py",
     "build-rag-index": "python3 scripts/build_rag_chunks_wiki.py && node scripts/build_rag_embeddings.mjs && python3 scripts/build_rag_tile.py",
     "rag:test": "node --import ./scripts/rag_test/register.mjs scripts/rag_test/run.mjs",
-    "rag:calibrate": "node --import ./scripts/rag_test/register.mjs scripts/rag_test/calibrate.mjs"
+    "rag:calibrate": "node --import ./scripts/rag_test/register.mjs scripts/rag_test/calibrate.mjs",
+    "yodelr:sync": "python3 scripts/sync_yodelr.py",
+    "yodelr:check": "python3 scripts/sync_yodelr.py --check"
   },
   "eslintConfig": {
     "extends": "react-app"
