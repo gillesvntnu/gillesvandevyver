@@ -1,10 +1,18 @@
-/* Runs the real yodelr.py in the browser under Pyodide.
+/* Runs the real yodelr code in the browser under Pyodide.
  *
  * The point of the playground is that it executes the actual submitted
  * implementation, not a JavaScript lookalike that agrees with it today and
- * quietly stops agreeing later. So yodelr.py is fetched as a file, dropped on
+ * quietly stops agreeing later. So the source is fetched as files, dropped on
  * Pyodide's virtual filesystem and imported. Nothing in this repo reimplements
  * it and nothing here edits it.
+ *
+ * Two files arrive, not one. The buttons drive YodelrV2 -- the revision the
+ * second timing card measures -- and yodelr_v2.py does `from yodelr import
+ * Post, Yodelr, MAX_POST_LENGTH, _TOPIC_RE` rather than restating any of them,
+ * so yodelr.py has to be on the path beside it or the import fails at boot.
+ * Shipping both is also what makes the constants below honest: the character
+ * limit and the topic regex the page displays are read out of the submitted
+ * file, through the module v2 imports them from.
  *
  * Everything below the BRIDGE constant is glue of mine that imports yodelr and
  * calls it from the outside, the same way the unit tests do.
@@ -16,7 +24,12 @@
 const PYODIDE_VERSION = '0.27.8';
 const PYODIDE_INDEX = `https://cdn.jsdelivr.net/pyodide/v${PYODIDE_VERSION}/full/`;
 
-const SRC_URL = `${process.env.PUBLIC_URL}/yodelr/yodelr.py`;
+// Both modules, in the order they have to be written to the filesystem is
+// irrelevant -- but both must be there before the first import runs.
+const SRC_URLS = {
+  'yodelr.py': `${process.env.PUBLIC_URL}/yodelr/yodelr.py`,
+  'yodelr_v2.py': `${process.env.PUBLIC_URL}/yodelr/yodelr_v2.py`,
+};
 const PROVENANCE_URL = `${process.env.PUBLIC_URL}/yodelr/provenance.json`;
 
 // The real-tweet corpus. ~1.9 MB, so it is fetched only if someone opens the
@@ -46,6 +59,7 @@ const PANEL_LIMIT = 200;
 const BRIDGE = `
 import gzip, json, time
 from yodelr import YodelrImpl, Yodelr, MAX_POST_LENGTH, _TOPIC_RE
+from yodelr_v2 import YodelrV2
 
 
 def _unescape(field):
@@ -72,13 +86,20 @@ def _unescape(field):
     return "".join(out)
 
 class Bridge:
-    """Owns one YodelrImpl and calls it on behalf of the page."""
+    """Owns one YodelrV2 and calls it on behalf of the page.
+
+    v2 rather than v1 because it is the faster of the two and answers every
+    call identically -- which is asserted by a differential test in the
+    challenge repo, not assumed here. The page is still running real
+    submitted code: v2 subclasses the same abstract base and imports its
+    vocabulary from yodelr.py.
+    """
 
     def __init__(self):
         self.reset()
 
     def reset(self):
-        self.y = YodelrImpl()
+        self.y = YodelrV2()
 
     # -- calling the implementation ------------------------------------
 
@@ -242,9 +263,16 @@ class Bridge:
         })
 
     def interface_check(self):
-        """Confirm the loaded file really is the submitted interface."""
+        """Confirm the loaded files really are the submitted interface.
+
+        Both classes, because the page would boot perfectly well with a v2
+        that had quietly stopped being a Yodelr -- Python does not care, and
+        the failure would only show up as a missing method when somebody
+        pressed a button.
+        """
         return json.dumps({
-            "isYodelr": issubclass(YodelrImpl, Yodelr),
+            "isYodelr": issubclass(YodelrImpl, Yodelr)
+                        and issubclass(YodelrV2, Yodelr),
             "abstractMethods": sorted(Yodelr.__abstractmethods__),
         })
 
@@ -310,21 +338,25 @@ async function boot(onProgress) {
   });
 
   report('Loading yodelr.py…');
-  const [source, provenanceText, corpusMetaText] = await Promise.all([
-    fetchText(SRC_URL, 'yodelr.py'),
+  const names = Object.keys(SRC_URLS);
+  const [sources, provenanceText, corpusMetaText] = await Promise.all([
+    Promise.all(names.map((name) => fetchText(SRC_URLS[name], name))),
     fetchText(PROVENANCE_URL, 'the yodelr.py provenance record').catch(() => '{}'),
     // Half a kilobyte of counts, so the load button can say how many tweets
     // and how many megabytes before anyone commits to the 1.9 MB of them.
     fetchText(CORPUS_META_URL, 'the corpus description').catch(() => '{}'),
   ]);
 
-  // Its own directory on the virtual filesystem, so the import is a plain
-  // `from yodelr import ...` exactly as in the test suite.
+  // Their own directory on the virtual filesystem, so the imports are plain
+  // `from yodelr import ...` exactly as in the test suite. Every file is
+  // written before the path is set and anything is imported, because
+  // yodelr_v2 imports yodelr at module level and a half-populated directory
+  // would fail on whichever happened to be written second.
   pyodide.FS.mkdirTree('/yodelr_src');
-  pyodide.FS.writeFile('/yodelr_src/yodelr.py', source);
+  names.forEach((name, i) => pyodide.FS.writeFile(`/yodelr_src/${name}`, sources[i]));
   pyodide.runPython('import sys\nif "/yodelr_src" not in sys.path: sys.path.insert(0, "/yodelr_src")');
 
-  report('Importing YodelrImpl…');
+  report('Importing YodelrV2…');
   pyodide.runPython(BRIDGE);
 
   const bridge = pyodide.globals.get('_bridge');
@@ -332,7 +364,7 @@ async function boot(onProgress) {
   const interfaceCheck = JSON.parse(bridge.interface_check());
 
   if (!interfaceCheck.isYodelr) {
-    throw new Error('The loaded yodelr.py does not implement the Yodelr interface.');
+    throw new Error('The loaded yodelr source does not implement the Yodelr interface.');
   }
 
   const pythonVersion = pyodide.runPython('import sys; sys.version.split()[0]');
@@ -356,7 +388,7 @@ async function boot(onProgress) {
         pyodide.FS.writeFile('/yodelr_data/corpus.tsv.gz', bytes);
         corpusOnDisk = true;
       }
-      report('Replaying it through yodelr.py…');
+      report('Replaying it through yodelr_v2.py…');
       // load_corpus blocks the main thread for a second or two. Yield first so
       // the browser paints that message rather than showing it after the work
       // it was meant to describe has already finished.
@@ -369,7 +401,10 @@ async function boot(onProgress) {
     reset() {
       bridge.reset();
     },
-    source,
+    // No `source` here any more. It existed for the "show the source" panel,
+    // which the page no longer has, and there are now two files rather than
+    // one -- so reinstating it would mean deciding which, rather than
+    // uncommenting a line.
     constants,
     abstractMethods: interfaceCheck.abstractMethods,
     provenance: JSON.parse(provenanceText),

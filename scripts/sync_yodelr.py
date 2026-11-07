@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Copy yodelr.py out of the coding-challenge repo and into public/.
+"""Copy the Yodelr implementations out of the coding-challenge repo into public/.
 
 The Yodelr playground page runs the real submitted implementation in the
 browser under Pyodide. For that to be true rather than merely claimed, the
@@ -8,9 +8,16 @@ hand-maintained second copy drifts away from the original the first time the
 original is touched, and then the page is demonstrating something that no
 longer exists.
 
-So this script is the only thing allowed to put yodelr.py into this repo. It
-reads the challenge repo, never writes to it, and records where the file came
-from so the page can show it.
+So this script is the only thing allowed to put Yodelr source into this repo.
+It reads the challenge repo, never writes to it, and records where each file
+came from so the page can show it.
+
+Two files, because there are two implementations. yodelr.py is the submission.
+yodelr_v2.py is the faster revision of get_trending_topics, and it does
+`from yodelr import ...` rather than restating the Post type and the topic
+regex -- so the pair has to travel together and out of the same directory, or
+the import resolves against a yodelr.py of a different vintage. Taking both
+from the directory the first one was chosen from is what guarantees that.
 
     python3 scripts/sync_yodelr.py            # default source, see below
     YODELR_SRC=/path/to/repo npm run yodelr:sync
@@ -18,7 +25,8 @@ from so the page can show it.
 
 Outputs:
     public/yodelr/yodelr.py         byte-for-byte copy
-    public/yodelr/provenance.json   hash, source path, size, sync time
+    public/yodelr/yodelr_v2.py      byte-for-byte copy
+    public/yodelr/provenance.json   hash, source path, size, sync time, per file
 """
 
 import argparse
@@ -61,6 +69,13 @@ REQUIRED_METHODS = (
     "get_trending_topics",
 )
 
+# The second implementation, taken from whichever directory yodelr.py was
+# chosen from. Its class name is checked for the same reason YodelrImpl's is:
+# a file of the right name holding the wrong thing is the failure that would
+# otherwise reach the browser.
+V2_NAME = "yodelr_v2.py"
+V2_CLASS = "class YodelrV2"
+
 
 def sha256(path):
     return hashlib.sha256(path.read_bytes()).hexdigest()
@@ -97,16 +112,23 @@ def pick_source(src_repo):
     return all_impls[0], all_impls
 
 
-def validate(path):
-    """Refuse to ship something that is not the implementation we expect."""
+def validate(path, expect_class):
+    """Refuse to ship something that is not the implementation we expect.
+
+    Both files get the same six-method check. v2 overrides only three of the
+    six and could in principle inherit the rest, but it does not -- it
+    subclasses the abstract base and implements all six -- and if that ever
+    changes, the page calling an inherited method is fine while this check
+    failing would be a false alarm. Worth knowing before relaxing it.
+    """
     text = path.read_text(encoding="utf-8")
 
     missing = [m for m in REQUIRED_METHODS if not re.search(r"def\s+" + m + r"\s*\(", text)]
     if missing:
         die("{} is missing: {}".format(path, ", ".join(missing)))
 
-    if "class YodelrImpl" not in text:
-        die("{} has no YodelrImpl".format(path))
+    if expect_class not in text:
+        die("{} has no {}".format(path, expect_class.replace("class ", "")))
 
     # Syntax-check without importing: importing would run module-level code,
     # and compiling is enough to catch a half-saved file.
@@ -119,6 +141,24 @@ def validate(path):
         tmp.unlink(missing_ok=True)
 
     return text
+
+
+def describe(source_file, src_root):
+    """The provenance record for one copied file."""
+    text = source_file.read_text(encoding="utf-8")
+    return {
+        # Deliberately relative. This file is committed, and an absolute path
+        # would bake one machine's home directory into the repo and show up on
+        # the live page.
+        "sourceRelative": (
+            str(source_file.relative_to(src_root))
+            if src_root.is_dir() and source_file.is_relative_to(src_root)
+            else source_file.name
+        ),
+        "sha256": sha256(source_file),
+        "bytes": source_file.stat().st_size,
+        "lines": text.count("\n") + 1,
+    }
 
 
 def report_drift(chosen, all_impls):
@@ -177,44 +217,60 @@ def main():
     else:
         source_file, all_impls = pick_source(src)
 
-    validate(source_file)
-    source_hash = sha256(source_file)
+    # Beside yodelr.py, not searched for independently. v2 imports v1 by bare
+    # module name, so the only pairing that is certainly coherent is the one
+    # that shares a directory.
+    v2_file = source_file.parent / V2_NAME
+    if not v2_file.exists():
+        die(
+            "{} not found beside {}\n"
+            "       the playground runs v2; without it the page has nothing "
+            "to load".format(V2_NAME, source_file)
+        )
 
-    dest = OUT_DIR / "yodelr.py"
+    validate(source_file, "class YodelrImpl")
+    validate(v2_file, V2_CLASS)
+
+    # (source, destination name) pairs, so the copy, the staleness check and
+    # the provenance record all walk the same list and cannot disagree about
+    # which files are involved.
+    pairs = ((source_file, "yodelr.py"), (v2_file, V2_NAME))
     provenance_path = OUT_DIR / "provenance.json"
 
     if args.check:
-        if not dest.exists():
-            die("public/yodelr/yodelr.py is missing; run: npm run yodelr:sync")
-        if sha256(dest) != source_hash:
-            die(
-                "public/yodelr/yodelr.py is stale.\n"
-                "       source: {}\n"
-                "       run: npm run yodelr:sync".format(source_file)
-            )
-        print("sync_yodelr: up to date ({})".format(source_hash[:12]))
+        for src_path, name in pairs:
+            dest = OUT_DIR / name
+            if not dest.exists():
+                die("public/yodelr/{} is missing; run: npm run yodelr:sync".format(name))
+            if sha256(dest) != sha256(src_path):
+                die(
+                    "public/yodelr/{} is stale.\n"
+                    "       source: {}\n"
+                    "       run: npm run yodelr:sync".format(name, src_path)
+                )
+        print("sync_yodelr: up to date ({} + {})".format(
+            sha256(source_file)[:12], sha256(v2_file)[:12]))
         return
 
     OUT_DIR.mkdir(parents=True, exist_ok=True)
-    shutil.copyfile(source_file, dest)
+    for src_path, name in pairs:
+        shutil.copyfile(src_path, OUT_DIR / name)
 
-    text = source_file.read_text(encoding="utf-8")
-    provenance = {
-        # Deliberately relative. This file is committed, and an absolute path
-        # would bake one machine's home directory into the repo and show up on
-        # the live page.
-        "sourceRelative": (
-            str(source_file.relative_to(src)) if src.is_dir() else source_file.name
-        ),
-        "sha256": source_hash,
-        "bytes": source_file.stat().st_size,
-        "lines": text.count("\n") + 1,
-        "syncedAt": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+    # The v1 keys stay at the top level rather than moving into files["yodelr.py"].
+    # Flattening them would be tidier and would also silently change the shape
+    # of a file the page already reads; the nesting is additive instead.
+    provenance = dict(describe(source_file, src))
+    provenance["files"] = {
+        name: describe(src_path, src) for src_path, name in pairs
     }
+    provenance["syncedAt"] = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
     provenance_path.write_text(json.dumps(provenance, indent=2) + "\n", encoding="utf-8")
 
-    print("sync_yodelr: {} -> public/yodelr/yodelr.py".format(source_file))
-    print("             {} bytes, sha256 {}".format(provenance["bytes"], source_hash[:12]))
+    for src_path, name in pairs:
+        record = provenance["files"][name]
+        print("sync_yodelr: {} -> public/yodelr/{}".format(src_path, name))
+        print("             {} bytes, sha256 {}".format(
+            record["bytes"], record["sha256"][:12]))
     report_drift(source_file, all_impls)
 
 

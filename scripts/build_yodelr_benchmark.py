@@ -16,14 +16,24 @@ benchmark.txt is committed as the receipt. Every number the page shows can
 be found in it by eye, and the page links to it. If the two ever disagree,
 the text wins and this parser is wrong.
 
-    python3 scripts/build_yodelr_benchmark.py            # re-parse the capture
-    python3 scripts/build_yodelr_benchmark.py --run      # re-measure, then parse
+    python3 scripts/build_yodelr_benchmark.py                 # re-parse the capture
+    python3 scripts/build_yodelr_benchmark.py --run           # re-measure, then parse
+    python3 scripts/build_yodelr_benchmark.py --run --impl v2 # the same, for v2
 
 --run needs the challenge repo and the downloaded dataset; the default path
 needs neither, so the site builds anywhere.
 
+There are two implementations and so two captures, written and parsed by this
+one script rather than by a copy of it with the filenames changed. v1 keeps
+the unsuffixed names it already had. The capture says which implementation it
+came from, and the run refuses to parse a capture whose marker disagrees with
+--impl -- otherwise the one mistake nobody would notice is a v1 run quietly
+being written into benchmark_v2.json, and the page would report a 68x speedup
+of v1 over itself.
+
 Outputs:
-    public/yodelr/benchmark.json   parsed rows, all times in nanoseconds
+    public/yodelr/benchmark.json      parsed rows, all times in nanoseconds
+    public/yodelr/benchmark_v2.json   the same, for yodelr_v2.py
 """
 
 import argparse
@@ -36,8 +46,18 @@ from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 OUT_DIR = REPO_ROOT / "public" / "yodelr"
-CAPTURE = OUT_DIR / "benchmark.txt"
-OUT_JSON = OUT_DIR / "benchmark.json"
+
+
+def paths_for(impl):
+    """Capture and JSON for one implementation.
+
+    v1 is unsuffixed because its capture is already committed under that name
+    and the page already fetches it; renaming both to benchmark_v1.* would be
+    more symmetrical and would invalidate the receipt for no gain.
+    """
+    suffix = "" if impl == "v1" else "_" + impl
+    return (OUT_DIR / "benchmark{}.txt".format(suffix),
+            OUT_DIR / "benchmark{}.json".format(suffix))
 
 DEFAULT_SRC_REPO = REPO_ROOT.parent / "yodelr-coding-challenge"
 HARNESS_REL = "yodelr_twitter_test/yodelr_twitter_test"
@@ -89,6 +109,9 @@ def parse(text):
         "scaling": [],
         "clockOverheadNs": None,
         "skippedRows": None,
+        # None means a capture taken before benchmark.py printed the marker,
+        # which can only be a v1 run: v2 did not exist then.
+        "implementation": None,
     }
     section = None
 
@@ -112,6 +135,14 @@ def parse(text):
             continue
 
         if section == "corpus":
+            # "implementation: v2 (YodelrV2)" -- matched before the generic
+            # key/value rule below, which only accepts numeric values and
+            # would otherwise drop this line silently.
+            m = re.match(r"^implementation:\s*(\S+)", stripped)
+            if m:
+                out["implementation"] = m.group(1)
+                continue
+
             m = re.match(r"^source:\s*(\S+)$", stripped)
             if m:
                 out["corpus"]["source"] = m.group(1)
@@ -172,19 +203,20 @@ def parse(text):
     return out
 
 
-def run_benchmark(src_repo, limit):
+def run_benchmark(src_repo, limit, impl):
     """Re-measure. Only used with --run; the committed capture is the default."""
     harness = src_repo / HARNESS_REL
     script = harness / "benchmark.py"
     if not script.exists():
         sys.exit("build_yodelr_benchmark: no benchmark.py at {}".format(script))
-    print("running benchmark.py --limit {} (this takes minutes)".format(limit))
+    print("running benchmark.py --impl {} --limit {} (this takes minutes)"
+          .format(impl, limit))
     # Merged, not captured separately. benchmark.py writes its corpus-loading
     # lines to stderr -- including "skipped N rows", which is where skippedRows
     # is parsed from -- so taking stdout alone would produce a capture missing
     # fields that the hand-made one has, and nothing would complain.
     done = subprocess.run(
-        [sys.executable, "benchmark.py", "--limit", str(limit)],
+        [sys.executable, "benchmark.py", "--impl", impl, "--limit", str(limit)],
         cwd=str(harness), stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
         text=True,
     )
@@ -202,16 +234,20 @@ def main():
                     help="posts to measure, when --run is given")
     ap.add_argument("--src", type=Path, default=DEFAULT_SRC_REPO,
                     help="path to the yodelr challenge repo")
+    ap.add_argument("--impl", choices=("v1", "v2"), default="v1",
+                    help="which implementation's capture to build (default: v1)")
     args = ap.parse_args()
 
+    capture, out_json = paths_for(args.impl)
+
     if args.run:
-        text = run_benchmark(args.src, args.limit)
-        CAPTURE.write_text(text, encoding="utf-8")
-        print("wrote {}".format(CAPTURE.relative_to(REPO_ROOT)))
+        text = run_benchmark(args.src, args.limit, args.impl)
+        capture.write_text(text, encoding="utf-8")
+        print("wrote {}".format(capture.relative_to(REPO_ROOT)))
     else:
-        if not CAPTURE.exists():
-            sys.exit("build_yodelr_benchmark: no capture at {}".format(CAPTURE))
-        text = CAPTURE.read_text(encoding="utf-8")
+        if not capture.exists():
+            sys.exit("build_yodelr_benchmark: no capture at {}".format(capture))
+        text = capture.read_text(encoding="utf-8")
 
     data = parse(text)
 
@@ -221,6 +257,19 @@ def main():
         if not data[key]:
             sys.exit("build_yodelr_benchmark: parsed no rows for '{}' -- has "
                      "benchmark.py's output format changed?".format(key))
+
+    # The capture has to agree with --impl. Getting this wrong is not a
+    # crash, it is a page that confidently reports the wrong thing, so it is
+    # checked rather than assumed. An unmarked capture predates --impl and is
+    # therefore v1; claiming it is v2 is the exact mistake being guarded.
+    marked = data["implementation"] or "v1"
+    if marked != args.impl:
+        sys.exit(
+            "build_yodelr_benchmark: {} is a {} capture but --impl is {}.\n"
+            "       re-run with --run, or parse it as {}.".format(
+                capture.name, marked, args.impl, marked)
+        )
+    data["implementation"] = args.impl
 
     # The capture names its source ("sentiment140") but carries no link, and
     # the page wants one. Rather than type the URL a second time, lift it off
@@ -234,13 +283,13 @@ def main():
             data["corpus"]["datasetUrl"] = meta["datasetUrl"]
             data["corpus"]["datasetName"] = meta.get("dataset", "")
 
-    data["capturedFrom"] = CAPTURE.name
+    data["capturedFrom"] = capture.name
     data["builtAt"] = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 
     OUT_DIR.mkdir(parents=True, exist_ok=True)
-    OUT_JSON.write_text(json.dumps(data, indent=2) + "\n", encoding="utf-8")
+    out_json.write_text(json.dumps(data, indent=2) + "\n", encoding="utf-8")
     print("wrote {} ({} write, {} read, {} delete, {} scaling rows)".format(
-        OUT_JSON.relative_to(REPO_ROOT), len(data["writes"]), len(data["reads"]),
+        out_json.relative_to(REPO_ROOT), len(data["writes"]), len(data["reads"]),
         len(data["deletes"]), len(data["scaling"])))
 
 

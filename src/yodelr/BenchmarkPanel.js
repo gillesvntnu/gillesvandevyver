@@ -1,4 +1,4 @@
-/* The Timing tab: one chart, one sentence saying where the data came from.
+/* The Timing tab: two charts, one sentence each saying where the data came from.
  *
  * Everything else on this page is live — you press a button, Python runs, you
  * see what it returned. This tab is the one exception, because the numbers it
@@ -19,11 +19,21 @@
  * The chart is hand-drawn SVG rather than a charting library. Two reasons: the
  * bundle is already large enough, and the axis needs to be logarithmic over six
  * decades, which is exactly the case where a library's defaults fight you.
+ *
+ * Two captures, because there are two implementations, and the second card is
+ * only meaningful if the pair is comparable. Both were therefore measured on
+ * the same machine in the same sitting: a 30% faster laptop would swamp a
+ * genuine difference, and the reader has no way to tell the two apart by
+ * looking. Each chart scales its own axis, so the same bar length in the two
+ * cards does not mean the same duration -- the axis labels are what to read.
  */
 
 import React, { useEffect, useState } from 'react';
 
-const BENCHMARK_URL = `${process.env.PUBLIC_URL}/yodelr/benchmark.json`;
+const BENCHMARK_URLS = {
+  v1: `${process.env.PUBLIC_URL}/yodelr/benchmark.json`,
+  v2: `${process.env.PUBLIC_URL}/yodelr/benchmark_v2.json`,
+};
 
 /* Same three-way split benchmark.py's own _unit() uses, so a number here reads
  * identically to the same number in the committed capture. */
@@ -186,18 +196,48 @@ export function LatencyChart({ groups }) {
 
 /* ── The tab ─────────────────────────────────────────────────────────── */
 
+/* The report indents two rows because they are the worst case of the row above
+   rather than separate operations. Keep that: "random topics costs 1.5 µs" and
+   "the biggest topic costs 42 µs" only mean something together. */
+function label(row) {
+  if (row.label === 'busiest user') return '↳ busiest user';
+  if (row.label === 'hottest topic') return '↳ hottest topic';
+  return row.label;
+}
+const prep = (rows) => rows.map((r) => ({ ...r, display: label(r) }));
+
+/* One capture, drawn. Both cards are the same component because they are the
+   same measurement of two objects; if they diverged into two bodies of JSX,
+   a change to one chart would silently stop applying to the other. */
+function TimingCard({ title, intro, data }) {
+  return (
+    <div className="vertical-card">
+      <h2>{title}</h2>
+      <p className="yo-timing-intro">{intro}</p>
+      <LatencyChart
+        groups={[
+          ['Writes', prep(data.writes)],
+          ['Reads', prep(data.reads)],
+          ['Deletes', prep(data.deletes)],
+        ]}
+      />
+    </div>
+  );
+}
+
 export default function BenchmarkPanel() {
   const [data, setData] = useState(null);
   const [error, setError] = useState(null);
 
   useEffect(() => {
     let cancelled = false;
-    fetch(BENCHMARK_URL)
-      .then((r) => {
-        if (!r.ok) throw new Error(`${r.status} ${r.statusText}`);
+    Promise.all(
+      ['v1', 'v2'].map((key) => fetch(BENCHMARK_URLS[key]).then((r) => {
+        if (!r.ok) throw new Error(`${key}: ${r.status} ${r.statusText}`);
         return r.json();
-      })
-      .then((json) => { if (!cancelled) setData(json); })
+      })),
+    )
+      .then(([v1, v2]) => { if (!cancelled) setData({ v1, v2 }); })
       .catch((err) => { if (!cancelled) setError(err.message); });
     return () => { cancelled = true; };
   }, []);
@@ -219,40 +259,35 @@ export default function BenchmarkPanel() {
     );
   }
 
-  /* The report indents two rows because they are the worst case of the row
-     above rather than separate operations. Keep that: "random topics costs
-     1.5 µs" and "the biggest topic costs 42 µs" only mean something together. */
-  const label = (row) => {
-    if (row.label === 'busiest user') return '↳ busiest user';
-    if (row.label === 'hottest topic') return '↳ hottest topic';
-    return row.label;
-  };
-  const prep = (rows) => rows.map((r) => ({ ...r, display: label(r) }));
-
-  const c = data.corpus;
+  const c = data.v1.corpus;
+  const n = (value) => Math.round(value).toLocaleString('en-US');
+  const dataset = c.datasetUrl
+    ? <a href={c.datasetUrl} target="_blank" rel="noreferrer">{c.datasetName || 'Sentiment140'}</a>
+    : (c.datasetName || 'Sentiment140');
 
   return (
     <div className="yo-timing" role="tabpanel" id="yo-panel-timing" aria-labelledby="yo-tab-timing">
-      <div className="vertical-card">
-        <h2>Timing</h2>
-        <p className="yo-timing-intro">
-          The timings below come from {Math.round(c.posts).toLocaleString('en-US')} real
-          tweets, {Math.round(c.users).toLocaleString('en-US')} users and{' '}
-          {Math.round(c.distinct_topics).toLocaleString('en-US')} topics. It is the public{' '}
-          {c.datasetUrl
-            ? <a href={c.datasetUrl} target="_blank" rel="noreferrer">{c.datasetName || 'Sentiment140'}</a>
-            : (c.datasetName || 'Sentiment140')}{' '}
-          dataset.
-        </p>
-
-        <LatencyChart
-          groups={[
-            ['Writes', prep(data.writes)],
-            ['Reads', prep(data.reads)],
-            ['Deletes', prep(data.deletes)],
-          ]}
-        />
-      </div>
+      <TimingCard
+        title="Timing"
+        data={data.v1}
+        intro={(
+          <>
+            The timings below come from {n(c.posts)} real tweets, {n(c.users)} users
+            and {n(c.distinct_topics)} topics. It is the public {dataset} dataset.
+          </>
+        )}
+      />
+      <TimingCard
+        title="Timing v2"
+        data={data.v2}
+        intro={(
+          <>
+            The same calls, against a revision that keeps a second timeline of
+            only the posts carrying a topic and counts those into hourly
+            buckets. Same tweets, same machine.
+          </>
+        )}
+      />
     </div>
   );
 }
