@@ -1,0 +1,59 @@
+
+Corpus
+------
+implementation: v3 (YodelrV3)
+source: sentiment140
+                   posts: 1,599,355.00
+                   users: 659,524.00
+         distinct_topics: 13,635.00
+   posts_with_topics_pct: 2.24
+       mentions_per_post: 0.03
+           mean_text_len: 72.87
+            span_seconds: 6,869,338.00
+
+clock overhead per measurement: 63 ns (subtracted below)
+
+Writes
+------
+add_user                      659524  mean     353 ns  median     268 ns  p95     623 ns  p99     818 ns  max   11.50 ms  
+add_post                     1599355  mean    2.09 us  median    1.80 us  p95    4.30 us  p99    5.95 us  max    5.66 ms  ~479,343 posts/sec
+
+Reads
+-----
+get_posts_for_user              3000  mean    1.98 us  median    1.68 us  p95    3.75 us  p99    7.68 us  max   17.29 us  random users
+  busiest user                  2000  mean   17.93 us  median   17.03 us  p95   21.38 us  p99   21.88 us  max  239.92 us  549 posts
+get_posts_for_topic             3000  mean    2.88 us  median    1.80 us  p95    6.50 us  p99   19.21 us  max  199.57 us  random topics
+  hottest topic                  500  mean  305.86 us  median  289.37 us  p95  381.89 us  p99  427.17 us  max    1.17 ms  #followfriday -- 2100 posts
+
+get_trending_topics (1 hour)     200  mean   32.55 us  median    4.60 us  p95  132.53 us  p99  173.15 us  max  260.10 us  ~0 posts in window
+get_trending_topics (1 day)      200  mean  219.84 us  median   48.59 us  p95  888.08 us  p99    1.08 ms  max    1.10 ms  ~43,054 posts in window
+get_trending_topics (1 week)     200  mean    1.13 ms  median  615.73 us  p95    4.71 ms  p99    5.04 ms  max    5.06 ms  ~41,942 posts in window
+get_trending_topics (whole corpus)     200  mean   16.45 ms  median   16.33 ms  p95   17.45 ms  p99   18.25 ms  max   18.40 ms  ~1,599,355 posts in window
+
+Deletes
+-------
+delete_user                      300  mean  133.26 ms  median  122.46 ms  p95  212.77 ms  p99  291.63 ms  max  307.59 ms  1,599,355 posts in system
+  The O(n) timeline rebuild dominates: it is the same amount of
+  work whether the user had one post or a thousand.
+
+Memory
+------
+   1,599,355 posts
+       590.3 MB held after loading
+         369 bytes per post (every index plus the Post itself)
+       590.3 MB peak during loading
+      41,207 entries in the topic index
+  The topic index is the biggest structure: one entry per
+  (post, topic) pair, not per post.
+
+Scaling
+-------
+     posts      add_post    trending/day     delete_user
+    25,000       1.26 us        11.18 us         2.73 ms
+    50,000       1.33 us        17.20 us         4.37 ms
+   100,000       1.35 us        42.71 us         6.60 ms
+   200,000       1.37 us        37.36 us        13.38 ms
+   400,000       1.54 us        83.73 us        27.74 ms
+   800,000       1.70 us       167.14 us        55.78 ms
+ 1,599,355       1.79 us       171.87 us       111.13 ms
+
