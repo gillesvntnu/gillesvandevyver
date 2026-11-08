@@ -19,12 +19,14 @@ the text wins and this parser is wrong.
     python3 scripts/build_yodelr_benchmark.py                  # re-parse the capture
     python3 scripts/build_yodelr_benchmark.py --run            # re-measure, then parse
     python3 scripts/build_yodelr_benchmark.py --run --impl v2  # the same, for v2
+    python3 scripts/build_yodelr_benchmark.py --run --impl v3  # the same, for v3
     python3 scripts/build_yodelr_benchmark.py --run --impl cpp # the same, for C++
+    python3 scripts/build_yodelr_benchmark.py --run --impl cpp_v3  # C++, v3
 
 --run needs the challenge repo and the downloaded dataset; the default path
 needs neither, so the site builds anywhere.
 
-There are three implementations and so three captures, written and parsed by
+There is one capture per implementation, all of them written and parsed by
 this one script rather than by a copy of it with the filenames changed. v1
 keeps the unsuffixed names it already had. The capture says which
 implementation it came from, and the run refuses to parse a capture whose
@@ -41,7 +43,14 @@ rather than three that have to be kept in agreement.
 Outputs:
     public/yodelr/benchmark.json      parsed rows, all times in nanoseconds
     public/yodelr/benchmark_v2.json   the same, for yodelr_v2.py
+    public/yodelr/benchmark_v3.json   the same, for yodelr_v3.py
     public/yodelr/benchmark_cpp.json  the same, for the C++ port
+    public/yodelr/benchmark_cpp_v3.json  the same, for the C++ port of v3
+
+A capture stays here once it is taken, whether or not a card still draws it.
+They are measurements, and the cost of keeping one is a 3 KB file; the cost of
+deleting one is that the version it measured can never be compared against
+again without re-running every other capture on the same machine.
 """
 
 import argparse
@@ -212,7 +221,7 @@ def parse(text):
     return out
 
 
-def run_cpp_benchmark(src_repo, limit):
+def run_cpp_benchmark(src_repo, limit, impl):
     """Re-measure with the C++ harness, building it first.
 
     cpp/benchmark.cpp is a port of benchmark.py: same corpus, same random
@@ -244,9 +253,14 @@ def run_cpp_benchmark(src_repo, limit):
     # different file than the Python runs measured would be the one difference
     # that invalidates the whole comparison.
     harness = src_repo / HARNESS_REL
-    print("running cpp/benchmark --limit {} (this takes minutes)".format(limit))
+    # The binary spells its implementations the way this script does, so the
+    # name is passed through rather than translated. One vocabulary across the
+    # two harnesses and this script is one fewer table to get wrong.
+    print("running cpp/benchmark --impl {} --limit {} (this takes minutes)"
+          .format(impl, limit))
     done = subprocess.run(
-        [str((cpp_dir / "benchmark").resolve()), "--limit", str(limit)],
+        [str((cpp_dir / "benchmark").resolve()),
+         "--impl", impl, "--limit", str(limit)],
         cwd=str(harness), stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
         text=True,
     )
@@ -258,8 +272,8 @@ def run_cpp_benchmark(src_repo, limit):
 
 def run_benchmark(src_repo, limit, impl):
     """Re-measure. Only used with --run; the committed capture is the default."""
-    if impl == "cpp":
-        return run_cpp_benchmark(src_repo, limit)
+    if impl.startswith("cpp"):
+        return run_cpp_benchmark(src_repo, limit, impl)
 
     harness = src_repo / HARNESS_REL
     script = harness / "benchmark.py"
@@ -290,7 +304,8 @@ def main():
                     help="posts to measure, when --run is given")
     ap.add_argument("--src", type=Path, default=DEFAULT_SRC_REPO,
                     help="path to the yodelr challenge repo")
-    ap.add_argument("--impl", choices=("v1", "v2", "cpp"), default="v1",
+    ap.add_argument("--impl", choices=("v1", "v2", "v3", "cpp", "cpp_v3"),
+                    default="v1",
                     help="which implementation's capture to build (default: v1)")
     args = ap.parse_args()
 

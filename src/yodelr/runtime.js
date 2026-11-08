@@ -6,8 +6,9 @@
  * Pyodide's virtual filesystem and imported. Nothing in this repo reimplements
  * it and nothing here edits it.
  *
- * Two files arrive, not one. The buttons drive YodelrV2 -- the revision the
- * second timing card measures -- and yodelr_v2.py does `from yodelr import
+ * Two files arrive, not one. The buttons drive YodelrV2 -- the bucketed
+ * revision, which the second timing card measured until that card moved to
+ * v3 -- and yodelr_v2.py does `from yodelr import
  * Post, Yodelr, MAX_POST_LENGTH, _TOPIC_RE` rather than restating any of them,
  * so yodelr.py has to be on the path beside it or the import fails at boot.
  * Shipping both is also what makes the constants below honest: the character

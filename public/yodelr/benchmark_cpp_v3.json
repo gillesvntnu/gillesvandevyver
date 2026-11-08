@@ -1,0 +1,197 @@
+{
+  "corpus": {
+    "source": "sentiment140",
+    "posts": 1599355.0,
+    "users": 659524.0,
+    "distinct_topics": 13635.0,
+    "posts_with_topics_pct": 2.24,
+    "mentions_per_post": 0.03,
+    "mean_text_len": 72.87,
+    "span_seconds": 6869338.0,
+    "datasetUrl": "https://www.kaggle.com/datasets/kazanova/sentiment140",
+    "datasetName": "Sentiment140"
+  },
+  "writes": [
+    {
+      "label": "add_user",
+      "detail": false,
+      "count": 659524,
+      "meanNs": 242.0,
+      "medianNs": 147.0,
+      "p95Ns": 473.0,
+      "p99Ns": 639.0,
+      "maxNs": 15370000.0,
+      "note": ""
+    },
+    {
+      "label": "add_post",
+      "detail": false,
+      "count": 1599355,
+      "meanNs": 595.0,
+      "medianNs": 480.0,
+      "p95Ns": 1670.0,
+      "p99Ns": 2330.0,
+      "maxNs": 7320000.0,
+      "note": "~1,681,243 posts/sec"
+    }
+  ],
+  "reads": [
+    {
+      "label": "get_posts_for_user",
+      "detail": false,
+      "count": 3000,
+      "meanNs": 890.0,
+      "medianNs": 741.0,
+      "p95Ns": 1760.0,
+      "p99Ns": 3440.0,
+      "maxNs": 10560.0,
+      "note": "random users"
+    },
+    {
+      "label": "busiest user",
+      "detail": true,
+      "count": 2000,
+      "meanNs": 23000.0,
+      "medianNs": 22930.0,
+      "p95Ns": 23030.0,
+      "p99Ns": 24580.0,
+      "maxNs": 88270.0,
+      "note": "549 posts"
+    },
+    {
+      "label": "get_posts_for_topic",
+      "detail": false,
+      "count": 3000,
+      "meanNs": 797.0,
+      "medianNs": 477.0,
+      "p95Ns": 1570.0,
+      "p99Ns": 6180.0,
+      "maxNs": 78420.0,
+      "note": "random topics"
+    },
+    {
+      "label": "hottest topic",
+      "detail": true,
+      "count": 500,
+      "meanNs": 207120.0,
+      "medianNs": 205200.0,
+      "p95Ns": 215960.0,
+      "p99Ns": 229270.0,
+      "maxNs": 472940.0,
+      "note": "#followfriday -- 2100 posts"
+    },
+    {
+      "label": "get_trending_topics (1 hour)",
+      "detail": false,
+      "count": 200,
+      "meanNs": 6250.0,
+      "medianNs": 388.0,
+      "p95Ns": 30760.0,
+      "p99Ns": 35990.0,
+      "maxNs": 44150.0,
+      "note": "~0 posts in window"
+    },
+    {
+      "label": "get_trending_topics (1 day)",
+      "detail": false,
+      "count": 200,
+      "meanNs": 108440.0,
+      "medianNs": 24080.0,
+      "p95Ns": 433980.0,
+      "p99Ns": 530660.0,
+      "maxNs": 548230.0,
+      "note": "~43,054 posts in window"
+    },
+    {
+      "label": "get_trending_topics (1 week)",
+      "detail": false,
+      "count": 200,
+      "meanNs": 535960.0,
+      "medianNs": 312750.0,
+      "p95Ns": 2060000.0,
+      "p99Ns": 2280000.0,
+      "maxNs": 2330000.0,
+      "note": "~41,942 posts in window"
+    },
+    {
+      "label": "get_trending_topics (whole corpus)",
+      "detail": false,
+      "count": 200,
+      "meanNs": 7080000.0,
+      "medianNs": 6940000.0,
+      "p95Ns": 7830000.0,
+      "p99Ns": 8720000.0,
+      "maxNs": 9330000.0,
+      "note": "~1,599,355 posts in window"
+    }
+  ],
+  "deletes": [
+    {
+      "label": "delete_user",
+      "detail": false,
+      "count": 300,
+      "meanNs": 52840000.0,
+      "medianNs": 52600000.0,
+      "p95Ns": 54710000.0,
+      "p99Ns": 60660000.0,
+      "maxNs": 62510000.0,
+      "note": "1,599,355 posts in system"
+    }
+  ],
+  "memory": {
+    "posts": 1599355.0,
+    "heldMb": 469.9,
+    "bytesPerPost": 294.0,
+    "peakMb": 469.9,
+    "topicIndexEntries": 41207.0
+  },
+  "scaling": [
+    {
+      "posts": 25000,
+      "addPostNs": 273.0,
+      "trendingDayNs": 3450.0,
+      "deleteUserNs": 648550.0
+    },
+    {
+      "posts": 50000,
+      "addPostNs": 367.0,
+      "trendingDayNs": 6760.0,
+      "deleteUserNs": 1500000.0
+    },
+    {
+      "posts": 100000,
+      "addPostNs": 322.0,
+      "trendingDayNs": 20130.0,
+      "deleteUserNs": 2420000.0
+    },
+    {
+      "posts": 200000,
+      "addPostNs": 364.0,
+      "trendingDayNs": 18440.0,
+      "deleteUserNs": 6500000.0
+    },
+    {
+      "posts": 400000,
+      "addPostNs": 420.0,
+      "trendingDayNs": 45720.0,
+      "deleteUserNs": 13290000.0
+    },
+    {
+      "posts": 800000,
+      "addPostNs": 485.0,
+      "trendingDayNs": 91250.0,
+      "deleteUserNs": 26620000.0
+    },
+    {
+      "posts": 1599355,
+      "addPostNs": 587.0,
+      "trendingDayNs": 97880.0,
+      "deleteUserNs": 52590000.0
+    }
+  ],
+  "clockOverheadNs": 19.0,
+  "skippedRows": 645,
+  "implementation": "cpp_v3",
+  "capturedFrom": "benchmark_cpp_v3.txt",
+  "builtAt": "2026-11-08T12:18:53Z"
+}

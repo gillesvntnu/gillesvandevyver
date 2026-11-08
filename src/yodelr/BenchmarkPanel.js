@@ -40,13 +40,20 @@ import React, { useEffect, useState } from 'react';
 
 /* Three captures, one per card. All three were produced by the same harness
  * -- the C++ one is a port of benchmark.py that prints the same format -- and
- * all three were measured on the same machine in the same sitting, which is
- * the only reason the cards can be read against each other at all. */
-const BENCHMARK_KEYS = ['v1', 'v2', 'cpp'];
+ * all three were measured on the same machine, which is the only reason the
+ * cards can be read against each other at all.
+ *
+ * This list is the only place a card's data is named, so a card is moved from
+ * one revision to another by editing the two lines below and the one
+ * `groups.*` it is drawn from, and nothing else. benchmark_v2.json and
+ * benchmark_cpp.json stay in public/yodelr even though no card fetches them
+ * any more: they are measurements of versions that existed, and the captures
+ * they were parsed from are committed beside them. */
+const BENCHMARK_KEYS = ['v1', 'v3', 'cpp_v3'];
 const BENCHMARK_URLS = {
   v1: `${process.env.PUBLIC_URL}/yodelr/benchmark.json`,
-  v2: `${process.env.PUBLIC_URL}/yodelr/benchmark_v2.json`,
-  cpp: `${process.env.PUBLIC_URL}/yodelr/benchmark_cpp.json`,
+  v3: `${process.env.PUBLIC_URL}/yodelr/benchmark_v3.json`,
+  cpp_v3: `${process.env.PUBLIC_URL}/yodelr/benchmark_cpp_v3.json`,
 };
 
 /* Same three-way split benchmark.py's own _unit() uses, so a number here reads
@@ -296,7 +303,8 @@ export default function BenchmarkPanel() {
   const groups = {};
   BENCHMARK_KEYS.forEach((key) => { groups[key] = groupsFor(data[key]); });
   /* One axis for all three cards. Left to themselves each chart fits the axis
-     to its own slowest call -- about 600 ms for v1, about 150 ms for v2, less
+     to its own slowest call -- about 600 ms for v1, about 130 ms for the
+     bucketed revision, less
      again for the C++ port -- so the same duration would sit at three
      different places on the page and the eye would compare bars drawn to
      three different scales. The whole point of the lower cards is the
@@ -322,26 +330,35 @@ export default function BenchmarkPanel() {
         intro={(
           <>
             The timings below come from {n(c.posts)} real tweets, {n(c.users)} users
-            and {n(c.distinct_topics)} topics. It is the public {dataset} dataset.
+            and {n(c.distinct_topics)} topics. It is the public {dataset} dataset,
+            which is an extract from Twitter in 2009.
           </>
         )}
       />
       <TimingCard
-        title="Timing with hourly buckets"
-        groups={groups.v2}
-        domain={domain}
-        intro={<>Adding hourly buckets instead of one big list</>}
-      />
-      <TimingCard
-        title="Timing in C++"
-        groups={groups.cpp}
+        title="Adding hourly buckets"
+        groups={groups.v3}
         domain={domain}
         intro={(
           <>
-            The same algorithm as the card above, written in C++ rather than
-            Python. Same tweets, same machine, same random windows — the
-            benchmark is a port of the Python one, so only the language
-            changed. The playground on the other tabs still runs the Python.
+            From the chart above, we can see that <code>get_trending_topics</code>{' '}
+            and <code>delete_user</code> take the most time. This is to be
+            expected as those scale with log(n) and n respectively, where n is
+            the total number of posts. We can optimize{' '}
+            <code>get_trending_topics</code> by putting the posts into hourly
+            buckets instead of one big timeline. This makes searching for the
+            posts significantly faster.
+          </>
+        )}
+      />
+      <TimingCard
+        title="Implementation in C++"
+        groups={groups.cpp_v3}
+        domain={domain}
+        intro={(
+          <>
+            A C++ implementation is 2 to 2.5 times faster on average than a
+            Python implementation in this case.
           </>
         )}
       />
