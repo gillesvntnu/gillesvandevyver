@@ -347,7 +347,11 @@ export default function BenchmarkPanel() {
             the total number of posts. We can optimize{' '}
             <code>get_trending_topics</code> by putting the posts into hourly
             buckets instead of one big timeline. This makes searching for the
-            posts significantly faster.
+            posts significantly faster, as can be seen in the chart below. This
+            optimization is not part of my
+            submitted solution as it adds complexity and the task did not
+            explicitly mention to optimize speed. <code>delete_user</code> could
+            be optimized by doing tombstoning.
           </>
         )}
       />
@@ -358,7 +362,8 @@ export default function BenchmarkPanel() {
         intro={(
           <>
             A C++ implementation is 2 to 2.5 times faster on average than a
-            Python implementation in this case.
+            Python implementation in this case. This version also uses the
+            bucketing described above.
           </>
         )}
       />
